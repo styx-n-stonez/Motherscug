@@ -1,0 +1,3 @@
+^Thank you. I must ask you... Don't do that again, little mother.<LINE>I understand you need to feed you and your kin... but I cannot allow you to eat what keeps me alive.<LINE>I will not talk to you anymore if you do that again.
+^My gratitude, little mother... I understand that your condition may make you hungrier than normal.<LINE>But these are very important to me, please do not do that again.
+^Thank you for listening... I understand your urges, little mother.<LINE>These are things that I cannot let do that again.

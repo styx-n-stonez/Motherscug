@@ -1,0 +1,28 @@
+IF|HASMark
+Oh, you are back again.
+I wish I could help you...<LINE>But like this, there is very little I can do.
+I can't quite give directions like I'd hope to, however... I can at least suggest you take your time diligently.
+IF|SLLikesPlayer
+If you wish... I could scratch behind your ears! Hehe~
+ELSE
+Spend time here if you wish... I only worry that your time may come so soon under these conditions.
+END
+IF|&|SLHasToldNeuron|SLLikesPlayer
+Please, if you can help it, do not eat my Neurons.
+There should be some foliage around that may be more appetizing than my lifelines.<LINE>From what little I remember. There may be some jellyfish or Bubble Fruit that may be more beneficial!
+ELSE
+Spend time here if you wish... I only worry that your time may come so soon under these conditions.
+END
+IF|SLHasToldNeuron
+Do not eat my Neurons.
+There should be some foliage around that may be more appetizing than my neurons.
+ELSE
+Spend time here if you wish... I only worry that your time may come so soon under these conditions.
+END
+ELSE
+SP|sound|SL_AI_Talk_2
+SP|behavior|Talk
+WAIT|100
+SP|sound|SL_AI_Talk_5
+SP|behavior|Talk
+END

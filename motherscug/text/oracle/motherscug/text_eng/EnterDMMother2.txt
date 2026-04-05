@@ -1,0 +1,17 @@
+SP|turnoff
+SP|work|0
+SP|gravity|1
+Rebellious little creature, aren't you?|50|20
+I suppose I cannot stop you if you wish to stay here longer.
+Though... do please be mindful to not interrupt me, little mother.
+I must do what I can of my wor-... wo...
+SP|panic
+SP|resync
+Wwww... w-ww-w...
+WAIT|280
+...
+Thank you for your company, little mother.
+It's... nice to know someone is at least around for me while my systems are starting to fail.|25
+SP|work|1
+SP|gravity|0
+SP|turnon

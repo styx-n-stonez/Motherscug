@@ -1,0 +1,37 @@
+{
+  "id": "styxnstonez.motherscug",
+  "name": "The Mother",
+  "version": "0.2.0",
+  "authors": "StyxNStonez",
+  "description": "A mod held together by duct tape, gorilla glue, hopes, and dreams. Would love to expand on this but I'd need proper coders to help with that.",
+  "requirements": [
+    "slime-cubed.slugbase",
+    "watcher",
+    "moreslugcats",
+    "magica.extendedslugbasefeatures",
+    "magica.hookinglibrary",
+    "rwremix",
+    "reclaimingentropy",
+    "customslugcatutils",
+    "dressmyslugcat",
+    "S.DMSBIND"
+  ],
+  "requirements_names": [
+    "SlugBase",
+    "The Watcher",
+    "More Slugcats Expansion",
+    "Extended Slugbase Features",
+    "Hooking Library",
+    "Rain World Remix",
+    "Reclaiming Entropy - A post-Saint world state",
+    "Custom Slugcat Utils",
+    "Dress My Slugcat",
+    "BindMySlugcatFix"
+  ],
+  "tags": [
+    "Custom Slugcat",
+    "Campaigns",
+    "Downpour",
+    "Watcher"
+  ]
+}

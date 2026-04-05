@@ -1,0 +1,52 @@
+{
+    "Slugcat": "motherscug",
+    "Oracle": "SS",
+    "Behaviors": [
+        {
+            "EnterTimes": 0,
+            "Events": [
+                {
+                    "Name": "EnterSSMother"
+                },
+                {
+                    "Name": "ThrowOut_Polite_ThrowOut"
+                }
+            ]
+        },
+        {
+            "EnterTimes": 1,
+            "Events": [
+                {
+                    "Name": "EnterSSMother1"
+                },
+                {
+                    "Name": "ThrowOut_ThrowOut"
+                }
+            ]
+        },
+        {
+            "EnterTimes": 2,
+            "Events": [
+                {
+                    "Name": "EnterSSMother2"
+                },
+                {
+                    "Name": "ThrowOut_Second_ThrowOut",
+                    "Random": true
+                }
+            ]
+        },
+        {
+            "EnterTimes": 3,
+            "Events": [
+                {
+                    "Name": "EnterSSMother3"
+                },
+                {
+                    "Name": "ThrowOut_KillOnSight",
+                    "Random": true
+                }
+            ]
+        }
+    ]
+}

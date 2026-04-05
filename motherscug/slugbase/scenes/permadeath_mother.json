@@ -1,0 +1,19 @@
+{
+	"id": "Permadeath_Mother",
+	"scene_folder": "scenes/permadeath - mother",
+	"images": [
+		{ "name": "permadeathmother - bkg 1", "pos": [350, 200], "depth": 3.7, "shader": "Basic" },
+		{ "name": "permadeathmother - bkg 2", "pos": [350, 200], "depth": 3.3, "shader": "Basic" },
+		{ "name": "permadeathmother - bkg blue fruits for da babies", "pos": [350, 200], "depth": 3.1, "shader": "Basic" },
+		{ "name": "permadeathmother - motherdead", "pos": [350, 200], "depth": 1.7, "shader": "Basic" },
+		{ "name": "permadeathmother - motherpup1 wayfarermourning", "pos": [350, 200], "depth": 1.5, "shader": "Basic" },
+		{ "name": "permadeathmother - motherpup2 weaponsmithmourning", "pos": [350, 200], "depth": 1.4, "shader": "Basic" },
+		{ "name": "permadeathmother - fg 2", "pos": [350, 200], "depth": 1.2, "shader": "Basic" },
+		{ "name": "permadeathmother - fg 1", "pos": [150, 200], "depth": 0.9, "shader": "Basic" }
+	],
+	"idle_depths": [ 2.0 ],
+	"glow_pos": [688, 484],
+	"mark_pos": [689, 583],
+	"select_menu_pos": [0, 0],
+	"slugcat_depth": 1.7
+}

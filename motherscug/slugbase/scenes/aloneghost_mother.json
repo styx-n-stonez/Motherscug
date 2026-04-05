@@ -1,0 +1,19 @@
+{
+	"id": "AloneGhost_Mother",
+	"scene_folder": "scenes/aloneghost - mother",
+	"images": [
+		{ "name": "motheralone-bkg", "pos": [40, 10], "depth": 3.7, "shader": "Basic" },
+		{ "name": "motheralone-bkg2", "pos": [40, 10], "depth": 3.3, "shader": "Basic" },
+		{ "name": "motheralone-ghosts1", "pos": [40, 10], "depth": 2.0, "shader": "Basic" },
+		{ "name": "motheralone-ghosts2", "pos": [40, 10], "depth": 1.7, "shader": "Basic" },
+		{ "name": "motheralone-ghosts3", "pos": [40, 10], "depth": 1.3, "shader": "Basic" },
+		{ "name": "motheralone-motherghostoverlay", "pos": [40, 10], "depth": 1.2, "shader": "Overlay" },
+		{ "name": "motheralone-motherghost", "pos": [40, 10], "depth": 1.0, "shader": "Basic" }
+		
+	],
+	"idle_depths": [ 1.2 ],
+	"glow_pos": [688, 484],
+	"mark_pos": [689, 583],
+	"select_menu_pos": [0, 0],
+	"slugcat_depth": 1.0
+}

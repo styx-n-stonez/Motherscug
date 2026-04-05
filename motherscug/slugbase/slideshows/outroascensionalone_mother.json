@@ -1,0 +1,69 @@
+{
+  "id": "OutroAscensionAlone_Mother",
+  "slideshow_folder": "scenes/outroascensionalone - mother",
+  "next_process": "Statistics",
+  "music": {
+    "name": "Radiarc_SubmergedEnd",
+    "fade_in": 40
+  },
+  
+  "scenes": [
+    {
+      "name": "outroascensionalone-scene1",
+      "fade_in_start": 0,
+      "fade_out_start": 7.1,
+      "images": [
+        {"name": "ascenalonefullrender_1", "pos": [0,0], "depth": 5, "shader": "Basic"}        
+      ]
+    },
+    {
+      "name": "outroascensionalone-scene2",
+      "fade_in_start": 10.1,
+      "fade_out_start": 16.25,
+      "images": [
+        {"name": "ascenalonefullrender_2", "pos": [0,0], "depth": 5, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "outroascensionalone-scene3",
+      "fade_in_start": 19.25,
+      "fade_out_start": 24.02,
+      "images": [
+        {"name": "ascenalonefullrender_3", "pos": [0,0], "depth": 5, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "outroascensionalone-scene4",
+      "fade_in_start": 26.02,
+      "fade_out_start": 32.1,
+      "images": [
+        {"name": "ascenalonefullrender_4", "pos": [0,0], "depth": 5, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "outroascensionalone-scene5",
+      "fade_in_start": 35.1,
+      "fade_out_start": 41.1,
+      "images": [
+        {"name": "ascenalonefullrender_5", "pos": [0,0], "depth": 5, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "outroascensionalone-scene6",
+      "fade_in_start": 42.8,
+      "fade_out_start": 50.2,
+      "images": [
+        {"name": "ascenalonefullrender_6", "pos": [0,0], "depth": 5, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "outroascensionalone-scene7",
+      "fade_in_start": 51.7,
+      "fade_out_start": 56.33,
+      "images": [
+        {"name": "ascenalonefullrender_7", "pos": [0,0], "depth": 5, "shader": "Basic"}
+        
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+IF|SLNeuronsLeft|5
+I think the rain is approaching.
+You better go, <little creature>! I will be fine. It's not pleasant, but I have been through it before.
+IF|SLNeuronsLeft|4
+...
+Rain... You better go. I will be fine.
+IF|SLNeuronsLeft|3
+...
+...rain... coming... Go!
+IF|SLNeuronsLeft|2
+...rain...
+run

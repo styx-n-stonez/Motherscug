@@ -1,0 +1,50 @@
+[FINDLINESTART]GM_FARM2 : 3-CicadaA-2, 4-CicadaB-5, 5-Centiwing, 6-YellowLizard-5
+[REPLACE]GM_FARM2 : 3-CicadaA-2, 4-CicadaB-5, 5-Centiwing, 6-YellowLizard-5 , 9-BasiliskLizard-{Night} , 11-BasiliskLizard-{Night}
+
+[FINDLINESTART]GM_M02 : 5-BigSpider-{Ignorecycle}-2, 5-Eel-{Night}, 7-Leech-{Ignorecycle}-8
+[REPLACE]GM_M02 : 5-BigSpider-{Ignorecycle}-2, 5-Eel-{Night}, 7-Leech-{Ignorecycle}-8 , 11-ScavengerTemplar-{Ignorecycle} , 13-ScavengerDisciple-{Ignorecycle}
+
+[FINDLINESTART]GM_M09 : 17-Salamander-2, 7-LanternMouse-{Ignorecycle}-5
+[REPLACE]GM_M09 : 17-Salamander-2, 7-LanternMouse-{Ignorecycle}-5 , 21-BasiliskLizard-{Night}
+
+[FINDLINESTART]GM_MUCK01 : 4-Leech-{Ignorecycle}-3, 2-Leech-{Ignorecycle}-3, 3-PoleMimic-{8}-{Ignorecycle}
+[REPLACE]GM_MUCK01 : 4-Leech-{Ignorecycle}-3, 2-Leech-{Ignorecycle}-3, 3-PoleMimic-{8}-{Ignorecycle} , 5-Barnacle-{Ignorecycle}-2
+
+[FINDLINESTART]GM_MUCK05 : 3-Eel-{Night}
+[REPLACE]GM_MUCK05 : 3-Eel-{Night} , GM_MUCK06 : 4-Barnacle-{Ignorecycle}
+
+[FINDLINESTART]GM_MUCK06 : 3-Leech-{Ignorecycle}-5
+[REPLACE]GM_MUCK06 : 3-Leech-{Ignorecycle}-5 , 4-Barnacle-{Ignorecycle}-2
+
+[FINDLINESTART]GM_MUCK08 : 5-Leech-{Ignorecycle}-4, 4-Leech-{Ignorecycle}-5
+[REPLACE]GM_MUCK08 : 5-Leech-{Ignorecycle}-4, 4-Leech-{Ignorecycle}-5 , 7-Barnacle-{Ignorecycle}-2
+
+[FINDLINESTART]GM_MARSH01 : 2-CicadaA, 3-CicadaB-3, 4-Garbageworm-4, 3-Eel-{Night}
+[REPLACE]GM_MARSH01 : 2-CicadaA, 3-CicadaB-3, 4-Garbageworm-4, 3-Eel-{Night} , 6-Loach , 8-BigMoth
+
+[FINDLINESTART]GM_MARSH02 : 3-Garbageworm-3, 4-Leech-{Ignorecycle}-4, 5-Leech-{Ignorecycle}-4
+[REPLACE]GM_MARSH02 : 3-Garbageworm-3, 4-Leech-{Ignorecycle}-4, 5-Leech-{Ignorecycle}-4
+
+[FINDLINESTART]GM_MARSH05 : 4-Centipede-{0.4}-3, 4-SmallCentipede-5, 3-Centiwing-2, 5-GreenLizard
+[REPLACE]GM_MARSH05 : 4-Centipede-{0.4}-3, 4-SmallCentipede-5, 3-Centiwing-2, 5-GreenLizard , 2-BasiliskLizard-{Night} , 11-BasiliskLizard-{Night}
+
+[FINDLINESTART]GM_POND : 4-Snail-3, 6-Leech-{Ignorecycle}-12
+[REPLACE]GM_POND : 4-Snail-3, 6-Leech-{Ignorecycle}-12 , 8-Loach
+
+[FINDLINESTART]GM_UNDERMUSH : 3-CicadaB-4, 4-GreenLizard, 5-Leech-{Ignorecycle}-3, 3-SmallCentipede-3
+[REPLACE]GM_UNDERMUSH : 3-CicadaB-4, 4-GreenLizard, 5-Leech-{Ignorecycle}-3, 3-SmallCentipede-3 , 6-BasiliskLizard-{Night} , 7-BasiliskLizard-{Night}
+
+[MERGE]
+CREATURES
+GM_FARM1 : 6-BasiliskLizard-{Night} , 7-BasiliskLizard-{Ignorecycle} , 8-Loach
+GM_M03 : 8-Tardigrade-3 , 9-PeachLizard
+GM_M04 : 5-ScavengerTemplar
+GM_MARSH04 : 5-BasiliskLizard
+GM_MO1 : 7-Rat-2 , 8-Rat , 2-Rat-3
+GM_MO7 : 4-ScavengerDisciple , 5-ScavengerTemplar
+GM_RB09 : 9-BasiliskLizard-{Night}-2
+GM_RB3 : 4-ScavengerTemplar
+GM_RB06 : 3-ScavengerTemplar
+GM_ROOTS5 : 2-Tardigrade-{Ignorecycle} , 5-BasiliskLizard
+END CREATURES
+[ENDMERGE]

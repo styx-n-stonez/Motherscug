@@ -1,0 +1,23 @@
+[FINDLINESTART]FU_A02 : 5-JungleLeech-{IgnoreCycle}-7, 4-Salamander, 4-Eel-{Night}
+[REPLACE]FU_A02 : 5-JungleLeech-{IgnoreCycle}-7, 4-Salamander, 4-Eel-{Night} , FU_A02 : 1-Tardigrade-{IgnoreCycle}
+
+[FINDLINESTART]FU_A07 : 3-JungleLeech-{IgnoreCycle}-8, 5-PoleMimic-{IgnoreCycle}-{12}, 4-Eel-{IgnoreCycle}
+[REPLACE]FU_A07 : 3-JungleLeech-{IgnoreCycle}-8, 5-PoleMimic-{IgnoreCycle}-{12}, 4-Eel-{IgnoreCycle} , 2-PeachLizard
+
+[FINDLINESTART]FU_A16 : 4-TentaclePlant-{IgnoreCycle}, 3-JungleLeech-{IgnoreCycle}-9
+[REPLACE]FU_A16 : 4-TentaclePlant-{IgnoreCycle}, 3-JungleLeech-{IgnoreCycle}-9 , 2-PeachLizard-{IgnoreCycle}
+
+[FINDLINESTART]FU_A21 : 3-BlueLizard, 2-PoleMimic-{IgnoreCycle}-{15}
+[REPLACE]FU_A21 : 3-BlueLizard, 2-PoleMimic-{IgnoreCycle}-{15} , 4-Frog-{IgnoreCycle} , 5-Frog-{IgnoreCycle}
+
+[FINDLINESTART]FU_A22 : 3-DropBug
+[REPLACE]FU_A22 : 3-DropBug , 2-Frog-{IgnoreCycle}-2
+
+[MERGE]
+CREATURES
+FU_B02 : 3-Tardigrade-{IgnoreCycle}
+FU_B03 : 5-PeachLizard-{IgnoreCycle}-3
+FU_C01 : 11-Frog-{IgnoreCycle}-2
+FU_HEART: 3-Tardigrade , 4-Tardigrade , 5-Tardigrade-{Slayer} , 6-Tardigrade-2 , 7-Tardigrade
+END CREATURES
+[ENDMERGE]

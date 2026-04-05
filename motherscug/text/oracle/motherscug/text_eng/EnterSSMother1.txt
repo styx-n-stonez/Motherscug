@@ -1,0 +1,21 @@
+SP|turnoff
+SP|work|0
+SP|gravity|1
+WAIT|60
+You again?
+Ah, I suppose I did not specify where you should go, have I? Apologies.
+My memory and my processes aren't quite as they once were before I had made it my goal to find the Solution.
+Right. Monologue.|30
+You're stuck in a cycle, a repeating pattern, blah blah blah. You want a way out.|25
+Know that this does not make you special - blah blah blah.<LINE>From the microbes in the processing strata, blah blah blah, I am godlike in comparison.|30
+Good news is, is in a way, I am what you are searching for. Me and my kind have as our<LINE>purpose to solve the claustrophobia, blah blah blah.<LINE>Strange charity with you the recipient, I the gift. The noble benefactors?<LINE>Gone to time and Void.|50
+Bad news: no definitive solution has been found. Blah blah blah, equipment erodes to a new state of decay.<LINE>Blah blah blah, you get the gist. Now to the important part, the way out.|80
+The old path is your only direction at this point, and greatly considering a few factors... you'll want to listen to this part.<LINE>Go to the west past the Farm Arrays, and then down into the earth<LINE>where the land fissures, as deep as you can reach, where the ancients built their temples and danced their silly rituals.<LINE>The mark should let you through.|80
+Not that it solves anyone's problem but yours and your unborn spawns's.|30
+Now with that out of the way. I did want to question one additional thing with you.|60
+How are you here?|20
+Taking a look at your scans again, you're not quite what you seem to be.<LINE>Your genomes and bodily structure suggest that you're from a further future than I could ever imagine there being.|90
+Not only that, but the fact that I had locked the gates to my district long after a little yellow rodent similar to you<LINE>made its way here suggests something I do not believe should be possible.|90
+Regardless, that is a mystery I am to not think of further.|30
+Best of luck to you, little mother.|30
+Be wary of predators, the lizards tend to go after maternal creatures to get more food.

@@ -1,0 +1,46 @@
+IF|HasMark
+SP|turnoff
+SP|work|0
+SP|gravity|1
+Unusual, plump, little creature you are...|50|20
+SP|behavior|Investigate
+... No... hold on a second.|0|50
+SP|behavior|Investigate
+WAIT|280
+Ah, I see now. Not exactly just plump... but having a little family on the way! Goodness!
+ELSE
+SP|turnoff
+SP|work|0
+SP|gravity|1
+WAIT|180
+SP|sound|SL_AI_Talk_2
+SP|behavior|Talk
+WAIT|240
+SP|behavior|Investigate
+WAIT|280
+SP|sound|SL_AI_Talk_4
+SP|behavior|Talk
+WAIT|240
+SP|behavior|Investigate
+WAIT|140
+SP|sound|SL_AI_Talk_1
+SP|behavior|Talk
+WAIT|120
+SP|karma
+... Are my words reaching you?
+END
+WAIT|80
+SP|panic
+SP|resync
+What a strange little thing you a-... ar- a...aaaaa
+WAIT|280
+Apologies for my condition, little creature.|20
+My Structure isn't in a suitable condition, as... recently, my neighbor, Five Pebbles,<LINE>has been taking in a large excess of materials needed to keep me alive.|50
+I cannot be entirely sure if I will survive for long or not...|50
+And to think, of all the strange curiosities to come to my chamber.<LINE>A bearing slugcat mother, of all the ones to come visit me.|30|20
+I believe it would be best if you were to leave, little mother.<LINE>Who knows how long I have until I shut down entirely and collapse?|0|75
+I suppose that is neither here nor there... you bear your closest treasures to you, little mother.<LINE>I believe it would be best if you left.|50
+Take care.|20
+SP|turnon
+SP|gravity|0
+SP|work|1

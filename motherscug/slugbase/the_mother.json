@@ -1,0 +1,52 @@
+{
+	"id": "motherscug",
+	"name": "The Mother",
+	"description": "Lost in a world soon to take you with it. Your journey will be one of<LINE>choices and consequences. Keep your closest treasures with you before you soon depart.",
+	"features": {
+		"color": "934AAC",
+		"start_room": "TK_TOP3",
+		"select_menu_scene": "Slugcat_Mother",
+		"select_menu_scene_ascended": "AloneGhost_Mother",
+		"sleep_scene": "SleepPreg_Mother",
+		"death_scene": "Death_Mother",
+		"starve_scene": "Starve_Mother",
+		"intro_slideshow": "Intro_Mother",
+		"outro_slideshow": "OutroAscensionAlone_Mother",
+		"motherscug/mean_lizards": 0.95,
+		"weight": [1.35 , 1.2],
+		"throw_skill": [2,1],
+		"can_maul": true,
+		"maul_blacklist" : [ "Scavenger" , "ScavengerElite" , "ScavengerTemplar" , "ScavengerDisciple" , "ScavengerKing", "LanternMouse" , "SlugNPC" ],
+		"has_dreams": true,
+		"use_default_dreams": true,
+		"food_min" : 14,
+		"food_max" : 14,
+		"diet": {
+  			"base": "Gourmand",
+  			"corpses": 1,
+  			"plants": 1,
+			"meat": 1
+  				},
+		"creature_relationships": {
+			"LanternMouse": { "PlaysWith" : 1 },
+			"Scavenger": { "Pack" : 0.5 },
+			"ScavengerElite": { "Pack" : 0.5 },
+			"ScavengerTemplar": { "Pack" : 0.5 },
+			"ScavengerDisciple": { "Pack" : 0.5 },
+			"ScavengerKing": { "Pack" : 0.5 },
+			"Snail": { "Ignore" : 1 },
+			"Yeek": { "PlaysWith" : 0.5 },
+			"BigNeedleWorm" : { "Ignore" : 0 }
+		},
+		"bite_lethality_mutliplier": 5,
+		"take_spears_from_wall": true,
+		"can_slam": true,
+		"show_rain_timer": true,
+		"limited_cycles": {
+			"cycles": 30,
+    		"death_menu_scene": "Permadeath_Mother"
+		},
+		"cycle_limited_force" : true, 
+		"lock_ascended_force" : true
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"id": "Death_Mother",
+	"scene_folder": "scenes/death - mother",
+	"images": [
+		{ "name": "motherdeath - bg3", "pos": [600, 50], "depth": 12.7, "shader": "Basic" },
+		{ "name": "motherdeath - bg2", "pos": [600, 50], "depth": 10.0, "shader": "Basic" },
+		{ "name": "motherdeath - bg1", "pos": [600, 50], "depth": 8.1, "shader": "Basic" },
+		{ "name": "motherdeath - fg1part2", "pos": [600, 50], "depth": 6.4, "shader": "Basic" },
+		{ "name": "motherdeath - fg2", "pos": [600, 50], "depth": 6.2, "shader": "Basic" },
+		{ "name": "motherdeath - deadmother", "pos": [600, 50], "depth": 4.5, "shader": "Basic" },
+		{ "name": "motherdeath - fg3 - light", "pos": [600, 50], "depth": 2.8, "shader": "Basic" },
+		{ "name": "motherdeath - fg1", "pos": [600, 50], "depth": 2.5, "shader": "Basic" }
+	],
+	"idle_depths": [ 5.5 ],
+	"glow_pos": [688, 484],
+	"mark_pos": [689, 583],
+	"select_menu_pos": [0, 0],
+	"slugcat_depth": 4.5
+}

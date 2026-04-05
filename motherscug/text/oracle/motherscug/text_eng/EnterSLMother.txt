@@ -1,0 +1,24 @@
+IF|HasMark
+Hello little creature.|30
+Your shape is familiar to me. I feel as if I... might have met your kind before.
+But my memory is so unreliable now.|30
+I see that someone has given you the gift of communication.<LINE>Must have been Five Pebbles, as you don't look like you can travel very far...
+He's sick, you know. Being corrupted from the inside by his own experiments.<LINE>Maybe they all are by now, who knows. We weren't designed to transcend and it drives us mad.
+Hm...|20
+Such a familiar feeling.|30
+...|60
+Oh.
+Little creature.
+You seem to be bearing the gift of life! Usually a very exciting time for those such as yourself.|60
+But... there's a much larger issue that I do not wish to overlook.|30
+I don't know why you spent your... last... remaining cycles coming to see me, and what I could do to better help you. However...
+Given how old you look, and given that you feel the need to rest by my side...<LINE>I fear this world is soon to take you. A postpartum lifecycle may not be possible for you.|75
+... perhaps one of the other nearby Iterators can help you? I do not know if any of them are left... but.
+They may be your best option to stay alive to witness your kin, little mother.
+ELSE
+SP|sound|SL_AI_Talk_1
+SP|behavior|Talk
+WAIT|130
+SP|sound|SL_AI_Talk_3
+SP|behavior|Talk
+END

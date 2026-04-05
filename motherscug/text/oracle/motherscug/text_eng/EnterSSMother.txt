@@ -1,0 +1,41 @@
+IF|HasMark
+SP|turnoff
+SP|work|0
+SP|gravity|1
+WAIT|130
+SP|behavior|Investigate
+... A fat little thing you are, it seems.
+SP|behavior|Investigate
+Question is, where did you get that Mark from? Surely not from me, otherwise I would've remembered you<LINE>waddling into my chamber from above. Are you perhaps related to the other rotund beast that had come in here?
+No...no that was so long ago. Or was it?<LINE>Regardless, I cannot afford distractions right now. Allow me to get my monologue over with.
+ELSE
+SP|turnoff
+SP|work|0
+SP|gravity|1
+WAIT|135
+SP|sound|SS_AI_Talk_3
+SP|behavior|Talk
+WAIT|130
+SP|behavior|Investigate
+WAIT|155
+SP|sound|SS_AI_Talk_5
+SP|behavior|Talk
+WAIT|150
+SP|behavior|Investigate
+WAIT|450
+SP|sound|SS_AI_Talk_1
+SP|behavior|Talk
+WAIT|100
+SP|karma
+END
+WAIT|60
+A little animal, on the floor of my chamber. I think I know what you are looking for.
+You're stuck in a cycle, a repeating pattern. You want a way out...
+... No.|40
+No, something is... quite wrong with you.
+Having had given you a scan. It seems you've gotten yourself quite the family to worry about.
+I suppose that is much the nature of creatures in the wild, they tend to find a mate and of course bring spawn into the world.|60
+You, little animal, on one hand will benefit from my advice, as your lifetime is quite limited.
+I was not a medical facility even when the equipment was functioning, and performing on an animal with my illness may cause an<LINE>unfortunate development to occur during the process of extracting your kin, leaving them the same type of sick I am.|90
+There is nothing more I can do for you, it is best you leave.
+Best of luck to you.|30

@@ -1,0 +1,43 @@
+{
+    "Slugcat": "motherscug",
+    "Oracle": "DM",
+    "Behaviors": [
+        {
+            "EnterTimes": 0,
+            "Events": [
+                {
+                    "Name": "EnterDMMother"
+                },
+                {
+                    "Name": "ThrowOut_Polite_ThrowOut"
+                }
+            ]
+        },
+        {
+            "EnterTimes": 1,
+            "Events": [
+                {
+                    "Name": "EnterDMMother1"
+                },
+                {
+                    "Name": "ThrowOut_Polite_ThrowOut"
+                }
+            ]
+        },
+        {
+            "EnterTimes": 2,
+            "Events": [
+                {
+                    "Name": "EnterDMMother2"
+                },
+                {
+                    "Name": "Moon_SlumberParty",
+                    "Loop": true,
+                    "Random": true,
+                    "MinWait": 5,
+                    "MaxWait": 10
+                }
+            ]
+        }
+    ]
+}

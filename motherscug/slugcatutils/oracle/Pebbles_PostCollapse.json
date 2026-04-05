@@ -1,0 +1,37 @@
+{
+    "Slugcat": "motherscug",
+    "Oracle": "CL",
+    "Behaviors": [
+        {
+            "EnterTimes": 0,
+            "Events": [
+                {
+                    "Name": "EnterCLMother"
+                }
+            ]
+        },
+        {
+            "EnterTimes": 1,
+            "Events": [
+                {
+                    "Name": "EnterCLMother1",
+                    "Random": true
+                }
+            ]
+        }
+    ],
+    "Conversations": {
+        "HalcyonStolen": {
+            "Name": "HalcyonStolenCLMother",
+            "Random": true
+        },
+        "Rain": {
+            "Name": "StormCLMother",
+            "Random": true
+        },
+        "DeadPlayer": {
+            "Name": "DeathCLMother",
+            "Random": true
+        }
+    }
+}

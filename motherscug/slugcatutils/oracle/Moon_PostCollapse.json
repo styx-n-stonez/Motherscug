@@ -1,0 +1,38 @@
+{
+    "Slugcat": "motherscug",
+    "Oracle": "SL",
+    "Behaviors": [
+        {
+            "EnterTimes": 0,
+            "Events": [
+                {
+                    "Name": "EnterSLMother"
+                }
+            ]
+        },
+        {
+            "EnterTimes": 1,
+            "Events": [
+                {
+                    "Name": "EnterSLMother1"
+                }
+            ]
+        }
+    ],
+    "Conversations": {
+        "HoldNeuron": {
+            "Name": "HoldNeuronMother",
+            "Random": true
+        },
+        "ReleaseNeuron": {
+            "Name": "ReleaseNeuronMotherLike",
+            "Random": true
+        },
+        "DeadPlayer": {
+            "Name": "DeathSLMother"
+        },
+        "Rain": {
+            "Name": "RainSLMotherFirst"
+        }
+    }
+}

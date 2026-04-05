@@ -1,0 +1,26 @@
+[FINDLINE]OFFSCREEN : 0-Vulture-2, 0-Deer-2, 0-Scavenger-20, 0-ScavengerElite-{Ignorecycle}-6
+[REPLACE]OFFSCREEN : 0-Vulture-2, 0-Deer-2, 0-Scavenger-20, 0-ScavengerElite-{Ignorecycle}-6 , 0-BigMoth-6 , 0-SmallMoth-10
+
+[FINDLINE]SO_A10 : 7-TentaclePlant-{Ignorecycle}, 6-JungleLeech-{Ignorecycle}-6, 5-Eel-{Ignorecycle}
+[REPLACE]SO_A10 : 7-TentaclePlant-{Ignorecycle}, 6-JungleLeech-{Ignorecycle}-6, 5-Eel-{Ignorecycle} , 6-Barnacle-2
+
+[FINDLINE]SO_B10 : 3-JungleLeech-{Ignorecycle}-2, 2-JungleLeech-{Ignorecycle}-3
+[REPLACE]SO_B10 : 3-JungleLeech-{Ignorecycle}-2, 2-JungleLeech-{Ignorecycle}-3 , 4-Barnacle-2
+
+[FINDLINE]SO_C01 : 9-Eel-{Ignorecycle}, 10-JungleLeech-{Ignorecycle}-7
+[REPLACE]SO_C01 : 9-Eel-{Ignorecycle}, 10-JungleLeech-{Ignorecycle}-7 , 13-Tardigrade-{Slayer}
+
+[FINDLINE]SO_C02 : 3-WhiteLizard-{Night}, 4-Centiwing-3
+[REPLACE]SO_C02 : 3-WhiteLizard-{Night}, 4-Centiwing-3 , 9-ScavengerTemplar-2 , 10-ScavengerDisciple , 11-ScavengerTemplar
+
+[MERGE]
+CREATURES
+SO_A20 : 7-ScavengerTemplar-2 , 8-ScavengerDisciple
+SO_A35 : 5-Rat-3 
+SO_A45 : 3-Rat-2 , 5-ScavengerTemplar
+SO_A63 : 2-Rat
+SO_B02 : 9-ScavengerTemplar
+SO_B05 : 5-Rat-4
+SO_B11 : 10-ScavengerTemplar , 12-ScavengerDisciple
+END CREATURES
+[ENDMERGE]

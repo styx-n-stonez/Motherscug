@@ -1,0 +1,16 @@
+{
+	"id": "SleepPreg_Mother",
+	"scene_folder": "scenes/sleeppreg - mother",
+	"images": [
+		{ "name": "sleep - 5", "pos": [650, 250], "depth": 7.7, "shader": "Basic" },
+		{ "name": "sleep - 4", "pos": [650, 200], "depth": 7.0, "shader": "Basic" },
+		{ "name": "sleep - 3", "pos": [650, 175], "depth": 6.8, "shader": "Basic" },
+		{ "name": "sleep - 2 - motherpreg", "pos": [650, 150], "depth": 5.5, "shader": "Basic" },
+		{ "name": "sleep - 1", "pos": [400, 0], "depth": 3.8, "shader": "Basic" }
+	],
+	"idle_depths": [ 2.8 ],
+	"glow_pos": [688, 484],
+	"mark_pos": [689, 583],
+	"select_menu_pos": [0, 0],
+	"slugcat_depth": 5.5
+}

@@ -1,0 +1,29 @@
+{
+    "Slugcat": "motherscug",
+    "Oracle": "RW",
+    "Behaviors": [
+        {
+            "EnterTimes": 0,
+            "Events": [
+                {
+                    "Name": "EnterRWMother"
+                }
+            ]
+        },
+        {
+            "EnterTimes": 1,
+            "Events": [
+                {
+                    "Name": "EnterRWMother1",
+                    "Random": true
+                }
+            ]
+        }
+    ],
+    "Conversations": {
+        "HalcyonStolen": {
+            "Name": "HalcyonStolenRWMother",
+            "Random": true
+        }
+    }
+}

@@ -1,0 +1,11 @@
+^You should not be here. This facility is in a constant state of decay.<LINE>Nothing in here is hospitable to the normal definition of life.
+Please, leave quickly, while you still can. 
+^I used to be furious at the idea of creatures crawling through my superstructure.<LINE>However, I am actually grateful for this rare opportunity to not be alone.
+However, you really shouldn't stay. It's too dangerous. 
+^Why have you returned? Do you have a death wish?<LINE>I have nothing left to give you... please leave, for your own sake. 
+^...
+Your company is welcome little mother, but please do not stay. 
+^You're back again.
+... Please do not stay long, little mother. As much as I enjoy your company.<LINE>It is too dangerous to stay alive here.
+^Foolish animal...
+... I cannot say I don't enjoy the company. But...<LINE>Do not stay long. It is not suitable to live in these environments.

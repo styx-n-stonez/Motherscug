@@ -1,0 +1,16 @@
+{
+	"id": "Slugcat_Mother",
+	"scene_folder": "scenes/slugcat - mother",
+	"images": [
+		{ "name": "MotherBG2", "pos": [350, 200], "depth": 3.7, "shader": "Basic" },
+		{ "name": "MotherBG1", "pos": [350, 200], "depth": 2.8, "shader": "Basic" },
+		{ "name": "MotherRender", "pos": [350, 200], "depth": 2.2, "shader": "Basic" },
+		{ "name": "MotherForeground1", "pos": [350, 200], "depth": 2.0, "shader": "Basic" },
+		{ "name": "MotherForeground2", "pos": [350, 200], "depth": 1.8, "shader": "Basic" }
+	],
+	"idle_depths": [ 2.8 ],
+	"glow_pos": [688, 484],
+	"mark_pos": [689, 583],
+	"select_menu_pos": [0, 0],
+	"slugcat_depth": 2.2
+}

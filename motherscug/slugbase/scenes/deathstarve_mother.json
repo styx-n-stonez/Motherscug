@@ -1,0 +1,16 @@
+{
+	"id": "Starve_Mother",
+	"scene_folder": "scenes/deathstarve - mother",
+	"images": [
+		{ "name": "starvemother - bg2", "pos": [600, 50], "depth": 10.0, "shader": "Basic" },
+		{ "name": "starvemother - bg1", "pos": [600, 50], "depth": 9.0, "shader": "Basic" },
+		{ "name": "starvemother - motherstarved", "pos": [600, 50], "depth": 4.5, "shader": "Basic" },
+		{ "name": "starvemother - fg1", "pos": [600, 50], "depth": 3.8, "shader": "Basic" },
+		{ "name": "starvemother - fg2", "pos": [600, 50], "depth": 2.5, "shader": "Basic" }
+	],
+	"idle_depths": [ 5.5 ],
+	"glow_pos": [688, 484],
+	"mark_pos": [689, 583],
+	"select_menu_pos": [0, 0],
+	"slugcat_depth": 4.5
+}

@@ -1,0 +1,76 @@
+{
+  "id": "Intro_Mother",
+  "slideshow_folder": "scenes/intro - mother",
+  "next_process": "Game",
+  "music": {
+    "name": "RW_161 - Childhoods End",
+    "fade_in": 15
+  },
+  
+  "scenes": [
+    {
+      "name": "intro-scene1",
+      "fade_in_start": 0,
+      "fade_out_start": 7.1,
+      "images": [
+        {"name": "wip1", "pos": [0,0], "depth": 1, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "intro-scene2",
+      "fade_in_start": 8.1,
+      "fade_out_start": 15.25,
+      "images": [
+        {"name": "wip2", "pos": [0,0], "depth": 1, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "intro-scene3",
+      "fade_in_start": 16.25,
+      "fade_out_start": 19.33,
+      "images": [
+        {"name": "wip3", "pos": [0,0], "depth": 1, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "intro-scene4",
+      "fade_in_start": 20.33,
+      "fade_out_start": 26.1,
+      "images": [
+        {"name": "wip4", "pos": [0,0], "depth": 1, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "intro-scene5",
+      "fade_in_start": 27.1,
+      "fade_out_start": 33.1,
+      "images": [
+        {"name": "wip5", "pos": [0,0], "depth": 1, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "intro-scene6",
+      "fade_in_start": 34.1,
+      "fade_out_start": 37.55,
+      "images": [
+        {"name": "wip6", "pos": [0,0], "depth": 1, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "intro-scene7",
+      "fade_in_start": 38.55,
+      "fade_out_start": 46.33,
+      "images": [
+        {"name": "wip7", "pos": [0,0], "depth": 1, "shader": "Basic"}
+      ]
+    },
+    {
+      "name": "intro-scene8",
+      "fade_in_start": 47.33,
+      "fade_out_start": 52.1,
+      "images": [
+        {"name": "wip8", "pos": [0,0], "depth": 1, "shader": "Basic"}
+      ]
+    }
+  ]
+}

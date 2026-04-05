@@ -1,0 +1,26 @@
+[FINDLINESTART]OFFSCREEN : 0-Scavenger-5-{Ignorecycle}, 0-BigEel-{Ignorecycle}, 0-KingVulture-{Night}
+[REPLACE]OFFSCREEN : 0-Scavenger-5-{Ignorecycle}, 0-BigEel-{Ignorecycle}, 0-KingVulture-{Night} , 0-BigMoth-{IgnoreCycle}-2
+
+[FINDLINE]AQ_B01 : 4-Salamander-{Ignorecycle}
+[REPLACE]AQ_B01 : 4-Salamander-{Ignorecycle} , 8-Tardigrade-{Ignorecycle}
+
+[FINDLINE]AQ_B02 : 2-TentaclePlant-{Ignorecycle}
+[REPLACE]AQ_B02 : 2-TentaclePlant-{Ignorecycle} , 6-Tardigrade-{Ignorecycle}-2
+
+[FINDLINE]AQ_E04 : 7-BlackLizard-{Ignorecycle}, 5-Centipede-{Ignorecycle}
+[REPLACE]AQ_E04 : 7-BlackLizard-{Ignorecycle}, 5-Centipede-{Ignorecycle} , 14-BigMoth 
+
+[FINDLINE]AQ_G03 : 6-BlackLizard-{Ignorecycle}, 3-Centipede-{0.75}-{Ignorecycle}, 3-SmallCentipede-{Ignorecycle}-3, 4-SmallCentipede-{Ignorecycle}-2, 7-SmallCentipede-{Ignorecycle}-2, 7-RedCentipede-{Night}
+[REPLACE]AQ_G03 : 6-BlackLizard-{Ignorecycle}, 3-Centipede-{0.75}-{Ignorecycle}, 3-SmallCentipede-{Ignorecycle}-3, 4-SmallCentipede-{Ignorecycle}-2, 7-SmallCentipede-{Ignorecycle}-2, 7-RedCentipede-{Night} , 10-Loach
+
+[FINDLINE]AQ_H03 : 8-Salamander-{Ignorecycle}, 10-Salamander-{Ignorecycle}
+[REPLACE]AQ_H03 : 8-Salamander-{Ignorecycle}, 10-Salamander-{Ignorecycle} , 5-PeachLizard-{Ignorecycle} , 11-PeachLizard-{Ignorecycle} , 12-Barnacle-{Ignorecycle}-2 , 13-Tardigrade-{Ignorecycle}
+
+[FINDLINE]AQ_J01 : 6-SmallCentipede-{Ignorecycle}, 7-Centipede-{0.5}-{Ignorecycle}, 6-Centipede-{0.3}-{Ignorecycle}-2, 7-SmallCentipede-{Ignorecycle}-4, 10-DropBug-{Ignorecycle}, 8-Yeek-4
+[REPLACE]AQ_J01 : 6-SmallCentipede-{Ignorecycle}, 7-Centipede-{0.5}-{Ignorecycle}, 6-Centipede-{0.3}-{Ignorecycle}-2, 7-SmallCentipede-{Ignorecycle}-4, 10-DropBug-{Ignorecycle}, 8-Yeek-4 , 1-Tardigrade-{Ignorecycle} , 2-Tardigrade-{Ignorecycle} , 11-PeachLizard , 12-Loach
+
+[FINDLINE]AQ_J02 : 10-JetFish-{Ignorecycle}-3, 11-Eel-{Ignorecycle}-2
+[REPLACE]AQ_J02 : 10-JetFish-{Ignorecycle}-3, 11-Eel-{Ignorecycle}-2 , 0-Angler
+
+[FINDLINE]AQ_UP2 : 4-JetFish-{Ignorecycle}, 2-Eel-{Ignorecycle}
+[REPLACE]AQ_UP2 : 4-JetFish-{Ignorecycle}, 2-Eel-{Ignorecycle} , 5-Tardigrade-{Ignorecycle}-3

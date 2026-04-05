@@ -1,0 +1,22 @@
+SP|turnoff
+SP|work|0
+SP|gravity|1
+Hello again, little mother.|50|20
+Why... have you come back?<LINE>Do you not realize the danger you are in?|20|50
+I suppose it cannot be helped to be curious.<LINE>I must warn you... as I'm sure you're not quite aware yet.<LINE>Your life is in very real danger, little mother. Not only because of the fact that you remain here...
+During a bearing mother's gestation period, one's Karma tends to fluctuate in ways that may cause a<LINE>permanent release from the cycle in ways that a mother may not want to happen.|50
+Given the prior scans I have done on you, it seems bearing your kin has taken a great toll on you...<LINE>One that may cause the end of your life if you are to deliver them without help.
+By the look on your face, you don't quite understand what The Cycle is, do you, little Mother? Not many of us do. Though, one thing to note is that...
+SP|panic
+SP|resync
+Tha-tttthhhh... th...th...
+WAIT|280
+Apologies...|20
+As I was saying, it's not difficult to assume you have some inituitive knowledge of The Cycle as it stands.<LINE>Like sleep like death... you wake back up again, whether you want to or not.
+Not many records are out there as to the effects of death during deliverance, but... some say that<LINE>those who have died during the birthing process do not wake up again.
+It is... safe to say that if the rumors are true. You should take great caution in staying here much longer.<LINE>I cannot perform on you as if I were to... and I were to be interrupted... you would not be awake to see your kin.
+It is best if you leave now, little mother.|25
+Best of luck to you.|20
+SP|turnon
+SP|gravity|0
+SP|work|1

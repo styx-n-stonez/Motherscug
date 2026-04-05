@@ -1,0 +1,18 @@
+IF|SLNeuronsLeft|5
+I think the rain is approaching.
+You better go, little mother! I will be fine. It's not pleasant, but I have been through it before.
+...
+What's with that confused look? Never mind... go! Go!
+IF|SLNeuronsLeft|4
+...
+Rain... You better go. I will be fine.
+... why do you look like that? Go!
+IF|SLNeuronsLeft|3
+...
+...rain... coming... Go!
+don't... look... go!
+IF|SLNeuronsLeft|2
+...rain...
+run
+...
+run...!
