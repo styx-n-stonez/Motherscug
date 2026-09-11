@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <LangVersion>11</LangVersion>
+        <DebugType>portable</DebugType>
+        <AssemblyName>Mother</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="../lib/*.dll">
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <Target Name="DeployMod" AfterTargets="Build" Condition="'$(RainWorldModDir)' != ''">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(RainWorldModDir)/newest/plugins" />
+    </Target>
+
+</Project>

@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build mod
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build
+        run: dotnet build src/Mother.csproj -c Release
+
+      # Produces a ready-to-drop-in mod folder. Any plugin DLLs committed under
+      # mod/newest/plugins are replaced by the fresh build so stale copies never ship.
+      - name: Assemble mod folder
+        shell: pwsh
+        run: |
+          $out = "artifact/motherscug"
+          New-Item -ItemType Directory -Force $out | Out-Null
+          Copy-Item mod/* $out -Recurse
+          $plugins = "$out/newest/plugins"
+          if (Test-Path $plugins) { Remove-Item "$plugins/*.dll" }
+          New-Item -ItemType Directory -Force $plugins | Out-Null
+          Copy-Item src/bin/Release/net48/Mother.dll $plugins
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: motherscug-${{ github.sha }}
+          path: artifact
+
+  validate-json:
+    name: Validate JSON
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse every JSON file under mod/
+        shell: python
+        run: |
+          import glob, json, sys
+          files = glob.glob("mod/**/*.json", recursive=True)
+          failed = 0
+          for f in files:
+              try:
+                  with open(f, encoding="utf-8-sig") as fh:
+                      json.load(fh)
+              except Exception as e:
+                  failed += 1
+                  print(f"::error file={f}::{e}")
+          print(f"Checked {len(files)} files, {failed} invalid")
+          sys.exit(1 if failed else 0)
