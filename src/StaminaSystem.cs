@@ -48,12 +48,8 @@ namespace MotherMod
 
             if (Plugin.Stamina.TryGet(self, out var config) && !data.TryGetValue(self, out _))
             {
-                data.Add(self, new StaminaData(config));
-
-                Plugin.DebugLogging = config.Debug;
-
-                Plugin.LogSource?.LogInfo($"[Mother] stamina initialized for player (debug={config.Debug})");
-                Plugin.Log("Config", $"effective {config}");
+                StaminaData d = new StaminaData(config);
+                data.Add(self, d);
             }
         }
 
@@ -196,8 +192,6 @@ namespace MotherMod
                 float origChance = self.lizardParams.biteDamageChance;
                 float biased = Mathf.Min(1f, origChance * d.config.StunBiteDeathMult);
                 self.lizardParams.biteDamageChance = biased;
-                Plugin.Log("Exh2", $"bite-bias applied lizard={self.abstractCreature?.creatureTemplate?.type} " +
-                                   $"chance={origChance:0.###}->{biased:0.###} mult={d.config.StunBiteDeathMult}");
                 try { orig(self, chunk); }
                 finally { self.lizardParams.biteDamageChance = origChance; }
             }

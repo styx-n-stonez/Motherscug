@@ -1,6 +1,6 @@
 {"frames": {
 
-"TailTexture.png":
+"Mother_TailTexture.png":
 {
 	"frame": {"x":2,"y":2,"w":150,"h":75},
 	"rotated": false,
@@ -11,7 +11,7 @@
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
-	"image": "tail.png",
+	"image": "mother_tail.png",
 	"format": "RGBA8888",
 	"size": {"w":154,"h":79},
 	"scale": "1",
