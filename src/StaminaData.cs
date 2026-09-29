@@ -26,7 +26,10 @@ namespace MotherMod
         private int stunFramesRemaining;
         private CreatureSpasmer spasmer;
 
+        private const string EARLY_BIRTH_COUNT_KEY = "motherEarlyBirthCount";
         private int earlyBirthCount;
+
+        private string lastCountReadSkip;
         private bool earlyBirthTriggered;
 
         private string emptyDeferReason;
@@ -60,7 +63,6 @@ namespace MotherMod
         private static readonly Dictionary<string, SoundID> soundCache = new Dictionary<string, SoundID>();
 
         private bool heartLockedToAudio;
-        private string heartClipLogged;
         private static readonly HashSet<string> warnedSounds = new HashSet<string>();
 
         public float HeartPhase { get; private set; }
@@ -113,7 +115,6 @@ namespace MotherMod
 
                 if (emptyDeferReason != null)
                 {
-                    Plugin.Log("Exh2", $"stun deferral cleared reason=death mode={config.ExhaustionEmptyMode}");
                     emptyDeferReason = null;
                 }
 
@@ -123,7 +124,6 @@ namespace MotherMod
                     dangerouslyExhausted = false;
                     if (spasmer != null && !spasmer.slatedForDeletetion) spasmer.Destroy();
                     spasmer = null;
-                    Plugin.Log("Exh2", "danger state cleared reason=death");
                 }
 
                 StopFeelAudio("death");
@@ -139,8 +139,6 @@ namespace MotherMod
             }
 
             if (Plugin.Stamina.TryGet(self, out var lc)) live = lc;
-            Plugin.DebugLogging = live.Debug;
-
             if (hitCooldownFrames > 0) hitCooldownFrames--;
 
             UpdateFeel(self);
@@ -154,7 +152,6 @@ namespace MotherMod
             bool zeroG = self.EffectiveRoomGravity < config.ZeroGThreshold;
             if (zeroG != wasZeroG)
             {
-                Plugin.Log("Exh2", $"zero-g {(zeroG ? "enter" : "leave")} gravity={self.EffectiveRoomGravity:0.###} threshold={config.ZeroGThreshold}");
                 wasZeroG = zeroG;
             }
 
@@ -174,14 +171,10 @@ namespace MotherMod
             if (!exhausted && stamina <= config.OverexertEnter)
             {
                 exhausted = true;
-                Plugin.Log("Exh2", $"zone enter stamina={stamina:0.#} enter={config.OverexertEnter} " +
-                                   $"speedMult={config.OverexertSpeedMult}->{config.OverexertSpeedMultMin} " +
-                                   $"slow[climb={config.OverexertSlowClimb} swim={config.OverexertSlowSwim} throw={config.OverexertSlowThrow}]");
             }
             else if (exhausted && stamina >= config.OverexertExit)
             {
                 exhausted = false;
-                Plugin.Log("Exh2", $"zone leave stamina={stamina:0.#} exit={config.OverexertExit}");
             }
 
             if (dangerouslyExhausted)
@@ -203,10 +196,6 @@ namespace MotherMod
 
                 if (movingWhileCollapsed != wasMovingWhileCollapsed)
                 {
-                    if (movingWhileCollapsed)
-                        Plugin.Log("Exhaustion", $"collapse-move start action=move drain={config.ExhaustionMoveDrainRate} stamina={stamina:0.#}");
-                    else
-                        Plugin.Log("Exhaustion", $"collapse-move stop reason=holding-still stamina={stamina:0.#}");
                     wasMovingWhileCollapsed = movingWhileCollapsed;
                 }
 
@@ -217,12 +206,10 @@ namespace MotherMod
                     dangerouslyExhausted = false;
                     pendingActDeath = false;
                     wasMovingWhileCollapsed = false;
-                    Plugin.Log("Exhaustion", $"survive stand-up stamina={stamina:0.#} exit={config.ExhaustionExit} survivalTimer={survivalTimer}");
                 }
                 else if (pendingActDeath || survivalTimer <= 0)
                 {
                     dangerouslyExhausted = false;
-                    Plugin.Log("Exhaustion", $"death path={(pendingActDeath ? "act-while-empty" : "timeout")} survivalTimer={survivalTimer} stamina={stamina:0.#}");
                     pendingActDeath = false;
                     wasMovingWhileCollapsed = false;
                     self.Die();
@@ -241,9 +228,6 @@ namespace MotherMod
                 {
                     if (emptyDeferReason != defer)
                     {
-                        if (emptyDeferReason != null)
-                            Plugin.Log("Exh2", $"stun deferral cleared reason=gating-changed mode={config.ExhaustionEmptyMode}");
-                        Plugin.Log("Exh2", $"stun deferred reason={defer} mode={config.ExhaustionEmptyMode} stamina={stamina:0.#}");
                         emptyDeferReason = defer;
                     }
                 }
@@ -251,8 +235,6 @@ namespace MotherMod
                 {
                     if (emptyDeferReason != null)
                     {
-                        Plugin.Log("Exh2", "stun deferral cleared " +
-                            $"reason={(emptyDeferReason == "submerged" ? "surfaced" : "exited-shortcut")} mode={config.ExhaustionEmptyMode}");
                         emptyDeferReason = null;
                     }
 
@@ -262,9 +244,6 @@ namespace MotherMod
             }
             else if (emptyDeferReason != null)
             {
-                Plugin.Log("Exh2", stamina > 0f
-                    ? $"stun deferral cleared reason=recovered mode={config.ExhaustionEmptyMode} stamina={stamina:0.#}"
-                    : $"stun deferral cleared reason=gating-changed mode={config.ExhaustionEmptyMode}");
                 emptyDeferReason = null;
             }
 
@@ -273,11 +252,11 @@ namespace MotherMod
 
         private void EnterEmptyState(Player self)
         {
-            earlyBirthCount++;
-            int remaining = config.EarlyBirthLimit - earlyBirthCount;
-            Plugin.Log("Exh2", $"early-birth counter={earlyBirthCount} limit={config.EarlyBirthLimit} remaining={remaining}");
+            int count = ReadEarlyBirthCount(self) + 1;
+            WriteEarlyBirthCount(self, count);
+            int remaining = config.EarlyBirthLimit - count;
 
-            if (earlyBirthCount >= config.EarlyBirthLimit)
+            if (count >= config.EarlyBirthLimit)
             {
                 earlyBirthTriggered = true;
                 TriggerEarlyBirth(self);
@@ -291,7 +270,6 @@ namespace MotherMod
                 pendingActDeath = false;
                 wasMovingWhileCollapsed = false;
                 StopContinuousLogs("suspended");
-                Plugin.Log("Exhaustion", $"enter DANGEROUS exhaustion stamina={stamina:0.#} survivalTimer={survivalTimer}");
             }
             else
             {
@@ -301,7 +279,6 @@ namespace MotherMod
                 framesSinceJump = 99999;
                 chainCount = 0;
                 StopContinuousLogs("suspended");
-                Plugin.Log("Exh2", $"stun enter frames={stunFramesRemaining} feed={config.StunFeedPerFrame}");
 
                 self.Stun(config.StunFeedPerFrame);
                 UpdateForcedStun(self);
@@ -332,39 +309,72 @@ namespace MotherMod
                 rechargeDelayTimer = 0;
                 if (spasmer != null && !spasmer.slatedForDeletetion) spasmer.Destroy();
                 spasmer = null;
-                Plugin.Log("Exh2", $"stun exit refill={stamina:0.#}");
 
                 if (exhausted && stamina >= config.OverexertExit)
                 {
                     exhausted = false;
-                    Plugin.Log("Exh2", $"zone leave stamina={stamina:0.#} exit={config.OverexertExit}");
                 }
             }
         }
 
+        private static DeathPersistentSaveData CampaignSaveData(Player self, out string skipReason)
+        {
+            skipReason = null;
+            RainWorldGame game = self?.abstractCreature?.world?.game;
+
+            if (game == null) { skipReason = "no-game"; return null; }
+            if (!game.IsStorySession) { skipReason = "not-story"; return null; }
+            DeathPersistentSaveData dpsd = game.GetStorySession.saveState?.deathPersistentSaveData;
+            if (dpsd == null) { skipReason = "no-death-persistent-data"; return null; }
+            return dpsd;
+        }
+
+        private int ReadEarlyBirthCount(Player self)
+        {
+            DeathPersistentSaveData dpsd = CampaignSaveData(self, out lastCountReadSkip);
+            if (dpsd == null) return earlyBirthCount;
+            lastCountReadSkip = null;
+            int stored = dpsd.GetSlugBaseData().TryGet(EARLY_BIRTH_COUNT_KEY, out int n) ? n : 0;
+
+            return stored > earlyBirthCount ? stored : earlyBirthCount;
+        }
+
+        private void WriteEarlyBirthCount(Player self, int count)
+        {
+            earlyBirthCount = count;
+            DeathPersistentSaveData dpsd = CampaignSaveData(self, out string skipReason);
+            if (dpsd == null)
+            {
+                return;
+            }
+            dpsd.GetSlugBaseData().Set(EARLY_BIRTH_COUNT_KEY, count);
+        }
+
         private void TriggerEarlyBirth(Player self)
         {
-            Plugin.Log("Exh2", $"EARLY BIRTH triggered count={earlyBirthCount} limit={config.EarlyBirthLimit}");
             forcedStun = false;
             dangerouslyExhausted = false;
 
-            var game = self.abstractCreature?.world?.game;
-            if (game != null && game.IsStorySession)
+            DeathPersistentSaveData dpsd = CampaignSaveData(self, out string skipReason);
+            if (dpsd != null)
             {
-                var dpsd = game.GetStorySession.saveState?.deathPersistentSaveData;
-                if (dpsd != null)
-                {
-                    dpsd.GetSlugBaseData().Set("motherEarlyBirth", true);
-                    Plugin.Log("Exh2", "early-birth flag motherEarlyBirth=true (death-persistent)");
-                }
-                else
-                {
-                    Plugin.Log("Exh2", "early-birth flag skipped reason=no-death-persistent-data");
-                }
+                dpsd.GetSlugBaseData().Set("motherEarlyBirth", true);
             }
             else
             {
-                Plugin.Log("Exh2", "early-birth flag skipped reason=not-story");
+            }
+
+            RainWorldGame game = self.abstractCreature?.world?.game;
+            if (config.EarlyBirthEndMode == "off")
+            {
+            }
+            else if (CampaignEnding.End(game, "scene"))
+            {
+                StopContinuousLogs("campaign-end");
+                forcedStun = true;
+                stunFramesRemaining = int.MaxValue;
+                UpdateForcedStun(self);
+                return;
             }
 
             self.Die();
@@ -504,7 +514,6 @@ namespace MotherMod
                 vineGraceFrames = 0;
                 if (sig != null && !Mathf.Approximately(rate, activeDrainRate))
                 {
-                    Plugin.Log("Exh2", $"drain-rate change source={sig} rate/s={rate:0.###} stamina={stamina:0.#}");
                     activeDrainRate = rate;
                 }
                 return;
@@ -517,10 +526,6 @@ namespace MotherMod
                 return;
             }
 
-            if (activeDrainSig != null)
-                Plugin.Log("Exh2", $"drain stop source={activeDrainSig} stamina={stamina:0.#}");
-            if (sig != null)
-                Plugin.Log("Exh2", $"drain start source={sig} rate/s={rate:0.###} stamina={stamina:0.#}");
             activeDrainSig = sig;
             activeDrainRate = rate;
             vineGraceFrames = 0;
@@ -530,13 +535,11 @@ namespace MotherMod
         {
             if (activeDrainSig != null)
             {
-                Plugin.Log("Exh2", $"drain stop source={activeDrainSig} reason={reason} stamina={stamina:0.#}");
                 activeDrainSig = null;
                 activeDrainRate = 0f;
             }
             if (activeGainTag != null)
             {
-                Plugin.Log("Exh2", $"gain stop source={activeGainTag} reason={reason} stamina={stamina:0.#}");
                 activeGainTag = null;
             }
             vineGraceFrames = 0;
@@ -588,15 +591,11 @@ namespace MotherMod
                     stamina = Mathf.Min(config.StaminaMax, stamina + PerFrame(applied));
                     if (tag != activeGainTag)
                     {
-                        if (activeGainTag != null)
-                            Plugin.Log("Exh2", $"gain stop source={activeGainTag} stamina={stamina:0.#}");
-                        Plugin.Log("Exh2", $"gain start source={tag} rate/s={applied:0.###} throttled={exhausted} stamina={stamina:0.#}");
                         activeGainTag = tag;
                         activeGainRate = applied;
                     }
                     else if (!Mathf.Approximately(applied, activeGainRate))
                     {
-                        Plugin.Log("Exh2", $"gain-rate change source={tag} rate/s={applied:0.###} throttled={exhausted} stamina={stamina:0.#}");
                         activeGainRate = applied;
                     }
                     return;
@@ -605,7 +604,6 @@ namespace MotherMod
 
             if (activeGainTag != null)
             {
-                Plugin.Log("Exh2", $"gain stop source={activeGainTag} stamina={stamina:0.#}");
                 activeGainTag = null;
             }
         }
@@ -659,7 +657,6 @@ namespace MotherMod
         {
             if (ForcedStunActive)
             {
-                Plugin.Log("Exh2", "jump skipped reason=stunned");
                 return;
             }
 
@@ -674,7 +671,6 @@ namespace MotherMod
         {
             if (ForcedStunActive)
             {
-                Plugin.Log("Exh2", "jump skipped reason=stunned");
                 return;
             }
             DrainJump("wallJump", config.PoleWallJumpCost);
@@ -682,43 +678,34 @@ namespace MotherMod
 
         public void NotifyThrow(Player self, PhysicalObject thrown, float throwMult)
         {
-            if (throwMult < 0.999f)
-                Plugin.Log("Exh2", $"throw weakened mult={throwMult:0.###} depth={OverexertDepth:0.##} type={thrown.GetType().Name}");
-
             if (ForcedStunActive)
             {
-                Plugin.Log("Exh2", $"throw skipped reason=stunned type={thrown.GetType().Name}");
                 return;
             }
             if (thrown is Spear) DrainAction("spearThrow", config.SpearThrowCost, isAct: false);
             else if (thrown is Rock) DrainAction("rockThrow", config.RockThrowCost, isAct: false);
-            else Plugin.Log("Exh2", $"throw uncharged type={thrown.GetType().Name}");
         }
 
         public void NotifyEat(Player self, IPlayerEdible edible)
         {
             if (DangerouslyExhausted)
             {
-                Plugin.Log("Exh2", $"eat skipped reason={(forcedStun ? "stunned" : "collapsed")} type={edible.GetType().Name}");
                 return;
             }
 
             if (edible is DangleFruit rottenCheck && rottenCheck.AbstrConsumable.rotted)
             {
-                Plugin.Log("Exh2", "eat uncredited reason=rotten type=DangleFruit");
                 return;
             }
 
             int nourishment = SlugcatStats.NourishmentOfObjectEaten(self.SlugCatClass, edible);
             if (nourishment <= 0)
             {
-                Plugin.Log("Exh2", $"eat uncredited reason=no-nourishment type={edible.GetType().Name} nourishment={nourishment}");
                 return;
             }
 
             float credit = nourishment * (config.EatGainPerPip / 4f);
             stamina = Mathf.Min(config.StaminaMax, stamina + credit);
-            Plugin.Log("Exh2", $"gain action=eat amount={credit:0.#} pips={nourishment / 4f:0.##} type={edible.GetType().Name} stamina={stamina:0.#}");
         }
 
         public void NotifyHit(Player self, Creature.DamageType type, float damage, float stunBonus)
@@ -727,13 +714,11 @@ namespace MotherMod
             if (damage <= 0f && stunBonus <= 0f) return;
             if (forcedStun)
             {
-                Plugin.Log("Exh2", $"hit uncharged reason=stunned type={type}");
                 return;
             }
             if (hitCooldownFrames > 0) return;
             hitCooldownFrames = config.HitCostCooldown;
             stamina = Mathf.Max(0f, stamina - config.HitStaminaCost);
-            Plugin.Log("Exh2", $"drain action=hit cost={config.HitStaminaCost:0.#} type={type} damage={damage:0.##} stun={stunBonus:0.#} stamina={stamina:0.#}");
         }
 
         private void UpdateFeel(Player self)
@@ -742,7 +727,6 @@ namespace MotherMod
 
             if (tier != feelTier)
             {
-                Plugin.Log("Exh2", $"feel tier={TierName(tier)} from={TierName(feelTier)} stamina={stamina:0.#}");
                 feelTier = tier;
                 lastSlowStep = -1;
             }
@@ -753,7 +737,6 @@ namespace MotherMod
                 if (step != lastSlowStep)
                 {
                     lastSlowStep = step;
-                    Plugin.Log("Exh2", $"slowdown depth={OverexertDepth:0.##} speedMult={SpeedMult:0.###} stamina={stamina:0.#}");
                 }
             }
 
@@ -775,7 +758,6 @@ namespace MotherMod
                 if (!heartLockedToAudio)
                 {
                     heartLockedToAudio = true;
-                    Plugin.Log("Exh2", $"heartbeat clock=audio-locked sound={heartPlayingName} tier={TierName(tier)}");
                 }
 
                 HeartPhase = Mathf.Repeat(audioPhase + live.HeartbeatPhaseOffset, 1f);
@@ -785,7 +767,6 @@ namespace MotherMod
             if (heartLockedToAudio)
             {
                 heartLockedToAudio = false;
-                Plugin.Log("Exh2", $"heartbeat clock=free reason=no-playing-clip tier={TierName(tier)}");
             }
             float period = tier == 2
                 ? Mathf.Lerp(live.HeartbeatSlow, live.HeartbeatFast, ExhaustionIntensity)
@@ -804,14 +785,6 @@ namespace MotherMod
 
             var clip = src.clip;
             if (clip == null || clip.length <= 0f) return false;
-
-            if (heartClipLogged != heartPlayingName)
-            {
-                heartClipLogged = heartPlayingName;
-                Plugin.Log("Exh2", $"heartbeat clip id={heartPlayingName} clipLen={clip.length:0.###}s " +
-                    $"beatsPerLoop={live.HeartbeatBeatsPerLoop:0.##} beatLen={clip.length / Mathf.Max(0.01f, live.HeartbeatBeatsPerLoop):0.###}s " +
-                    $"offset={live.HeartbeatPhaseOffset:0.###}");
-            }
 
             float beatLen = clip.length / Mathf.Max(0.01f, live.HeartbeatBeatsPerLoop);
             phase = Mathf.Repeat(src.time / beatLen, 1f);
@@ -844,7 +817,6 @@ namespace MotherMod
             if (stale)
             {
                 em.alive = false;
-                Plugin.Log("Exh2", $"feel-audio stop sound={tag} id={playingName}");
                 em = null;
                 playingName = null;
             }
@@ -863,7 +835,6 @@ namespace MotherMod
                 em = self.room.PlaySound(id, self.mainBodyChunk, loop: true, vol, 1f);
                 em.requireActiveUpkeep = true;
                 playingName = wantName;
-                Plugin.Log("Exh2", $"feel-audio start sound={tag} id={wantName} vol={vol:0.##}");
             }
             em.alive = true;
             em.volume = vol;
@@ -875,14 +846,12 @@ namespace MotherMod
             if (heartEmitter != null)
             {
                 heartEmitter.alive = false;
-                Plugin.Log("Exh2", $"feel-audio stop sound=heartbeat id={heartPlayingName} reason={reason}");
                 heartEmitter = null;
                 heartPlayingName = null;
             }
             if (breathEmitter != null)
             {
                 breathEmitter.alive = false;
-                Plugin.Log("Exh2", $"feel-audio stop sound=breath id={breathPlayingName} reason={reason}");
                 breathEmitter = null;
                 breathPlayingName = null;
             }
@@ -907,8 +876,6 @@ namespace MotherMod
             chainCount = (framesSinceJump <= config.ChainJumpWindow) ? chainCount + 1 : 0;
             framesSinceJump = 0;
             float mult = 1f + chainCount * config.ChainJumpMultiplier;
-            if (chainCount > 0)
-                Plugin.Log("Exh2", $"chain-jump escalation action={action} chainCount={chainCount} mult={mult:0.###}");
             DrainAction(action, baseCost * mult, isAct: true);
         }
 
@@ -916,19 +883,16 @@ namespace MotherMod
         {
             stamina = Mathf.Max(0f, stamina - amount);
             rechargeDelayTimer = config.RechargeDelay;
-            Plugin.Log("Exh2", $"drain action={action} cost={amount:0.#} stamina={stamina:0.#}");
 
             if (dangerouslyExhausted && isAct)
             {
                 if (config.ExhaustionActFatal)
                 {
                     pendingActDeath = true;
-                    Plugin.Log("Exhaustion", $"act-while-empty FATAL action={action} (act_fatal=true)");
                 }
                 else
                 {
                     survivalTimer -= config.ExhaustionActPenalty;
-                    Plugin.Log("Exhaustion", $"act-while-empty penalty action={action} framesRemoved={config.ExhaustionActPenalty} survivalTimer={survivalTimer}");
                 }
             }
         }

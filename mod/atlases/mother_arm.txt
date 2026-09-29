@@ -1,6 +1,6 @@
 {"frames": {
 
-"OnTopOfTerrainHand.png":
+"Mother_OnTopOfTerrainHand.png":
 {
 	"frame": {"x":2,"y":2,"w":15,"h":12},
 	"rotated": false,
@@ -8,7 +8,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":15,"h":12},
 	"sourceSize": {"w":15,"h":12}
 },
-"OnTopOfTerrainHand2.png":
+"Mother_OnTopOfTerrainHand2.png":
 {
 	"frame": {"x":19,"y":2,"w":14,"h":11},
 	"rotated": false,
@@ -16,7 +16,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":14,"h":11},
 	"sourceSize": {"w":14,"h":11}
 },
-"PlayerArm0.png":
+"Mother_PlayerArm0.png":
 {
 	"frame": {"x":2,"y":16,"w":244,"h":64},
 	"rotated": false,
@@ -24,7 +24,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm1.png":
+"Mother_PlayerArm1.png":
 {
 	"frame": {"x":2,"y":82,"w":244,"h":64},
 	"rotated": false,
@@ -32,7 +32,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm2.png":
+"Mother_PlayerArm2.png":
 {
 	"frame": {"x":2,"y":148,"w":244,"h":64},
 	"rotated": false,
@@ -40,7 +40,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm3.png":
+"Mother_PlayerArm3.png":
 {
 	"frame": {"x":2,"y":214,"w":244,"h":64},
 	"rotated": false,
@@ -48,7 +48,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm4.png":
+"Mother_PlayerArm4.png":
 {
 	"frame": {"x":2,"y":280,"w":244,"h":64},
 	"rotated": false,
@@ -56,7 +56,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm5.png":
+"Mother_PlayerArm5.png":
 {
 	"frame": {"x":2,"y":346,"w":244,"h":64},
 	"rotated": false,
@@ -64,7 +64,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm6.png":
+"Mother_PlayerArm6.png":
 {
 	"frame": {"x":2,"y":412,"w":244,"h":64},
 	"rotated": false,
@@ -72,7 +72,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm7.png":
+"Mother_PlayerArm7.png":
 {
 	"frame": {"x":2,"y":478,"w":244,"h":64},
 	"rotated": false,
@@ -80,7 +80,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm8.png":
+"Mother_PlayerArm8.png":
 {
 	"frame": {"x":2,"y":544,"w":244,"h":64},
 	"rotated": false,
@@ -88,7 +88,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm9.png":
+"Mother_PlayerArm9.png":
 {
 	"frame": {"x":2,"y":610,"w":244,"h":64},
 	"rotated": false,
@@ -96,7 +96,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm10.png":
+"Mother_PlayerArm10.png":
 {
 	"frame": {"x":2,"y":676,"w":244,"h":64},
 	"rotated": false,
@@ -104,7 +104,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm11.png":
+"Mother_PlayerArm11.png":
 {
 	"frame": {"x":2,"y":742,"w":244,"h":64},
 	"rotated": false,
@@ -112,7 +112,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":244,"h":64},
 	"sourceSize": {"w":244,"h":64}
 },
-"PlayerArm12.png":
+"Mother_PlayerArm12.png":
 {
 	"frame": {"x":2,"y":808,"w":244,"h":64},
 	"rotated": false,
@@ -123,7 +123,7 @@
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
-	"image": "arm.png",
+	"image": "mother_arm.png",
 	"format": "RGBA8888",
 	"size": {"w":248,"h":874},
 	"scale": "1",

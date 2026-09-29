@@ -20,7 +20,6 @@ namespace MotherMod
             this.config = config;
 
             active = Futile.atlasManager.DoesContainElementWithName("MotherVignette");
-            Plugin.Log("Overlay", $"init active={active}");
             if (!active) return;
 
             vignette = new FSprite("MotherVignette")

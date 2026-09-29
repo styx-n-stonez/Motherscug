@@ -1,6 +1,6 @@
 {"frames": {
 
-"HipsA.png":
+"Mother_HipsA.png":
 {
 	"frame": {"x":0,"y":0,"w":32,"h":38},
 	"rotated": false,
@@ -11,7 +11,7 @@
 "meta": {
 	"app": "https://www.codeandweb.com/tgreenturepacker",
 	"version": "1.0",
-	"image": "EXtemplatehips.png",
+	"image": "mother_hips.png",
 	"format": "RGBA8888",
 	"size": {"w":32,"h":38},
 	"scale": "1",

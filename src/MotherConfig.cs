@@ -9,7 +9,6 @@ namespace MotherMod
     {
         public const float TICKS_PER_SECOND = 40f;
 
-        public bool Debug = false;
 
         public float StaminaMax = 1000f;
 
@@ -71,6 +70,8 @@ namespace MotherMod
         public float StunBiteDeathMult = 2f;
         public int   EarlyBirthLimit = 5;
 
+        public string EarlyBirthEndMode = "scene";
+
         public float ZeroGThreshold = 0.1f;
 
         public int   ExhaustionSurvivalTime = 160;
@@ -128,10 +129,25 @@ namespace MotherMod
         public float HudFadeIn = 0.05f;
         public float HudFadeOut = 0.025f;
 
+        public bool SpritesEnabled = true;
+        public bool SpritesKeepVanillaTint = true;
+
+        public bool  SpritesRecolor    = false;
+        public Color SpritesColorBody  = new Color(0.07f, 0.07f, 0.07f);
+        public Color SpritesColorHips  = new Color(0.07f, 0.07f, 0.07f);
+        public Color SpritesColorHead  = new Color(0.07f, 0.07f, 0.07f);
+        public Color SpritesColorArms  = new Color(0.07f, 0.07f, 0.07f);
+        public Color SpritesColorHands = new Color(0.07f, 0.07f, 0.07f);
+        public Color SpritesColorTail  = new Color(0.07f, 0.07f, 0.07f);
+
+        public Color SpritesColorFace  = new Color(-1f, -1f, -1f);
+
         public static MotherConfig Default => new MotherConfig();
 
         private static string warnedBandClamp;
         private static string warnedEmptyMode;
+        private static string warnedEndMode;
+        private static int warnedEarlyBirthLimit = int.MinValue;
         private static string warnedStunFeedClamp;
 
         public static MotherConfig FromJson(JsonAny json)
@@ -139,7 +155,17 @@ namespace MotherMod
             var o = json.AsObject();
             var c = new MotherConfig();
 
-            c.Debug = B(o, "debug", c.Debug);
+
+            c.SpritesEnabled = B(o, "sprites_enabled", c.SpritesEnabled);
+            c.SpritesKeepVanillaTint = B(o, "sprites_keep_vanilla_tint", c.SpritesKeepVanillaTint);
+            c.SpritesRecolor = B(o, "sprites_recolor", c.SpritesRecolor);
+            c.SpritesColorBody = C(o, "sprites_color_body", c.SpritesColorBody);
+            c.SpritesColorHips = C(o, "sprites_color_hips", c.SpritesColorHips);
+            c.SpritesColorHead = C(o, "sprites_color_head", c.SpritesColorHead);
+            c.SpritesColorArms = C(o, "sprites_color_arms", c.SpritesColorArms);
+            c.SpritesColorHands = C(o, "sprites_color_hands", c.SpritesColorHands);
+            c.SpritesColorTail = C(o, "sprites_color_tail", c.SpritesColorTail);
+            c.SpritesColorFace = C(o, "sprites_color_face", c.SpritesColorFace);
 
             c.StaminaMax = F(o, "stamina_max", c.StaminaMax);
 
@@ -240,7 +266,39 @@ namespace MotherMod
             }
             c.PostStunRefill = Mathf.Min(F(o, "post_stun_refill", c.PostStunRefill), c.StaminaMax);
             c.StunBiteDeathMult = F(o, "stun_bite_death_mult", c.StunBiteDeathMult);
-            c.EarlyBirthLimit = I(o, "early_birth_limit", c.EarlyBirthLimit);
+
+            int rawLimit = I(o, "early_birth_limit", c.EarlyBirthLimit);
+            if (rawLimit < 1)
+            {
+                if (warnedEarlyBirthLimit != rawLimit)
+                {
+                    warnedEarlyBirthLimit = rawLimit;
+                    Plugin.LogSource?.LogWarning(
+                        $"[Mother][Config] early_birth_limit clamped to 1 (was {rawLimit}; below 1 would end the campaign on the first dangerous exhaustion)");
+                }
+                rawLimit = 1;
+            }
+            c.EarlyBirthLimit = rawLimit;
+
+            string rawEndMode = S(o, "early_birth_end_mode", c.EarlyBirthEndMode);
+            if (string.Equals(rawEndMode, "off", System.StringComparison.OrdinalIgnoreCase))
+            {
+                c.EarlyBirthEndMode = "off";
+            }
+            else
+            {
+                bool known = string.IsNullOrEmpty(rawEndMode)
+                    || string.Equals(rawEndMode, "scene", System.StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(rawEndMode, "esf", System.StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(rawEndMode, "redsgameover", System.StringComparison.OrdinalIgnoreCase);
+                if (!known && warnedEndMode != rawEndMode)
+                {
+                    warnedEndMode = rawEndMode;
+                    Plugin.LogSource?.LogWarning(
+                        $"[Mother][Config] early_birth_end_mode \"{rawEndMode}\" not recognized — using \"scene\" (expected \"scene\" or \"off\")");
+                }
+                c.EarlyBirthEndMode = "scene";
+            }
 
             c.ZeroGThreshold = F(o, "zero_g_threshold", c.ZeroGThreshold);
 
@@ -331,24 +389,6 @@ namespace MotherMod
                 return new Color(r / 255f, g / 255f, b / 255f);
             }
             return fallback;
-        }
-
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-            sb.Append($"MotherConfig(debug={Debug}, staminaMax={StaminaMax}, ");
-            sb.Append($"discrete[slide={SlideCost} jump={JumpCost} poleWall={PoleWallJumpCost} chain[{ChainJumpWindow}f x{ChainJumpMultiplier}] spear={SpearThrowCost} rock={RockThrowCost} boostSwim={BoostSwimCost}], ");
-            sb.Append($"drains/s[roll={RollDrainPerSecond} walk={WalkDrainPerSecond} swim={SwimDrainPerSecond} float={FloatDrainPerSecond} poleHold={PoleHoldDrainPerSecond} poleClimb={PoleClimbDrainPerSecond} vineHold={VineHoldDrainPerSecond} vineClimb={VineClimbDrainPerSecond} carryLight={CarryLightDrainPerSecond} carryHeavy={CarryHeavyDrainPerSecond} pup={SlugpupCarryDrainPerSecond}], ");
-            sb.Append($"gains[eatPerPip={EatGainPerPip} stand/s={StandGainPerSecond} lay/s={LayGainPerSecond} iterator/s={IteratorGainPerSecond} iterRadius={IteratorRestRadius} iterOracles=[{string.Join(",", IteratorRestOracles)}] delay={RechargeDelay} zoneMult={ExhaustedRechargeMult}], ");
-            sb.Append($"zone[enter={OverexertEnter} exit={OverexertExit} speedMult={OverexertSpeedMult}->{OverexertSpeedMultMin} slow[climb={OverexertSlowClimb} swim={OverexertSlowSwim} throw={OverexertSlowThrow}]], ");
-            sb.Append($"hit[cost={HitStaminaCost} cooldown={HitCostCooldown}], ");
-            sb.Append($"feel[heart zone={FeelHeartbeatZoneSound}@{FeelHeartbeatVolZone} stun={FeelHeartbeatStunSound}@{FeelHeartbeatVolStun} breath={FeelBreathSound}@{FeelBreathVolZone}/{FeelBreathVolStun} hudPulse={HudPulseScale}], ");
-            sb.Append($"empty[mode={ExhaustionEmptyMode} stunSec={ExhaustionStunSeconds} stunFeed={StunFeedPerFrame} refill={PostStunRefill} biteMult={StunBiteDeathMult} earlyBirthLimit={EarlyBirthLimit} zeroG<{ZeroGThreshold}], ");
-            sb.Append($"collapse[t{ExhaustionSurvivalTime} rec{ExhaustionRecoveryRate} exit{ExhaustionExit} act{ExhaustionActPenalty} fatal{ExhaustionActFatal} movePen{ExhaustionMovePenalty} moveDrain{ExhaustionMoveDrainRate}], ");
-            sb.Append($"intensityW[t{IntensityTimeWeight} s{IntensityStaminaWeight}], pulse[shape{PulseShape} base{PulseBase} depth{PulseDepth} atk{PulseAttack} dec{PulseDecay} sus{PulseSustain}], ");
-            sb.Append($"vignette[maxA{VignetteMaxAlpha} col{VignetteColor}], heartbeat[{HeartbeatSlow}->{HeartbeatFast} sync={HeartbeatSyncAudio} beats/loop={HeartbeatBeatsPerLoop} offset={HeartbeatPhaseOffset}], shake{ShakeMax}, ");
-            sb.Append($"hud[pips={HudPipCount} sp={HudPipSpacing} sc={HudPipScale} showBelow={HudShowBelow} y={HudYOffset} fill={HudFillColor} zoneCol={HudZoneColor} reveal={HudRevealFrames} dim={HudEmptyDim} fade[{HudFadeIn}/{HudFadeOut}]])");
-            return sb.ToString();
         }
     }
 }

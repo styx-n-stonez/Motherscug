@@ -8,6 +8,8 @@ namespace MotherMod
 {
     [BepInPlugin(MOD_ID, "The Mother", "0.2.0")]
     [BepInDependency("slime-cubed.slugbase")]
+
+    [BepInDependency("customslugcatutils", BepInDependency.DependencyFlags.SoftDependency)]
     class Plugin : BaseUnityPlugin
     {
         private const string MOD_ID = "styxnstonez.motherscug";
@@ -19,20 +21,11 @@ namespace MotherMod
 
         public static readonly GameFeature<float> MeanLizards = GameFloat("motherscug/mean_lizards");
 
-        public static bool DebugLogging;
-
         internal static BepInEx.Logging.ManualLogSource LogSource;
-
-        public static void Log(string tag, string msg)
-        {
-            if (!DebugLogging) return;
-            LogSource?.LogDebug($"[Mother][{tag}] {msg}");
-        }
 
         public void OnEnable()
         {
             LogSource = base.Logger;
-            LogSource.LogInfo("The Mother 0.2.0 loaded");
 
             if (!ExtEnumBase.TryParse(typeof(SoundID), BREATH_SOUND, false, out _))
             {
@@ -44,6 +37,7 @@ namespace MotherMod
             StaminaSystem.Register();
             StaminaHud.Register();
             PredatorAI.Register();
+            MotherSprites.Register();
 
             On.Lizard.ctor += Lizard_ctor;
         }
@@ -54,6 +48,8 @@ namespace MotherMod
 
         private void LoadResources(RainWorld rainWorld)
         {
+            MotherSprites.LoadAtlases();
+
             if (Futile.atlasManager.GetAtlasWithName("MotherVignette") != null) return;
 
             string path = AssetManager.ResolveFilePath("illustrations/mother_vignette.png");
@@ -62,15 +58,12 @@ namespace MotherMod
                 var fileTex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
                 AssetManager.SafeWWWLoadTexture(ref fileTex, path, clampWrapMode: true, crispPixels: false);
                 Futile.atlasManager.LoadAtlasFromTexture("MotherVignette", fileTex, false);
-                Log("Overlay", $"vignette source=file path={path} size={fileTex.width}x{fileTex.height}");
                 return;
             }
 
             var tex = GenerateVignetteTexture();
 
             Futile.atlasManager.LoadAtlasFromTexture("MotherVignette", tex, false);
-            Log("Overlay", $"vignette source=generated size={VIGNETTE_SIZE}x{VIGNETTE_SIZE} " +
-                           $"innerClear={VIGNETTE_INNER_CLEAR} outerOpaque={VIGNETTE_OUTER_OPAQUE}");
         }
 
         private static Texture2D GenerateVignetteTexture()
