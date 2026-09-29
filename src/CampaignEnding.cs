@@ -26,7 +26,7 @@ namespace MotherMod
             if (!switching)
             {
                 Plugin.LogSource?.LogWarning(
-                    "[Mother][End] WARNING campaign end did NOT start — no process switch is pending " +
+                    "[Mother][End] WARNING campaign end did NOT start " +
                     "(a dialog may have queued it, or another mod's finalization dropped it). " +
                     "Falling back to an ordinary death; the campaign is NOT over.");
                 return false;
@@ -35,8 +35,8 @@ namespace MotherMod
             if (!sceneApplied)
             {
                 Plugin.LogSource?.LogWarning(
-                    "[Mother][End] WARNING ending scene NOT applied — the campaign is ending but the " +
-                    "permadeath scene was not written. Check that the_mother.json still declares " +
+                    "[Mother][End] WARNING ending scene NOT applied " +
+                    "Check that the_mother.json still declares " +
                     "limited_cycles (with death_menu_scene), and that no mod was toggled in Remix " +
                     "mid-session (progression refuses to save when the mod set changed).");
             }
