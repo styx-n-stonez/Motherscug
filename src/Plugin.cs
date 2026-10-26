@@ -40,6 +40,7 @@ namespace MotherMod
             StaminaHud.Register();
             PredatorAI.Register();
             MotherSprites.Register();
+            CravingsSystem.Register();
 
             Content.Register(FoxCritob.AllVariants());
 
@@ -121,6 +122,8 @@ namespace MotherMod
             var tex = GenerateVignetteTexture();
 
             Futile.atlasManager.LoadAtlasFromTexture("MotherVignette", tex, false);
+
+            CravingsSystem.LateRegister();
         }
 
         private static Texture2D GenerateVignetteTexture()

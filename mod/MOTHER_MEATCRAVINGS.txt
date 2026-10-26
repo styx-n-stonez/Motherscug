@@ -1,0 +1,8 @@
+PinkLizard
+GreenLizard
+BlueLizard
+YellowLizard
+WhiteLizard
+BlackLizard
+Salamander
+CyanLizard
