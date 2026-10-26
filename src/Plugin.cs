@@ -38,6 +38,7 @@ namespace MotherMod
             StaminaHud.Register();
             PredatorAI.Register();
             MotherSprites.Register();
+            CravingsSystem.Register();
 
             On.Lizard.ctor += Lizard_ctor;
         }
@@ -64,6 +65,8 @@ namespace MotherMod
             var tex = GenerateVignetteTexture();
 
             Futile.atlasManager.LoadAtlasFromTexture("MotherVignette", tex, false);
+
+            CravingsSystem.LateRegister();
         }
 
         private static Texture2D GenerateVignetteTexture()
