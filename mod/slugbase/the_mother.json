@@ -78,8 +78,8 @@
 
 			"_doc_gains": "GAINS -- eating credits eat_gain_per_pip stamina for every FOOD PIP the item gives (a quarter-pip item credits a quarter of it; ignores delay + zone throttle). Rotted blue fruit credits 0 (detected directly); anything the game reports as zero-nourishment also credits 0. Passive rest = HIGHEST single rate that applies, only while holding still: stand (grounded; in zero-G it applies while fully still without ground), lay (crouched/crawling + grounded), iterator (within iterator_rest_radius px of an Oracle; iterator_rest_oracles lists qualifying IDs like SS/SL, empty = all). Passive gains wait recharge_delay frames after any action and are multiplied by exhausted_recharge_mult inside the red zone.",
 			"eat_gain_per_pip": 100,
-			"stand_gain_per_second": 5,
-			"lay_gain_per_second": 10,
+			"stand_gain_per_second": 10,
+			"lay_gain_per_second": 20,
 			"iterator_gain_per_second": 25,
 			"iterator_rest_radius": 300,
 			"iterator_rest_oracles": [],
