@@ -1,5 +1,6 @@
 using System.IO;
 using BepInEx;
+using Fisobs.Core;
 using UnityEngine;
 using SlugBase.Features;
 using static SlugBase.Features.FeatureTypes;
@@ -10,6 +11,7 @@ namespace MotherMod
     [BepInDependency("slime-cubed.slugbase")]
 
     [BepInDependency("customslugcatutils", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("io.github.dual.fisobs")]
     class Plugin : BaseUnityPlugin
     {
         private const string MOD_ID = "styxnstonez.motherscug";
@@ -39,7 +41,56 @@ namespace MotherMod
             PredatorAI.Register();
             MotherSprites.Register();
 
+            Content.Register(FoxCritob.AllVariants());
+
+            On.SandboxGameSession.SpawnEntity += SandboxGameSession_SpawnEntity;
+
+            FoxState.Register();
+
+            FoxPathTieBreak.Install();
+
+            FoxPoleDestination.Install();
+
+            FoxWallAccess.Install();
+
+            FoxSandboxIcon.Install();
+
             On.Lizard.ctor += Lizard_ctor;
+        }
+
+        private static void SandboxGameSession_SpawnEntity(
+            On.SandboxGameSession.orig_SpawnEntity orig, SandboxGameSession self,
+            ArenaBehaviors.SandboxEditor.PlacedIconData p)
+        {
+            if (p == null || p.data.critType == null || !FoxCritob.IsFoxType(p.data.critType))
+            {
+                orig(self, p);
+                return;
+            }
+
+            AbstractRoom room = (self != null && self.game != null && self.game.world != null)
+                ? self.game.world.GetAbstractRoom(0)
+                : null;
+            if (room == null || room.creatures == null)
+            {
+                orig(self, p);
+                return;
+            }
+
+            int before = room.creatures.Count;
+
+            orig(self, p);
+
+            WorldCoordinate placed = new WorldCoordinate(
+                0, Mathf.RoundToInt(p.pos.x / 20f), Mathf.RoundToInt(p.pos.y / 20f), -1);
+
+            for (int i = before; i < room.creatures.Count; i++)
+            {
+                AbstractCreature c = room.creatures[i];
+                if (c == null) continue;
+
+                c.pos = placed;
+            }
         }
 
         private const int   VIGNETTE_SIZE          = 256;
@@ -49,6 +100,10 @@ namespace MotherMod
         private void LoadResources(RainWorld rainWorld)
         {
             MotherSprites.LoadAtlases();
+
+            FoxParams.Load();
+
+            FoxAtlas.Load();
 
             if (Futile.atlasManager.GetAtlasWithName("MotherVignette") != null) return;
 

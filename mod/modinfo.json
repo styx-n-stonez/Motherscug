@@ -13,8 +13,7 @@
     "rwremix",
     "reclaimingentropy",
     "customslugcatutils",
-    "dressmyslugcat",
-    "S.DMSBIND"
+    "fisobs"
   ],
   "requirements_names": [
     "SlugBase",
@@ -25,8 +24,7 @@
     "Rain World Remix",
     "Reclaiming Entropy - A post-Saint world state",
     "Custom Slugcat Utils",
-    "Dress My Slugcat",
-    "BindMySlugcatFix"
+    "Fisobs"
   ],
   "tags": [
     "Custom Slugcat",

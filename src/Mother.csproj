@@ -5,6 +5,7 @@
         <LangVersion>11</LangVersion>
         <DebugType>portable</DebugType>
         <AssemblyName>Mother</AssemblyName>
+        <RootNamespace>MotherMod</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

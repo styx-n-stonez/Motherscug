@@ -50,6 +50,8 @@ namespace MotherMod
             {
                 StaminaData d = new StaminaData(config);
                 data.Add(self, d);
+
+                d.LogEarlyBirthStatus(self);
             }
         }
 
