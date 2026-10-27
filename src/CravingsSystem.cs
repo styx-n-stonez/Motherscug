@@ -30,7 +30,7 @@ namespace MotherMod
             set
             {
                 _activeMeatCraving = value;
-                CravingValue = value.value;
+                CravingValue = value?.value;
             }
         }
         private static AbstractPhysicalObject.AbstractObjectType _ActiveCraving;
@@ -43,12 +43,30 @@ namespace MotherMod
             set
             {
                 _ActiveCraving = value;
-                CravingValue = value.value;
+                CravingValue = value?.value;
             }
         }
         public static string CravingValue = string.Empty;
-
-        public static bool IsMeat = false;
+        private static bool _isMeat;
+        public static bool IsMeat
+        {
+            get
+            {
+                return _isMeat;
+            }
+            set
+            {
+                _isMeat = value;
+                if (value)
+                {
+                    ActiveCraving = null;
+                }
+                else
+                {
+                    ActiveMeatCraving = null;
+                }
+            }
+        }
 
         public static float Multiplier = 1.5f;
         public static void Register()
@@ -75,13 +93,17 @@ namespace MotherMod
                 {
                     string[] op = line.Split(',');
                     AbstractPhysicalObject.AbstractObjectType type = new(op[0].Trim());
-                    if (type.index == -1) continue;
+                    if (type.index == -1)
+                    {
+                        Plugin.LogSource.LogDebug($"Food object craving does not exists (missing mod or dlc?): {op[0].Trim()}");
+                        continue;
+                    }
                     PossibleCravings.Add(type);
-                    if (op.Length > 1 && int.TryParse(op[1].Trim(),out int cMul))
+                    if (op.Length > 1 && float.TryParse(op[1].Trim(),out float cMul))
                     {
                         CravingsMultipliers[type] = cMul;
                     }
-                    Plugin.LogSource.LogDebug("Registered object craving: {type.value}");
+                    Plugin.LogSource.LogDebug($"Registered object craving: {type.value}");
                 }
             }
             else
@@ -98,9 +120,13 @@ namespace MotherMod
                 {
                     string[] op = line.Split(',');
                     CreatureTemplate.Type type = new(op[0].Trim());
-                    if (type.index == -1) continue;
+                    if (type.index == -1)
+                    {
+                        Plugin.LogSource.LogDebug($"Meat craving does not exists (missing mod or dlc?): {op[0].Trim()}");
+                        continue;
+                    }
                     PossibleMeatCravings.Add(type);
-                    if (op.Length > 1 && int.TryParse(op[1].Trim(), out int cMul))
+                    if (op.Length > 1 && float.TryParse(op[1].Trim(), out float cMul))
                     {
                         MeatCravingsMultipliers[type] = cMul;
                     }
@@ -116,7 +142,7 @@ namespace MotherMod
         private static int SlugcatStats_NourishmentOfObjectEaten(On.SlugcatStats.orig_NourishmentOfObjectEaten orig, SlugcatStats.Name slugcatIndex, IPlayerEdible eatenobject)
         {
             if (slugcatIndex == MotherEnums.Mother &&
-                ((IsMeat && (eatenobject as Creature).Template.type == ActiveMeatCraving)
+                ((IsMeat && eatenobject is Creature crit && crit.Template.type == ActiveMeatCraving)
                 || (eatenobject as PhysicalObject).abstractPhysicalObject.type == ActiveCraving))
             {
                 return Mathf.RoundToInt(orig(slugcatIndex, eatenobject) * Multiplier);
@@ -145,8 +171,7 @@ namespace MotherMod
             if (self is not StoryGameSession)
             {
                 ActiveCraving = null;
-                ActiveMeatCraving = null;
-                IsMeat = false;
+                IsMeat = false; //setting this to false will aready set the meat craving to null
             }
         }
 
@@ -163,9 +188,10 @@ namespace MotherMod
 
                 if (slugbasedata.TryGet(LASTMOTHERCRAVINGS, out List<string> lastcravings))
                 {
-                    while (lastcravings.Count > Mathf.Min(sum, 4))
+                    int minCravings = Mathf.Min(sum - 1, 4);
+                    while (lastcravings.Count > minCravings)
                     {
-                        lastcravings.RemoveAt(4);
+                        lastcravings.RemoveAt(minCravings);
                     }
                 }
                 else
@@ -193,7 +219,7 @@ namespace MotherMod
                             {
                                 Multiplier = 1.5f;
                             }
-                            Plugin.LogSource.LogDebug($"Current food craving: {(ActiveMeatCraving.value)}");
+                            Plugin.LogSource.LogDebug($"Current food craving: {ActiveMeatCraving.value}");
                             return;
                         }
                     }
@@ -210,18 +236,18 @@ namespace MotherMod
                         {
                             Multiplier = 1.5f;
                         }
-                        Plugin.LogSource.LogDebug($"Current food craving: {(ActiveCraving.value)}");
+                        Plugin.LogSource.LogDebug($"Current food craving: {ActiveCraving.value}");
                         return;
                     }
                 }
 
-                int index = -1;
+                int index;
 
                 do
                 {
-                    index = Random.Range(0, PossibleCravings.Count + PossibleMeatCravings.Count + 1);
+                    index = Random.Range(0, sum);
 
-                    if (index >= PossibleCravings.Count)
+                    if (PossibleMeatCravings.Count > 0 && index >= PossibleCravings.Count)
                     {
                         IsMeat = true;
                         ActiveMeatCraving = PossibleMeatCravings[index - PossibleCravings.Count];
@@ -235,10 +261,10 @@ namespace MotherMod
                             Multiplier = 1.5f;
                         }
                     }
-                    else
+                    else if(PossibleCravings.Count > 0)
                     {
                         IsMeat = false;
-                        ActiveCraving = PossibleCravings[index - 1];
+                        ActiveCraving = PossibleCravings[index];
 
                         if (CravingsMultipliers.TryGetValue(ActiveCraving, out var mul))
                         {
@@ -249,14 +275,22 @@ namespace MotherMod
                             Multiplier = 1.5f;
                         }
                     }
+                    else
+                    {
+
+                        IsMeat = false;
+                        ActiveCraving = null;
+                        Plugin.LogSource.LogError($"index is somehow bigger than the sum of the craving lists. index: {index}; sum: {sum}");
+                        slugbasedata.Set(LASTMOTHERCRAVINGS, lastcravings);
+                        slugbasedata.Set(MOTHERPREVCYCLE, dpsd.survives);
+                        return;
+                    }
                 } while (lastcravings.Contains(CravingValue));
 
                 lastcravings.Insert(0, IsMeat ? ActiveMeatCraving.value : ActiveCraving.value);
 
                 slugbasedata.Set(LASTMOTHERCRAVINGS, lastcravings);
                 slugbasedata.Set(MOTHERPREVCYCLE, dpsd.survives);
-
-                self.saveState.progression.SaveDeathPersistentDataOfCurrentState(false, false);
 
                 Plugin.LogSource.LogDebug($"Current food craving: {(IsMeat ? ActiveMeatCraving.value : ActiveCraving.value)} - {index}");
             }
