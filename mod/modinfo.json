@@ -11,10 +11,8 @@
     "magica.extendedslugbasefeatures",
     "magica.hookinglibrary",
     "rwremix",
-    "reclaimingentropy",
-    "customslugcatutils",
-    "dressmyslugcat",
-    "S.DMSBIND"
+    "reclaimingentropycontinued",
+    "customslugcatutils"
   ],
   "requirements_names": [
     "SlugBase",
@@ -23,10 +21,8 @@
     "Extended Slugbase Features",
     "Hooking Library",
     "Rain World Remix",
-    "Reclaiming Entropy - A post-Saint world state",
-    "Custom Slugcat Utils",
-    "Dress My Slugcat",
-    "BindMySlugcatFix"
+    "Reclaiming Entropy: Continued - A Post-Saint Worldstate",
+    "Custom Slugcat Utils"
   ],
   "tags": [
     "Custom Slugcat",
