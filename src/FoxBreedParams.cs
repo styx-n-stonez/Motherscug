@@ -275,7 +275,7 @@ namespace MotherMod
         public float Acceleration = 0.55f;
         public float SpeedFloor = 1f;
         public float SpeedCorridor = 0.85f;
-        public float SpeedClimb = 0.6f;
+        public float SpeedClimb = 0.55f;
         public float SpeedWall = 0.6f;
         public float SpeedCeiling = 0.5f;
         public float StepUpBoost = 2.4f;
@@ -655,9 +655,11 @@ namespace MotherMod
         public int   RoamAttemptsPerCandidate = 6;
 
         public int   HuntForgetFrames = 300;
+        public int   HuntForgetCooldownTicks = 200;
 
         public float DenRainUtilityThreshold = 0.01f;
         public float DenHealthThreshold = 0.5f;
+        public int DenGiveUpTicks = 120;
 
         public float VisionPerfectAngle = 0.8f;
         public float VisionPeripheralAngle = -0.25f;
@@ -873,6 +875,11 @@ namespace MotherMod
         public bool PartsRig = true;
         public string PartsPrefix = "FoxTofu_";
         public bool PartsMask = false;
+
+        public int TobyDraw = 1;
+        public int TobyFrameTicks = 10;
+        public float TobyFrameScale = 1f;
+        public float TobyFrameFeetPx = 17f;
         public float PartsScaleFac = 1f;
         public float PartsRefSpine = 32.3f;
         public float PartsBodyReach = 1f;
@@ -1105,7 +1112,7 @@ namespace MotherMod
         public float PoleCyclePx = 20f;
         public float PoleReachFrac = 0.4f;
         public float PolePawPhaseOffset = 0.5f;
-        public float PoleHindPhaseOffset = 0.5f;
+        public float PoleHindPhaseOffset = 0.35f;
         public float PoleFrontAmpPx = 6f;
         public float PoleFrontLeadPx = 4f;
         public float PoleHindAmpPx = 6f;
@@ -1117,7 +1124,12 @@ namespace MotherMod
         public float PoleLegMetaDegHind = 45f;
         public float PolePawSpeedFac = 1.5f;
         public bool PoleBackDown = true;
-        public float PolePullPulseFac = 0f;
+        public float PolePullPulseFac = 0.15f;
+        public float PoleBodySwayPx = 1.25f;
+        public int PoleBodySwayCycles = 1;
+        public float PoleBodySwayLag = 0.25f;
+        public float PoleStrokeJitter = 0.5f;
+        public float PoleStrokeJitterPx = 1.0f;
         public int PoleLogTicks = 20;
 
         public int PoleMeetDetectTicks = 60;
@@ -1861,6 +1873,8 @@ namespace MotherMod
             p.HuntForgetFrames = I(o, "hunt_forget_frames", p.HuntForgetFrames);
             p.DenRainUtilityThreshold = F(o, "den_rain_utility_threshold", p.DenRainUtilityThreshold);
             p.DenHealthThreshold = F(o, "den_health_threshold", p.DenHealthThreshold);
+            p.DenGiveUpTicks = I(o, "den_give_up_ticks", p.DenGiveUpTicks);
+            p.HuntForgetCooldownTicks = I(o, "hunt_forget_cooldown_ticks", p.HuntForgetCooldownTicks);
 
             p.VisionPerfectAngle = F(o, "vision_perfect_angle", p.VisionPerfectAngle);
             p.VisionPeripheralAngle = F(o, "vision_peripheral_angle", p.VisionPeripheralAngle);
@@ -2111,6 +2125,10 @@ namespace MotherMod
             p.PartsRig = B(o, "parts_rig", p.PartsRig);
             p.PartsPrefix = S(o, "parts_prefix", p.PartsPrefix);
             p.PartsMask = B(o, "parts_mask", p.PartsMask);
+            p.TobyDraw = I(o, "toby_draw", p.TobyDraw);
+            p.TobyFrameTicks = I(o, "toby_frame_ticks", p.TobyFrameTicks);
+            p.TobyFrameScale = F(o, "toby_frame_scale", p.TobyFrameScale);
+            p.TobyFrameFeetPx = F(o, "toby_frame_feet_px", p.TobyFrameFeetPx);
             p.PartsScaleFac = F(o, "parts_scale_fac", p.PartsScaleFac);
             p.PartsRefSpine = F(o, "parts_ref_spine", p.PartsRefSpine);
             p.PartsBodyReach = F(o, "parts_body_reach", p.PartsBodyReach);
@@ -2335,6 +2353,11 @@ namespace MotherMod
             p.PolePawSpeedFac = F(o, "pole_paw_speed_fac", p.PolePawSpeedFac);
             p.PoleBackDown = B(o, "pole_back_down", p.PoleBackDown);
             p.PolePullPulseFac = F(o, "pole_pull_pulse_fac", p.PolePullPulseFac);
+            p.PoleBodySwayPx = F(o, "pole_body_sway_px", p.PoleBodySwayPx);
+            p.PoleBodySwayCycles = I(o, "pole_body_sway_cycles", p.PoleBodySwayCycles);
+            p.PoleBodySwayLag = F(o, "pole_body_sway_lag", p.PoleBodySwayLag);
+            p.PoleStrokeJitter = F(o, "pole_stroke_jitter", p.PoleStrokeJitter);
+            p.PoleStrokeJitterPx = F(o, "pole_stroke_jitter_px", p.PoleStrokeJitterPx);
             p.PoleLogTicks = I(o, "pole_log_ticks", p.PoleLogTicks);
             p.PoleMeetDetectTicks = I(o, "pole_meet_detect_ticks", p.PoleMeetDetectTicks);
             p.PoleMeetYieldRule = S(o, "pole_meet_yield_rule", p.PoleMeetYieldRule);
@@ -2631,6 +2654,16 @@ namespace MotherMod
                 Mathf.Clamp(p.PoleLegMetaDegHind, 0f, 90f), "range_0_to_90_degrees_off_the_poles_outward_normal");
             p.PolePullPulseFac = ClampF(o, "pole_pull_pulse_fac", p.PolePullPulseFac,
                 Mathf.Clamp(p.PolePullPulseFac, 0f, 0.9f), "range_0_to_0.9_or_the_drive_reverses_mid_cycle");
+            p.PoleBodySwayPx = ClampF(o, "pole_body_sway_px", p.PoleBodySwayPx,
+                Mathf.Max(0f, p.PoleBodySwayPx), "must_not_be_negative_0_is_off");
+            p.PoleBodySwayCycles = ClampI(o, "pole_body_sway_cycles", p.PoleBodySwayCycles,
+                Math.Max(1, p.PoleBodySwayCycles), "at_least_1_sway_per_paw_cycle");
+            p.PoleBodySwayLag = ClampF(o, "pole_body_sway_lag", p.PoleBodySwayLag,
+                Mathf.Clamp01(p.PoleBodySwayLag), "range_0_to_1_of_a_sway");
+            p.PoleStrokeJitter = ClampF(o, "pole_stroke_jitter", p.PoleStrokeJitter,
+                Mathf.Max(0f, p.PoleStrokeJitter), "must_not_be_negative_0_is_off");
+            p.PoleStrokeJitterPx = ClampF(o, "pole_stroke_jitter_px", p.PoleStrokeJitterPx,
+                Mathf.Max(0f, p.PoleStrokeJitterPx), "must_not_be_negative_0_is_off");
             p.PoleLogTicks = ClampI(o, "pole_log_ticks", p.PoleLogTicks,
                 Math.Max(0, p.PoleLogTicks), "must_not_be_negative");
             p.PoleMeetDetectTicks = ClampI(o, "pole_meet_detect_ticks", p.PoleMeetDetectTicks,
@@ -3213,7 +3246,9 @@ namespace MotherMod
 
     public static class FoxParams
     {
-        public const string FILE = "fox/foxes.json";
+        public const string FILE = "fox/base.json";
+
+        public const string VARIANT_DIR = "fox/variants";
 
         private const int RELOAD_POLL_TICKS = 80;
 
@@ -3223,12 +3258,17 @@ namespace MotherMod
         private static readonly Dictionary<string, FoxBreedParams> Fallbacks =
             new Dictionary<string, FoxBreedParams>();
 
-        private static string _resolvedPath;
-        private static DateTime _stamp;
+        private sealed class Watched
+        {
+            public string Rel;
+            public string Path;
+            public bool Present;
+            public DateTime Stamp;
+        }
+
+        private static readonly List<Watched> _watched = new List<Watched>();
 
         private static int _lastPollTick = -1000000;
-
-        private static bool _filePresent;
 
         public static bool ForceDebug { get; private set; }
 
@@ -3258,19 +3298,28 @@ namespace MotherMod
             if (gameTick - _lastPollTick < RELOAD_POLL_TICKS) return;
             _lastPollTick = gameTick;
 
+            bool changed = false;
             try
             {
-                if (_resolvedPath == null || !File.Exists(_resolvedPath))
+                foreach (var w in _watched)
                 {
-                    string candidate = AssetManager.ResolveFilePath(FILE);
-                    bool nowPresent = File.Exists(candidate);
-                    if (nowPresent != _filePresent)
+                    if (w.Path == null || !File.Exists(w.Path))
                     {
-                        Reload("hot");
+                        string candidate = AssetManager.ResolveFilePath(w.Rel);
+                        bool nowPresent = File.Exists(candidate);
+                        if (nowPresent != w.Present)
+                        {
+                            changed = true;
+                            break;
+                        }
+                        continue;
                     }
-                    return;
+                    if (File.GetLastWriteTimeUtc(w.Path) != w.Stamp)
+                    {
+                        changed = true;
+                        break;
+                    }
                 }
-                if (File.GetLastWriteTimeUtc(_resolvedPath) == _stamp) return;
             }
             catch (Exception e)
             {
@@ -3280,25 +3329,37 @@ namespace MotherMod
                 return;
             }
 
-            Reload("hot");
+            if (changed) Reload("hot");
+        }
+
+        private static Watched Watch(string rel)
+        {
+            var w = new Watched { Rel = rel, Path = AssetManager.ResolveFilePath(rel) };
+            w.Present = File.Exists(w.Path);
+            if (w.Present) w.Stamp = File.GetLastWriteTimeUtc(w.Path);
+            _watched.Add(w);
+            return w;
         }
 
         private static void Reload(string reason)
         {
             try
             {
-                _resolvedPath = AssetManager.ResolveFilePath(FILE);
-                if (!File.Exists(_resolvedPath))
+                _watched.Clear();
+                Watched baseFile = Watch(FILE);
+                List<string> ids = FoxCritob.RegisteredVariantIds();
+                var variantFiles = new Dictionary<string, Watched>();
+                foreach (var id in ids) variantFiles[id] = Watch(VARIANT_DIR + "/" + id + ".json");
+
+                if (!baseFile.Present)
                 {
-                    _filePresent = false;
                     ForceDebug = true;
                     Loaded.Clear();
                     return;
                 }
 
-                _filePresent = true;
-                _stamp = File.GetLastWriteTimeUtc(_resolvedPath);
-                var root = JsonAny.Parse(File.ReadAllText(_resolvedPath)).TryObject();
+                string baseText = File.ReadAllText(baseFile.Path);
+                var root = JsonAny.Parse(baseText).TryObject();
                 if (root == null)
                 {
                     ForceDebug = true;
@@ -3306,25 +3367,49 @@ namespace MotherMod
                 }
 
                 ReadOptions(root.Value);
+                List<FoxParamsMerge.Member> baseMembers = FoxParamsMerge.Members(baseText);
+
+                var variantMembers = new Dictionary<string, List<FoxParamsMerge.Member>>();
+                var notObject = new HashSet<string>();
+                foreach (var id in ids)
+                {
+                    Watched vf = variantFiles[id];
+                    if (!vf.Present) continue;
+                    string vText = File.ReadAllText(vf.Path);
+                    try
+                    {
+                        if (JsonAny.Parse(vText).TryObject() == null)
+                        {
+                            notObject.Add(id);
+                            continue;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new FormatException($"{vf.Path}: {e.Message}", e);
+                    }
+                    variantMembers[id] = FoxParamsMerge.Members(vText);
+                }
 
                 var parsed = new Dictionary<string, FoxBreedParams>();
-                foreach (var kv in root.Value)
+                foreach (var id in ids)
                 {
-                    if (kv.Key.StartsWith("_")) continue;
-
-                    var obj = kv.Value.TryObject();
-                    if (obj == null)
+                    if (notObject.Contains(id))
                     {
                         continue;
                     }
 
+                    variantMembers.TryGetValue(id, out var vm);
+                    var unknown = new List<string>();
+                    string merged = FoxParamsMerge.Merge(baseMembers, vm, unknown, out int overrides);
+
                     try
                     {
-                        parsed[kv.Key] = FoxBreedParams.FromJson(obj.Value);
+                        parsed[id] = FoxBreedParams.FromJson(FoxParamsMerge.ToObject(id, merged));
                     }
                     catch (Exception e)
                     {
-                        FoxFault.Warn($"params_entry_failed variant={kv.Key} err={e.GetType().Name} " +
+                        FoxFault.Warn($"params_entry_failed variant={id} err={e.GetType().Name} " +
                                     $"path={((e as JsonException)?.JsonPath ?? "unknown")} " +
                                     $"msg=\"{e.Message}\" action=defaults_used");
                     }

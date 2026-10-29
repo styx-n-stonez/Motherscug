@@ -23,6 +23,8 @@ namespace MotherMod
 
         public static readonly CreatureType MotherFoxPotato = new CreatureType("MotherFoxPotato", true);
 
+        public static readonly CreatureType MotherFoxToby = new CreatureType("MotherFoxToby", true);
+
         public static readonly CreatureCommunities.CommunityID FoxCommunity =
             new CreatureCommunities.CommunityID("MotherFoxes", true);
 
@@ -39,6 +41,8 @@ namespace MotherMod
                 new FoxCritob(MotherFoxCherry,   variantId: "cherry",   creatureName: "Cherry Fox"),
                 new FoxCritob(MotherFoxMushroom, variantId: "mushroom", creatureName: "Mushroom Fox"),
                 new FoxCritob(MotherFoxPotato,   variantId: "potato",   creatureName: "Potato Fox"),
+
+                new FoxCritob(MotherFoxToby,     variantId: "toby",     creatureName: "Toby Fox"),
             };
         }
 
@@ -58,6 +62,14 @@ namespace MotherMod
         public static IEnumerable<CreatureType> AllFoxTypes()
         {
             return FoxTypes.Keys;
+        }
+
+        public static List<string> RegisteredVariantIds()
+        {
+            var ids = new List<string>();
+            foreach (var id in FoxTypes.Values)
+                if (!ids.Contains(id)) ids.Add(id);
+            return ids;
         }
 
         public readonly string VariantId;

@@ -1,0 +1,674 @@
+{
+ "frames": {
+  "FoxPotato_HeadSide.png": {
+   "frame": {
+    "x": 2,
+    "y": 2,
+    "w": 24,
+    "h": 19
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 19
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 19
+   }
+  },
+  "FoxPotato_HeadSideMask.png": {
+   "frame": {
+    "x": 28,
+    "y": 2,
+    "w": 24,
+    "h": 19
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 19
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 19
+   }
+  },
+  "FoxPotato_HeadSideEye.png": {
+   "frame": {
+    "x": 54,
+    "y": 2,
+    "w": 24,
+    "h": 19
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 19
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 19
+   }
+  },
+  "FoxPotato_HeadThreeQuarter.png": {
+   "frame": {
+    "x": 80,
+    "y": 2,
+    "w": 22,
+    "h": 20
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 20
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 20
+   }
+  },
+  "FoxPotato_HeadThreeQuarterMask.png": {
+   "frame": {
+    "x": 104,
+    "y": 2,
+    "w": 22,
+    "h": 20
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 20
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 20
+   }
+  },
+  "FoxPotato_HeadThreeQuarterEye.png": {
+   "frame": {
+    "x": 128,
+    "y": 2,
+    "w": 22,
+    "h": 20
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 20
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 20
+   }
+  },
+  "FoxPotato_HeadAway.png": {
+   "frame": {
+    "x": 152,
+    "y": 2,
+    "w": 23,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 23,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 23,
+    "h": 21
+   }
+  },
+  "FoxPotato_HeadAwayMask.png": {
+   "frame": {
+    "x": 177,
+    "y": 2,
+    "w": 23,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 23,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 23,
+    "h": 21
+   }
+  },
+  "FoxPotato_HeadAwayEye.png": {
+   "frame": {
+    "x": 202,
+    "y": 2,
+    "w": 23,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 23,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 23,
+    "h": 21
+   }
+  },
+  "FoxPotato_Chest.png": {
+   "frame": {
+    "x": 227,
+    "y": 2,
+    "w": 16,
+    "h": 13
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 13
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 13
+   }
+  },
+  "FoxPotato_ChestMask.png": {
+   "frame": {
+    "x": 2,
+    "y": 25,
+    "w": 16,
+    "h": 13
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 13
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 13
+   }
+  },
+  "FoxPotato_Body.png": {
+   "frame": {
+    "x": 20,
+    "y": 25,
+    "w": 23,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 23,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 23,
+    "h": 12
+   }
+  },
+  "FoxPotato_BodyMask.png": {
+   "frame": {
+    "x": 45,
+    "y": 25,
+    "w": 23,
+    "h": 12
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 23,
+    "h": 12
+   },
+   "sourceSize": {
+    "w": 23,
+    "h": 12
+   }
+  },
+  "FoxPotato_LegA_Upper.png": {
+   "frame": {
+    "x": 70,
+    "y": 25,
+    "w": 14,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 5
+   }
+  },
+  "FoxPotato_LegA_UpperMask.png": {
+   "frame": {
+    "x": 86,
+    "y": 25,
+    "w": 14,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 5
+   }
+  },
+  "FoxPotato_LegA_Joint.png": {
+   "frame": {
+    "x": 102,
+    "y": 25,
+    "w": 5,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 5,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegA_JointMask.png": {
+   "frame": {
+    "x": 109,
+    "y": 25,
+    "w": 5,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 5,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 5,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegA_Lower.png": {
+   "frame": {
+    "x": 116,
+    "y": 25,
+    "w": 11,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 11,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 11,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegA_LowerMask.png": {
+   "frame": {
+    "x": 129,
+    "y": 25,
+    "w": 11,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 11,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 11,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegA_Paw.png": {
+   "frame": {
+    "x": 142,
+    "y": 25,
+    "w": 7,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegA_PawMask.png": {
+   "frame": {
+    "x": 151,
+    "y": 25,
+    "w": 7,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegB_Haunch.png": {
+   "frame": {
+    "x": 160,
+    "y": 25,
+    "w": 7,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 8
+   }
+  },
+  "FoxPotato_LegB_HaunchMask.png": {
+   "frame": {
+    "x": 169,
+    "y": 25,
+    "w": 7,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 8
+   }
+  },
+  "FoxPotato_LegB_Upper.png": {
+   "frame": {
+    "x": 178,
+    "y": 25,
+    "w": 8,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 5
+   }
+  },
+  "FoxPotato_LegB_UpperMask.png": {
+   "frame": {
+    "x": 188,
+    "y": 25,
+    "w": 8,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 5
+   }
+  },
+  "FoxPotato_LegB_Joint.png": {
+   "frame": {
+    "x": 198,
+    "y": 25,
+    "w": 4,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 4,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegB_JointMask.png": {
+   "frame": {
+    "x": 204,
+    "y": 25,
+    "w": 4,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 4,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegB_Lower.png": {
+   "frame": {
+    "x": 210,
+    "y": 25,
+    "w": 6,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 6,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegB_LowerMask.png": {
+   "frame": {
+    "x": 218,
+    "y": 25,
+    "w": 6,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 6,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegB_Paw.png": {
+   "frame": {
+    "x": 226,
+    "y": 25,
+    "w": 8,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 4
+   }
+  },
+  "FoxPotato_LegB_PawMask.png": {
+   "frame": {
+    "x": 236,
+    "y": 25,
+    "w": 8,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 4
+   }
+  },
+  "FoxPotato_Tail.png": {
+   "frame": {
+    "x": 2,
+    "y": 40,
+    "w": 40,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 17
+   }
+  },
+  "FoxPotato_TailMask.png": {
+   "frame": {
+    "x": 44,
+    "y": 40,
+    "w": 40,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 17
+   }
+  }
+ },
+ "meta": {
+  "version": "1.0",
+  "image": "fox_potato.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 256,
+   "h": 59
+  },
+  "scale": "1"
+ }
+}

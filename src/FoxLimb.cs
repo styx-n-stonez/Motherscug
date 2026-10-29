@@ -542,6 +542,40 @@ namespace MotherMod
         private const float POLE_PLAN_MARGIN_PX = 1f;
         private const float POLE_LIMB_REACH_SLACK_PX = 0.5f;
 
+        internal int PoleStrokeNo { get; private set; }
+        internal float PoleStrokeAmpMul { get; private set; } = 1f;
+        internal float PoleStrokeLeadJitter { get; private set; }
+        private float poleStrokeU1, poleStrokeU2;
+
+        private float PoleStrokeReachFrac(FoxBreedParams p, float r)
+        {
+            return Mathf.Clamp(r * (1f + 0.5f * Mathf.Max(0f, p.PoleStrokeJitter) * poleStrokeU1), 0.05f, 0.9f);
+        }
+
+        private static float PoleStrokeUnit(int seed, int leg, int strokeNo, int salt)
+        {
+            int x = unchecked(seed * 31 + leg * 977 + salt * 7919);
+            int y = unchecked(strokeNo * 131 + salt);
+            return (float)(LabHash2(x, y) * 2.0 - 1.0);
+        }
+
+        private static double LabHash2(int x, int y)
+        {
+            int h = JsToInt32((double)x * 374761393.0 + (double)y * 668265263.0);
+            h ^= (int)((uint)h >> 13);
+            h = JsToInt32((double)h * 1274126177.0);
+            h ^= (int)((uint)h >> 16);
+            return (uint)h / 4294967296.0;
+        }
+
+        private static int JsToInt32(double d)
+        {
+            if (double.IsNaN(d) || double.IsInfinity(d)) return 0;
+            double t = Math.Truncate(d);
+            double m = t - 4294967296.0 * Math.Floor(t / 4294967296.0);
+            return unchecked((int)(uint)m);
+        }
+
         private void UpdateOnPole(FoxBreedParams p)
         {
             Fox fox = gfx.fox;
@@ -555,23 +589,35 @@ namespace MotherMod
             ph -= Mathf.Floor(ph);
 
             float r = Mathf.Clamp(p.PoleReachFrac, 0.05f, 0.9f);
+            float rk = PoleStrokeReachFrac(p, r);
+            bool reaching = ph < rk;
+            if (!poleWasOn || (reaching && !wasReaching))
+            {
+                PoleStrokeNo++;
+                int seed = fox.abstractCreature.ID.number;
+                poleStrokeU1 = PoleStrokeUnit(seed, limbNumber, PoleStrokeNo, 1);
+                poleStrokeU2 = PoleStrokeUnit(seed, limbNumber, PoleStrokeNo, 2);
+                rk = PoleStrokeReachFrac(p, r);
+                reaching = ph < rk;
+            }
             float stroke;
             float reachU = 0f;
-            bool reaching = ph < r;
             if (reaching)
             {
-                reachU = ph / r;
+                reachU = ph / rk;
                 float eased = reachU * reachU * (3f - 2f * reachU);
                 stroke = -1f + 2f * eased;
             }
             else
             {
-                stroke = 1f - 2f * ((ph - r) / (1f - r));
+                stroke = 1f - 2f * ((ph - rk) / (1f - rk));
             }
             PoleReaching = reaching;
 
-            float amp = Mathf.Max(0f, front ? p.PoleFrontAmpPx : p.PoleHindAmpPx);
-            float lead = front ? p.PoleFrontLeadPx : p.PoleHindLeadPx;
+            PoleStrokeAmpMul = (1f - rk) / (1f - r);
+            PoleStrokeLeadJitter = Mathf.Max(0f, p.PoleStrokeJitterPx) * poleStrokeU2;
+            float amp = Mathf.Max(0f, front ? p.PoleFrontAmpPx : p.PoleHindAmpPx) * PoleStrokeAmpMul;
+            float lead = (front ? p.PoleFrontLeadPx : p.PoleHindLeadPx) + PoleStrokeLeadJitter;
 
             float bodySide = gfx.PoleBodySide;
             float sideSign = ((limbNumber % 2 == 0) ? -1f : 1f) * bodySide;

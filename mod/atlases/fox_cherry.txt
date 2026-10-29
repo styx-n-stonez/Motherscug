@@ -260,10 +260,170 @@
     "h": 20
    }
   },
-  "FoxCherry_LegB_Haunch.png": {
+  "FoxCherry_LegA_Upper.png": {
    "frame": {
     "x": 198,
     "y": 39,
+    "w": 27,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 27,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 27,
+    "h": 10
+   }
+  },
+  "FoxCherry_LegA_UpperMask.png": {
+   "frame": {
+    "x": 227,
+    "y": 39,
+    "w": 27,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 27,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 27,
+    "h": 10
+   }
+  },
+  "FoxCherry_LegA_Joint.png": {
+   "frame": {
+    "x": 2,
+    "y": 76,
+    "w": 7,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 8
+   }
+  },
+  "FoxCherry_LegA_JointMask.png": {
+   "frame": {
+    "x": 11,
+    "y": 76,
+    "w": 7,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 8
+   }
+  },
+  "FoxCherry_LegA_Lower.png": {
+   "frame": {
+    "x": 20,
+    "y": 76,
+    "w": 18,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 7
+   }
+  },
+  "FoxCherry_LegA_LowerMask.png": {
+   "frame": {
+    "x": 40,
+    "y": 76,
+    "w": 18,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 7
+   }
+  },
+  "FoxCherry_LegA_Paw.png": {
+   "frame": {
+    "x": 60,
+    "y": 76,
+    "w": 12,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 7
+   }
+  },
+  "FoxCherry_LegA_PawMask.png": {
+   "frame": {
+    "x": 74,
+    "y": 76,
+    "w": 12,
+    "h": 7
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 7
+   },
+   "sourceSize": {
+    "w": 12,
+    "h": 7
+   }
+  },
+  "FoxCherry_LegB_Haunch.png": {
+   "frame": {
+    "x": 88,
+    "y": 76,
     "w": 9,
     "h": 10
    },
@@ -282,8 +442,8 @@
   },
   "FoxCherry_LegB_HaunchMask.png": {
    "frame": {
-    "x": 209,
-    "y": 39,
+    "x": 99,
+    "y": 76,
     "w": 9,
     "h": 10
    },
@@ -302,8 +462,8 @@
   },
   "FoxCherry_LegB_Upper.png": {
    "frame": {
-    "x": 220,
-    "y": 39,
+    "x": 110,
+    "y": 76,
     "w": 13,
     "h": 7
    },
@@ -322,8 +482,8 @@
   },
   "FoxCherry_LegB_UpperMask.png": {
    "frame": {
-    "x": 235,
-    "y": 39,
+    "x": 125,
+    "y": 76,
     "w": 13,
     "h": 7
    },
@@ -342,7 +502,7 @@
   },
   "FoxCherry_LegB_Joint.png": {
    "frame": {
-    "x": 2,
+    "x": 140,
     "y": 76,
     "w": 5,
     "h": 6
@@ -362,7 +522,7 @@
   },
   "FoxCherry_LegB_JointMask.png": {
    "frame": {
-    "x": 9,
+    "x": 147,
     "y": 76,
     "w": 5,
     "h": 6
@@ -382,7 +542,7 @@
   },
   "FoxCherry_LegB_Lower.png": {
    "frame": {
-    "x": 16,
+    "x": 154,
     "y": 76,
     "w": 11,
     "h": 6
@@ -402,7 +562,7 @@
   },
   "FoxCherry_LegB_LowerMask.png": {
    "frame": {
-    "x": 29,
+    "x": 167,
     "y": 76,
     "w": 11,
     "h": 6
@@ -422,7 +582,7 @@
   },
   "FoxCherry_LegB_Paw.png": {
    "frame": {
-    "x": 42,
+    "x": 180,
     "y": 76,
     "w": 13,
     "h": 6
@@ -442,7 +602,7 @@
   },
   "FoxCherry_LegB_PawMask.png": {
    "frame": {
-    "x": 57,
+    "x": 195,
     "y": 76,
     "w": 13,
     "h": 6
@@ -462,8 +622,8 @@
   },
   "FoxCherry_Tail.png": {
    "frame": {
-    "x": 72,
-    "y": 76,
+    "x": 2,
+    "y": 88,
     "w": 68,
     "h": 17
    },
@@ -482,8 +642,8 @@
   },
   "FoxCherry_TailMask.png": {
    "frame": {
-    "x": 142,
-    "y": 76,
+    "x": 72,
+    "y": 88,
     "w": 68,
     "h": 17
    },
@@ -502,8 +662,8 @@
   },
   "FoxCherry_Spine1.png": {
    "frame": {
-    "x": 212,
-    "y": 76,
+    "x": 142,
+    "y": 88,
     "w": 33,
     "h": 3
    },
@@ -522,8 +682,8 @@
   },
   "FoxCherry_Spine1Mask.png": {
    "frame": {
-    "x": 2,
-    "y": 95,
+    "x": 177,
+    "y": 88,
     "w": 33,
     "h": 3
    },
@@ -542,8 +702,8 @@
   },
   "FoxCherry_Spine2.png": {
    "frame": {
-    "x": 37,
-    "y": 95,
+    "x": 212,
+    "y": 88,
     "w": 20,
     "h": 2
    },
@@ -562,8 +722,8 @@
   },
   "FoxCherry_Spine2Mask.png": {
    "frame": {
-    "x": 59,
-    "y": 95,
+    "x": 234,
+    "y": 88,
     "w": 20,
     "h": 2
    },
@@ -578,166 +738,6 @@
    "sourceSize": {
     "w": 20,
     "h": 2
-   }
-  },
-  "FoxCherry_LegA_Upper.png": {
-   "frame": {
-    "x": 81,
-    "y": 95,
-    "w": 13,
-    "h": 7
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 13,
-    "h": 7
-   },
-   "sourceSize": {
-    "w": 13,
-    "h": 7
-   }
-  },
-  "FoxCherry_LegA_UpperMask.png": {
-   "frame": {
-    "x": 96,
-    "y": 95,
-    "w": 13,
-    "h": 7
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 13,
-    "h": 7
-   },
-   "sourceSize": {
-    "w": 13,
-    "h": 7
-   }
-  },
-  "FoxCherry_LegA_Joint.png": {
-   "frame": {
-    "x": 111,
-    "y": 95,
-    "w": 5,
-    "h": 6
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 5,
-    "h": 6
-   },
-   "sourceSize": {
-    "w": 5,
-    "h": 6
-   }
-  },
-  "FoxCherry_LegA_JointMask.png": {
-   "frame": {
-    "x": 118,
-    "y": 95,
-    "w": 5,
-    "h": 6
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 5,
-    "h": 6
-   },
-   "sourceSize": {
-    "w": 5,
-    "h": 6
-   }
-  },
-  "FoxCherry_LegA_Lower.png": {
-   "frame": {
-    "x": 125,
-    "y": 95,
-    "w": 11,
-    "h": 6
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 11,
-    "h": 6
-   },
-   "sourceSize": {
-    "w": 11,
-    "h": 6
-   }
-  },
-  "FoxCherry_LegA_LowerMask.png": {
-   "frame": {
-    "x": 138,
-    "y": 95,
-    "w": 11,
-    "h": 6
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 11,
-    "h": 6
-   },
-   "sourceSize": {
-    "w": 11,
-    "h": 6
-   }
-  },
-  "FoxCherry_LegA_Paw.png": {
-   "frame": {
-    "x": 151,
-    "y": 95,
-    "w": 13,
-    "h": 6
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 13,
-    "h": 6
-   },
-   "sourceSize": {
-    "w": 13,
-    "h": 6
-   }
-  },
-  "FoxCherry_LegA_PawMask.png": {
-   "frame": {
-    "x": 166,
-    "y": 95,
-    "w": 13,
-    "h": 6
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 13,
-    "h": 6
-   },
-   "sourceSize": {
-    "w": 13,
-    "h": 6
    }
   }
  },
@@ -747,7 +747,7 @@
   "format": "RGBA8888",
   "size": {
    "w": 256,
-   "h": 104
+   "h": 107
   },
   "scale": "1"
  }

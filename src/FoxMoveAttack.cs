@@ -657,6 +657,12 @@ namespace MotherMod
                 return true;
             }
 
+            if (reason == "evaded")
+            {
+                fox.RestoreAfterCommittedState(p, "charge_evaded");
+                return true;
+            }
+
             fox.RestoreAfterCommittedState(p, "charge");
             return true;
         }
