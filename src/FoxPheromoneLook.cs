@@ -220,6 +220,7 @@ namespace MotherMod
             if (f == null || f.slatedForDeletetion || f.room == null || f.mainBodyChunk == null) return false;
             if (f.graphicsModule is FoxGraphics g)
             {
+                if (g.tobyFramesActive) { nose = g.TobyFrameNose; return true; }
                 Vector2 n = g.DrawNosePos;
                 if (n != Vector2.zero && (n - f.mainBodyChunk.pos).sqrMagnitude < 100f * 100f) { nose = n; return true; }
                 if (g.head != null) { nose = g.head.pos; return true; }
@@ -240,7 +241,7 @@ namespace MotherMod
 
             string skip = null;
             if (!p.PheromoneReceiverSniff) skip = "key_off";
-            else if (!partsRigActive) skip = "no_parts_rig";
+            else if (!partsRigActive || tobyFramesActive) skip = "no_parts_rig";
             else if (fox.dead || !fox.Consious) skip = "unconscious";
             else if (pherSniffLeft > 0) skip = "already_sniffing";
             if (skip != null)
@@ -373,7 +374,7 @@ namespace MotherMod
 
         public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
-            base.AddToContainer(sLeaser, rCam, newContatiner ?? rCam.ReturnFContainer("Items"));
+            base.AddToContainer(sLeaser, rCam, newContatiner ?? rCam.ReturnFContainer("ForegroundLights"));
         }
 
         public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)

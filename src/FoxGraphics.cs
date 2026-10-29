@@ -187,7 +187,7 @@ namespace MotherMod
 
         public int SpriteChest { get { return SpriteEye + 1; } }
         public int StartOfExtraSprites { get { return SpriteEye + 1 + (partsRigActive ? 1 : 0); } }
-        public int TotalSprites { get { return StartOfExtraSprites + extraSprites; } }
+        public int TotalSprites { get { return StartOfExtraSprites + extraSprites + (tobyFramesActive ? 1 : 0); } }
 
         public FoxGraphics(Fox fox) : base(fox, true)
         {
@@ -226,6 +226,7 @@ namespace MotherMod
             FoxAtlas.EnsureLoaded();
             partsRigActive = ResolvePartsRig(p);
             if (partsRigActive) BuildPartsRig(p);
+            tobyFramesActive = ResolveTobyFrames(p);
 
             bodySpriteActive = !partsRigActive && p.BodySprite && FoxAtlas.Has(p.BodySpriteElement);
             tailSpriteActive = partsRigActive || (bodySpriteActive && FoxAtlas.Has(p.TailSpriteElement));
@@ -517,6 +518,7 @@ namespace MotherMod
             UpdateTail(p);
             UpdateHead(p);
             if (partsRigActive) UpdatePartsHeadFrame(p);
+            TickTobyFrames(p);
 
             MeasureDrawMotion();
 
@@ -576,6 +578,29 @@ namespace MotherMod
             lookInitialized = true;
         }
 
+        private float poleSwayFront, poleSwayHind;
+
+        private void ApplyPoleBodySway(FoxBreedParams p)
+        {
+            float amt = Mathf.Clamp01(fox.PoleAmount);
+            if (amt <= 0f || p.PoleBodySwayPx <= 0f)
+            {
+                poleSwayFront = 0f;
+                poleSwayHind = 0f;
+                return;
+            }
+            int n = Mathf.Max(1, p.PoleBodySwayCycles);
+            float r = Mathf.Clamp(p.PoleReachFrac, 0.05f, 0.9f);
+            float a = 2f * Mathf.PI * n * (fox.PolePhase - r * 0.5f);
+            float lag = 2f * Mathf.PI * Mathf.Clamp01(p.PoleBodySwayLag);
+            float amp = p.PoleBodySwayPx * amt;
+            poleSwayFront = amp * Mathf.Cos(a);
+            poleSwayHind = amp * Mathf.Cos(a - lag);
+            Vector2 up = BodyUp;
+            drawPositions[0, 0] += up * poleSwayFront;
+            drawPositions[2, 0] += up * poleSwayHind;
+        }
+
         private void UpdateDrawPositions(FoxBreedParams p)
         {
             Vector2 ride = RideVector(p);
@@ -595,6 +620,7 @@ namespace MotherMod
             drawPositions[0, 0].y += frontBob * p.WalkBob * bobFac;
             drawPositions[1, 0].y += (frontBob + hindBob) * 0.5f * p.WalkBob * bobFac;
             drawPositions[2, 0].y += hindBob * p.WalkBob * bobFac;
+            ApplyPoleBodySway(p);
 
             float crouch = Mathf.Clamp01(fox.StalkCrouch);
             if (crouch > 0f)
@@ -1075,6 +1101,7 @@ namespace MotherMod
             }
 
             for (int i = 0; i < cosmetics.Count; i++) cosmetics[i].InitiateSprites(sLeaser, rCam);
+            if (tobyFramesActive) InitiateTobyFrameSprite(sLeaser);
 
             sLeaser.containers = new FContainer[1] { new FContainer() };
 
@@ -1096,6 +1123,8 @@ namespace MotherMod
         public Vector2 DrawHeadPos { get; private set; }
 
         public Vector2 DrawHeadDir { get; private set; }
+
+        private bool headDrawGuard;
 
         public Vector2 DrawHeadUp { get; private set; }
 
@@ -1121,7 +1150,7 @@ namespace MotherMod
             BuildArtFrame(p, rearChunk, headChunk, depth, out aOrigin, out aFwd, out aUp, out aSx, out aSy);
             float faceSign = (depth >= 0f) ? 1f : -1f;
 
-            ComputeHeadFrame(p, timeStacker, headChunk, midChunk, drawUp, depth);
+            ComputeHeadFrame(p, timeStacker, headChunk, midChunk, rearChunk, drawUp, depth);
             if (partsRigActive)
             {
                 DrawPartsRig(sLeaser, p, timeStacker, headChunk, midChunk, rearChunk, depth, camPos);
@@ -1283,6 +1312,8 @@ namespace MotherMod
             {
                 cosmetics[i].DrawSprites(sLeaser, rCam, timeStacker, camPos);
             }
+
+            if (tobyFramesActive) DrawTobyFrame(sLeaser, p, headChunk, rearChunk, depth, camPos);
 
             ApplyCamoBlend(sLeaser, rCam, p, headChunk, midChunk, rearChunk);
 
@@ -1488,12 +1519,16 @@ namespace MotherMod
         }
 
         private void ComputeHeadFrame(FoxBreedParams p, float timeStacker,
-                                      Vector2 headChunk, Vector2 midChunk, Vector2 drawUp, float depth)
+                                      Vector2 headChunk, Vector2 midChunk, Vector2 rearChunk,
+                                      Vector2 drawUp, float depth)
         {
             Vector2 headPart = Vector2.Lerp(head.lastPos, head.pos, timeStacker);
             DrawHeadPos = Vector2.Lerp(headPart, headChunk, 0.2f);
 
             Vector2 neckLine = Fox.Dir(midChunk, headChunk);
+            Vector2 bodyFwd = Fox.Dir(rearChunk, headChunk);
+            headDrawGuard = Fox.NeckDot(headChunk, midChunk, rearChunk) < 0f;
+            if (headDrawGuard) neckLine = bodyFwd;
             Vector2 lookLine = Fox.Dir(headChunk, headPart);
             if (lookLine.sqrMagnitude < 0.01f) lookLine = neckLine;
 
@@ -1772,6 +1807,12 @@ namespace MotherMod
             if (newContatiner == null) newContatiner = rCam.ReturnFContainer("Midground");
 
             sLeaser.RemoveAllSpritesFromContainer();
+
+            if (tobyFramesActive)
+            {
+                AddTobyFrameToContainer(sLeaser, newContatiner);
+                return;
+            }
 
             AddLayer(sLeaser, rCam, newContatiner, FoxCosmetic.ZOrder.Behind);
 

@@ -210,6 +210,23 @@ namespace MotherMod
 
         internal float SpineRestSpan { get { return RestSpan(); } }
 
+        internal static float NeckDot(Vector2 head, Vector2 mid, Vector2 rear)
+        {
+            Vector2 a = mid - head, b = rear - head;
+            float la = a.magnitude, lb = b.magnitude;
+            if (la < 0.01f || lb < 0.01f) return 1f;
+            return Vector2.Dot(a, b) / (la * lb);
+        }
+
+        internal float NeckDotNow
+        {
+            get
+            {
+                if (bodyChunks == null || bodyChunks.Length < 3) return 1f;
+                return NeckDot(bodyChunks[0].pos, bodyChunks[1].pos, bodyChunks[2].pos);
+            }
+        }
+
         internal void RelaxSpineForTurnNow(FoxBreedParams p) { RelaxSpineForTurn(p); }
 
         internal void ReleaseSpineAfterTurnNow(FoxBreedParams p) { ReleaseSpineAfterTurn(p); }
@@ -1804,7 +1821,19 @@ namespace MotherMod
             }
 
             float step = Mathf.Max(0f, p.SpanFloorCorrectPx);
-            if (act && step > 0f && !turnOwnsBody)
+            if (act && step > 0f && !turnOwnsBody && span > 0.01f
+                && NeckDot(bodyChunks[0].pos, bodyChunks[1].pos, bodyChunks[2].pos) < 0f)
+            {
+                Vector2 headToRear = off / span;
+                float along = Vector2.Dot(bodyChunks[1].pos - bodyChunks[0].pos, headToRear);
+                float pull = Mathf.Min(step, span * 0.5f - along);
+                if (pull > 0f)
+                {
+                    bodyChunks[1].pos += headToRear * pull;
+                    bodyChunks[1].vel += headToRear * pull;
+                }
+            }
+            else if (act && step > 0f && !turnOwnsBody)
             {
                 Vector2 dir = span > 0.01f ? off / span : Dir(bodyChunks[0].pos, bodyChunks[1].pos);
                 if (dir.sqrMagnitude < 0.0001f) dir = new Vector2(1f, 0f);

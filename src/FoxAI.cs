@@ -58,6 +58,22 @@ namespace MotherMod
         private int eatCounter;
         private Creature eatTarget;
         private int denRestCounter;
+        private string denReason = "none";
+
+        private bool denWatchOn;
+        private int denNoProgressTicks;
+        private float denBestCost = float.MaxValue;
+        private int denBestGen = -1;
+        private AbstractCreature denResumePrey;
+        private bool denGaveUp;
+        private float denGaveUpHealth = -1f;
+
+        private struct ForgottenPrey
+        {
+            public AbstractCreature Creature;
+            public int Tick;
+        }
+        private readonly List<ForgottenPrey> forgottenPrey = new List<ForgottenPrey>();
         private int lastSpacingLogTick = -1000000;
 
         private AbstractCreature lastPreyTarget;
@@ -195,6 +211,7 @@ namespace MotherMod
         {
             FoxBreedParams p = fox.P;
             Behavior previous = behavior;
+            if (forgottenPrey.Count > 0) TickForgottenPrey(p);
             float utility = utilityComparer.HighestUtility();
 
             if (utility < p.IdleUtilityThreshold)
@@ -259,17 +276,32 @@ namespace MotherMod
                 huntLatchHolding = false;
             }
 
+            Behavior beforeDen = behavior;
             if (behavior != Behavior.Flee && behavior != Behavior.EscapeRain)
             {
                 string reason = null;
-                if (creature.state is HealthState hs && hs.health < p.DenHealthThreshold) reason = "injury";
+                float health = creature.state is HealthState hs0 ? hs0.health : 1f;
+                bool injured = creature.state is HealthState && health < p.DenHealthThreshold;
+                if (denGaveUp) UpdateDenGiveUpWound(health, injured);
+                if (injured && !denGaveUp) reason = "injury";
                 else if (p.DenFedEnabled && denRestCounter > 0 && utility < p.DenFedPriority) reason = "fed";
 
                 if (reason != null)
                 {
                     behavior = Behavior.ReturnToDen;
+                    denReason = reason;
                 }
             }
+
+            if (behavior == Behavior.ReturnToDen && denReason == "injury")
+            {
+                if (!denWatchOn) BeginDenWatch(previous);
+                else if (DenRetreatStalled(p))
+                {
+                    behavior = GiveUpDen(p, beforeDen);
+                }
+            }
+            else denWatchOn = false;
 
             bool ambushHolds = bait != null && bait.HoldsHunt(p);
 
@@ -305,7 +337,12 @@ namespace MotherMod
 
             if ((behavior == Behavior.Hunt || behavior == Behavior.Stalk) && !ambushHolds)
             {
-                huntCounter = HuntProgressed(p) ? 0 : huntCounter + 1;
+                bool progressed = HuntProgressed(p);
+                var watched = preyTracker.MostAttractivePrey;
+                bool seen = watched != null && watched.VisualContact;
+                bool reachable = watched != null && PreyReachable(watched);
+                if (progressed) huntCounter = 0;
+                else if (!(seen && reachable)) huntCounter++;
                 if (huntCounter > p.HuntForgetFrames)
                 {
                     var giveUp = preyTracker.MostAttractivePrey;
@@ -313,6 +350,7 @@ namespace MotherMod
                     if (giveUp != null)
                     {
                         preyTracker.ForgetPrey(giveUp.representedCreature);
+                        RememberForgottenPrey(giveUp.representedCreature);
                     }
                     behavior = Behavior.Idle;
                 }
@@ -326,6 +364,8 @@ namespace MotherMod
             }
 
             if (bait != null) behavior = bait.Arbitrate(p, behavior);
+
+            if (behavior != Behavior.ReturnToDen) denWatchOn = false;
 
             behaviorCounter--;
 
@@ -404,6 +444,140 @@ namespace MotherMod
                 return true;
             }
             return false;
+        }
+
+        private bool PreyReachable(Tracker.CreatureRepresentation rep)
+        {
+            if (rep == null || pathFinder == null || !pathFinder.DoneMappingAccessibility) return false;
+            WorldCoordinate guess = rep.BestGuessForPosition();
+            if (pathFinder.CoordinateReachableAndGetbackable(guess)) return true;
+            for (int i = 0; i < 4; i++)
+            {
+                if (pathFinder.CoordinateReachableAndGetbackable(guess + Custom.fourDirections[i])) return true;
+            }
+            return false;
+        }
+
+        private void RememberForgottenPrey(AbstractCreature ac)
+        {
+            if (ac == null) return;
+            for (int i = forgottenPrey.Count - 1; i >= 0; i--)
+            {
+                if (ReferenceEquals(forgottenPrey[i].Creature, ac)) forgottenPrey.RemoveAt(i);
+            }
+            forgottenPrey.Add(new ForgottenPrey { Creature = ac, Tick = GameTick });
+        }
+
+        private void TickForgottenPrey(FoxBreedParams p)
+        {
+            int now = GameTick;
+            int cooldown = p.HuntForgetCooldownTicks;
+            for (int i = forgottenPrey.Count - 1; i >= 0; i--)
+            {
+                ForgottenPrey f = forgottenPrey[i];
+                if (cooldown < 0)
+                {
+                    forgottenPrey.RemoveAt(i);
+                    continue;
+                }
+                if (now - f.Tick < cooldown) continue;
+                forgottenPrey.RemoveAt(i);
+
+                Tracker.CreatureRepresentation rep = (tracker == null || preyTracker == null || f.Creature == null)
+                    ? null : tracker.RepresentationForCreature(f.Creature, false);
+                if (rep == null || rep.deleteMeNextFrame)
+                {
+                    continue;
+                }
+                CreatureTemplate.Relationship rel = rep.dynamicRelationship != null
+                    ? rep.dynamicRelationship.currentRelationship : StaticRelationship(f.Creature);
+                if (RouteFor(rel.type, p) != RelRoute.Prey)
+                {
+                    continue;
+                }
+                preyTracker.AddPrey(rep);
+            }
+        }
+
+        private void BeginDenWatch(Behavior was)
+        {
+            denWatchOn = true;
+            denNoProgressTicks = 0;
+            denBestCost = float.MaxValue;
+            denBestGen = -1;
+            denResumePrey = (was == Behavior.Hunt || was == Behavior.Stalk)
+                ? (preyTracker.MostAttractivePrey?.representedCreature ?? huntLatchPrey) : null;
+        }
+
+        private bool DenRetreatStalled(FoxBreedParams p)
+        {
+            bool progress = false;
+            if (pathFinder == null) { }
+            else if (!denFinder.GetDenPosition().HasValue) { }
+            else
+            {
+                PathFinder.PathingCell cell = pathFinder.PathingCellAtWorldCoordinate(creature.pos);
+                if (cell == null) { }
+                else
+                {
+                    if (cell.generation != pathFinder.pathGeneration) { }
+                    else if (!cell.costToGoal.Allowed) { }
+                    else
+                    {
+                        float cost = cell.costToGoal.resistance;
+                        if (denBestGen != cell.generation)
+                        {
+                            denBestGen = cell.generation;
+                            denBestCost = cost;
+                        }
+                        else if (cost < denBestCost)
+                        {
+                            denBestCost = cost;
+                            progress = true;
+                        }
+                    }
+                }
+            }
+
+            denNoProgressTicks = progress ? 0 : denNoProgressTicks + 1;
+            return p.DenGiveUpTicks > 0 && denNoProgressTicks >= p.DenGiveUpTicks;
+        }
+
+        private Behavior GiveUpDen(FoxBreedParams p, Behavior arbitrated)
+        {
+            denGaveUp = true;
+            denGaveUpHealth = creature.state is HealthState hs ? hs.health : 1f;
+            denWatchOn = false;
+            denNoProgressTicks = 0;
+
+            Behavior next = arbitrated;
+            Tracker.CreatureRepresentation top = preyTracker.MostAttractivePrey;
+            if (denResumePrey != null && top != null && ReferenceEquals(top.representedCreature, denResumePrey))
+            {
+                next = Behavior.Hunt;
+                huntLatchPrey = denResumePrey;
+                huntLatchTicks = Math.Max(0, p.HuntPersistFrames);
+                huntLatchHolding = false;
+            }
+            if (next == Behavior.ReturnToDen) next = Behavior.Idle;
+
+            denFinder.GetDenPosition();
+            return next;
+        }
+
+        private void UpdateDenGiveUpWound(float health, bool injured)
+        {
+            if (!injured)
+            {
+                denGaveUp = false;
+                return;
+            }
+            if (health < denGaveUpHealth)
+            {
+                denGaveUp = false;
+                return;
+            }
+            denGaveUpHealth = health;
         }
 
         private void ActOnBehavior()

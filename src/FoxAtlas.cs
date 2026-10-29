@@ -8,7 +8,7 @@ namespace MotherMod
         private static readonly string[] ATLAS_PATHS =
         {
             "atlases/fox_ref", "atlases/fox_tofu", "atlases/fox_milk", "atlases/fox_popcorn", "atlases/fox_corn",
-            "atlases/fox_cherry",
+            "atlases/fox_cherry", "atlases/fox_mushroom", "atlases/fox_potato", "atlases/fox_toby",
         };
 
         private static readonly HashSet<string> Names = new HashSet<string>();

@@ -81,6 +81,16 @@ namespace MotherMod
             }
         }
 
+        internal string RunningActionNameExcept(FoxMoveAction skip)
+        {
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (ReferenceEquals(all[i], skip)) continue;
+                if (all[i].Running) return all[i].Name;
+            }
+            return null;
+        }
+
         internal void TickCooldownsEarly()
         {
             for (int i = 0; i < all.Length; i++)

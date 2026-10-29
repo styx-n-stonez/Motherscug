@@ -206,6 +206,10 @@ namespace MotherMod
                 return;
             }
 
+            if (move != null && move.Charge.Running)
+            {
+                move.Charge.End(p, "evaded");
+            }
             if (chosen == "duck")
             {
                 for (int i = 0; i < bodyChunks.Length; i++)
@@ -312,7 +316,7 @@ namespace MotherMod
             if (WallHeld || WallOwnsGravity) return "wall";
             if (ClimbOwnsGravity) return "climb";
             if (EngineOwnsBody || inShortcut) return "shortcut";
-            string action = move != null ? move.RunningActionName : null;
+            string action = move != null ? move.RunningActionNameExcept(move.Charge) : null;
             if (action != null) return "action_" + action;
             return null;
         }

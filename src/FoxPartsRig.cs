@@ -868,7 +868,8 @@ namespace MotherMod
             s.anchorX = 0f;
             s.anchorY = 0.5f;
             s.rotation = AimDeg(dir) - 90f * faceSign;
-            s.scaleX = (len / Mathf.Max(0.5f, elemW)) * faceSign;
+            float ew = (s.element != null && s.element.sourcePixelSize.x > 0.01f) ? s.element.sourcePixelSize.x : elemW;
+            s.scaleX = (len / Mathf.Max(0.5f, ew)) * faceSign;
             s.scaleY = (s.element != null && s.element.sourcePixelSize.y > 0.01f)
                 ? thickPx / s.element.sourcePixelSize.y : 1f;
         }

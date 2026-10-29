@@ -264,7 +264,8 @@ namespace MotherMod
             if (toTarget.sqrMagnitude > 0.01f)
             {
                 Vector2 now = toTarget.normalized;
-                if (longEnoughThisTick
+                neckDotThisTick = fox.NeckDotNow;
+                if (longEnoughThisTick && neckDotThisTick > 0f
                     && Vector2.Dot(Fox.Dir(rear.pos, front.pos), now) > p.TurnPivotReleaseDot)
                 {
                     return "aligned";
@@ -279,12 +280,15 @@ namespace MotherMod
 
         private bool  crossingStalled;
         private bool  longEnoughThisTick;
+        private float neckDotThisTick = 1f;
         private float spanThisTick;
         private Vector2 offThisTick;
 
         protected override string IsComplete(FoxBreedParams p)
         {
-            return (pivotS <= -1f + Mathf.Max(0.001f, p.TurnPivotFinish)) ? "completed" : null;
+            if (pivotS > -1f + Mathf.Max(0.001f, p.TurnPivotFinish)) return null;
+            neckDotThisTick = fox.NeckDotNow;
+            return neckDotThisTick > 0f ? "completed" : null;
         }
 
         protected override void OnTick(FoxBreedParams p)
@@ -315,9 +319,16 @@ namespace MotherMod
                 if (goalLen < pivotFloorPx) swingGoal = anchor.pos + outward * pivotFloorPx;
                 if (span < pivotFloorPx)
                 {
-                    swingChunk.pos = anchor.pos + outward * pivotFloorPx;
-                    float radial = Vector2.Dot(swingChunk.vel - anchor.vel, outward);
-                    if (radial < 0f) swingChunk.vel -= outward * radial;
+                    Vector2 chunkOut = outward;
+                    bool crossed = span > 0.01f && Vector2.Dot(off, chunkOut) < 0f;
+                    swingChunk.pos = anchor.pos + chunkOut * pivotFloorPx;
+                    if (crossed)
+                    {
+                        mid.pos = (anchor.pos + swingChunk.pos) * 0.5f;
+                        mid.vel = anchor.vel;
+                    }
+                    float radial = Vector2.Dot(swingChunk.vel - anchor.vel, chunkOut);
+                    if (radial < 0f) swingChunk.vel -= chunkOut * radial;
                     off = swingChunk.pos - anchor.pos;
                     span = off.magnitude;
                 }

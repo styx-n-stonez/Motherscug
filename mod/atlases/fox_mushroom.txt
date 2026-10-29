@@ -1,0 +1,674 @@
+{
+ "frames": {
+  "FoxMushroom_HeadSide.png": {
+   "frame": {
+    "x": 2,
+    "y": 2,
+    "w": 21,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 21,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 21,
+    "h": 26
+   }
+  },
+  "FoxMushroom_HeadSideMask.png": {
+   "frame": {
+    "x": 25,
+    "y": 2,
+    "w": 21,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 21,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 21,
+    "h": 26
+   }
+  },
+  "FoxMushroom_HeadSideEye.png": {
+   "frame": {
+    "x": 48,
+    "y": 2,
+    "w": 21,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 21,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 21,
+    "h": 26
+   }
+  },
+  "FoxMushroom_HeadThreeQuarter.png": {
+   "frame": {
+    "x": 71,
+    "y": 2,
+    "w": 17,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 25
+   }
+  },
+  "FoxMushroom_HeadThreeQuarterMask.png": {
+   "frame": {
+    "x": 90,
+    "y": 2,
+    "w": 17,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 25
+   }
+  },
+  "FoxMushroom_HeadThreeQuarterEye.png": {
+   "frame": {
+    "x": 109,
+    "y": 2,
+    "w": 17,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 25
+   }
+  },
+  "FoxMushroom_HeadAway.png": {
+   "frame": {
+    "x": 128,
+    "y": 2,
+    "w": 17,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 25
+   }
+  },
+  "FoxMushroom_HeadAwayMask.png": {
+   "frame": {
+    "x": 147,
+    "y": 2,
+    "w": 17,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 25
+   }
+  },
+  "FoxMushroom_HeadAwayEye.png": {
+   "frame": {
+    "x": 166,
+    "y": 2,
+    "w": 17,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 17,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 17,
+    "h": 25
+   }
+  },
+  "FoxMushroom_Chest.png": {
+   "frame": {
+    "x": 185,
+    "y": 2,
+    "w": 18,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 17
+   }
+  },
+  "FoxMushroom_ChestMask.png": {
+   "frame": {
+    "x": 205,
+    "y": 2,
+    "w": 18,
+    "h": 17
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 18,
+    "h": 17
+   },
+   "sourceSize": {
+    "w": 18,
+    "h": 17
+   }
+  },
+  "FoxMushroom_Body.png": {
+   "frame": {
+    "x": 225,
+    "y": 2,
+    "w": 26,
+    "h": 15
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 15
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 15
+   }
+  },
+  "FoxMushroom_BodyMask.png": {
+   "frame": {
+    "x": 2,
+    "y": 30,
+    "w": 26,
+    "h": 15
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 15
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 15
+   }
+  },
+  "FoxMushroom_LegA_Upper.png": {
+   "frame": {
+    "x": 30,
+    "y": 30,
+    "w": 14,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 5
+   }
+  },
+  "FoxMushroom_LegA_UpperMask.png": {
+   "frame": {
+    "x": 46,
+    "y": 30,
+    "w": 14,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 5
+   }
+  },
+  "FoxMushroom_LegA_Joint.png": {
+   "frame": {
+    "x": 62,
+    "y": 30,
+    "w": 4,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 4,
+    "h": 5
+   }
+  },
+  "FoxMushroom_LegA_JointMask.png": {
+   "frame": {
+    "x": 68,
+    "y": 30,
+    "w": 4,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 4,
+    "h": 5
+   }
+  },
+  "FoxMushroom_LegA_Lower.png": {
+   "frame": {
+    "x": 74,
+    "y": 30,
+    "w": 11,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 11,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 11,
+    "h": 4
+   }
+  },
+  "FoxMushroom_LegA_LowerMask.png": {
+   "frame": {
+    "x": 87,
+    "y": 30,
+    "w": 11,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 11,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 11,
+    "h": 4
+   }
+  },
+  "FoxMushroom_LegA_Paw.png": {
+   "frame": {
+    "x": 100,
+    "y": 30,
+    "w": 8,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 5
+   }
+  },
+  "FoxMushroom_LegA_PawMask.png": {
+   "frame": {
+    "x": 110,
+    "y": 30,
+    "w": 8,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 5
+   }
+  },
+  "FoxMushroom_LegB_Haunch.png": {
+   "frame": {
+    "x": 120,
+    "y": 30,
+    "w": 7,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 8
+   }
+  },
+  "FoxMushroom_LegB_HaunchMask.png": {
+   "frame": {
+    "x": 129,
+    "y": 30,
+    "w": 7,
+    "h": 8
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 8
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 8
+   }
+  },
+  "FoxMushroom_LegB_Upper.png": {
+   "frame": {
+    "x": 138,
+    "y": 30,
+    "w": 8,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 4
+   }
+  },
+  "FoxMushroom_LegB_UpperMask.png": {
+   "frame": {
+    "x": 148,
+    "y": 30,
+    "w": 8,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 4
+   }
+  },
+  "FoxMushroom_LegB_Joint.png": {
+   "frame": {
+    "x": 158,
+    "y": 30,
+    "w": 4,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 4,
+    "h": 4
+   }
+  },
+  "FoxMushroom_LegB_JointMask.png": {
+   "frame": {
+    "x": 164,
+    "y": 30,
+    "w": 4,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 4,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 4,
+    "h": 4
+   }
+  },
+  "FoxMushroom_LegB_Lower.png": {
+   "frame": {
+    "x": 170,
+    "y": 30,
+    "w": 7,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 4
+   }
+  },
+  "FoxMushroom_LegB_LowerMask.png": {
+   "frame": {
+    "x": 179,
+    "y": 30,
+    "w": 7,
+    "h": 4
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 7,
+    "h": 4
+   },
+   "sourceSize": {
+    "w": 7,
+    "h": 4
+   }
+  },
+  "FoxMushroom_LegB_Paw.png": {
+   "frame": {
+    "x": 188,
+    "y": 30,
+    "w": 8,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 5
+   }
+  },
+  "FoxMushroom_LegB_PawMask.png": {
+   "frame": {
+    "x": 198,
+    "y": 30,
+    "w": 8,
+    "h": 5
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 5
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 5
+   }
+  },
+  "FoxMushroom_Tail.png": {
+   "frame": {
+    "x": 2,
+    "y": 47,
+    "w": 51,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 51,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 51,
+    "h": 14
+   }
+  },
+  "FoxMushroom_TailMask.png": {
+   "frame": {
+    "x": 55,
+    "y": 47,
+    "w": 51,
+    "h": 14
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 51,
+    "h": 14
+   },
+   "sourceSize": {
+    "w": 51,
+    "h": 14
+   }
+  }
+ },
+ "meta": {
+  "version": "1.0",
+  "image": "fox_mushroom.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 256,
+   "h": 63
+  },
+  "scale": "1"
+ }
+}
