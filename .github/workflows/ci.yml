@@ -35,6 +35,7 @@ jobs:
         with:
           name: motherscug-${{ github.sha }}
           path: artifact
+          retention-days: 3
 
   prerelease:
     name: Publish test download
