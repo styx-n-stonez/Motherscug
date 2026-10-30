@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: ['**']
   pull_request:
   workflow_dispatch:
 
@@ -20,8 +20,6 @@ jobs:
       - name: Build
         run: dotnet build src/Mother.csproj -c Release
 
-      # Produces a ready-to-drop-in mod folder. Any plugin DLLs committed under
-      # mod/newest/plugins are replaced by the fresh build so stale copies never ship.
       - name: Assemble mod folder
         shell: pwsh
         run: |
@@ -37,6 +35,40 @@ jobs:
         with:
           name: motherscug-${{ github.sha }}
           path: artifact
+
+  prerelease:
+    name: Publish test download
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: prerelease-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: motherscug-${{ github.sha }}
+          path: artifact
+
+      - name: Replace the branch's pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          safe="${BRANCH//\//-}"
+          tag="build-$safe"
+          short="${GITHUB_SHA::7}"
+          zip_name="motherscug-$safe-$short.zip"
+          (cd artifact && zip -qr "../$zip_name" motherscug)
+          gh release delete "$tag" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag || true
+          gh release create "$tag" "$zip_name" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Test build: $BRANCH ($short)" \
+            --notes "Automatic test build of $BRANCH at $GITHUB_SHA. Unzip and drop the motherscug folder into Rain World's mods folder. Replaced on every push to this branch."
 
   validate-json:
     name: Validate JSON
