@@ -1,4 +1,5 @@
-﻿using MonoMod.RuntimeDetour.HookGen;
+﻿using HUD;
+using MonoMod.RuntimeDetour.HookGen;
 using SlugBase.SaveData;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +31,18 @@ namespace MotherMod
                 (hook_GetMeatMultiplier)MeatMultiplierHK);
             On.StoryGameSession.ctor += StoryGameSession_ctor;
             On.GameSession.ctor += GameSession_ctor;
+
+            On.HUD.HUD.ctor += HUD_ctor;
+        }
+
+        private static void HUD_ctor(On.HUD.HUD.orig_ctor orig, HUD.HUD self, FContainer[] fContainers, RainWorld rainWorld, IOwnAHUD owner)
+        {
+            orig(self, fContainers, rainWorld, owner);
+
+            if (owner is Player player && player.abstractCreature.world.game.session is StoryGameSession session && session.characterStats.name == MotherEnums.Mother)
+            {
+                self.parts.Add(new CravingsUI(self, fContainers[1]));
+            }
         }
 
         public static void LateRegister()
@@ -199,6 +212,132 @@ namespace MotherMod
                 slugbasedata.Set(MOTHERPREVCYCLE, dpsd.survives);
 
                 Plugin.LogSource.LogDebug($"Current food craving: {Craving.value}");
+            }
+        }
+
+        public class CravingsUI : HudPart
+        {
+            public readonly FContainer HUDfContainer;
+
+            public IconSymbol symbol;
+            public Color storedColor;
+
+            private int _internalUpdateTimer = DefaultUpdateTimer;
+            public const int DefaultUpdateTimer = 50;
+            public bool cravingsIconSet;
+
+            public float fade;
+            public float lastFade;
+            public float firstFade;
+
+            public Vector2 Pos
+            {
+                get
+                {
+                    return hud.foodMeter?.pos + new Vector2(0f,32f) ?? Vector2.zero;
+                }
+            }
+            public bool Show
+            {
+                get
+                {
+                    return hud.showKarmaFoodRain || hud.owner.RevealMap;
+                }
+            }
+
+            public override void Draw(float timeStacker)
+            {
+                base.Draw(timeStacker);
+
+                if(symbol is not null)
+                {
+                    symbol.Draw(timeStacker, Pos);
+                    symbol.symbolSprite.alpha = fade;
+
+                    if (firstFade < 1f)
+                    {
+                        symbol.showFlash = Mathf.Lerp(symbol.showFlash, 0.5f, 0.1f);
+                    }
+                    else
+                    {
+                        symbol.showFlash = Mathf.Lerp(symbol.showFlash, 0f, 0.1f);
+                    }
+
+                    symbol.shadowSprite1.alpha = symbol.symbolSprite.alpha * 0.5f;
+                    symbol.shadowSprite2.alpha = symbol.symbolSprite.alpha * 0.5f;
+                }
+            }
+
+            public CravingsUI(HUD.HUD hud, FContainer container) : base(hud)
+            {
+                HUDfContainer = container;
+            }
+
+            public void RemoveSprites()
+            {
+                symbol?.RemoveSprites();
+
+            }
+
+            public override void Update()
+            {
+                base.Update();
+
+                if (firstFade < 0.995f)
+                {
+                    firstFade = Mathf.Lerp(firstFade, 1f, 0.05f);
+                }
+                else
+                {
+                    firstFade = 1f;
+                }
+
+                if (hud.foodMeter is not null)
+                {
+                    fade = Mathf.Lerp(fade, Show ? hud.foodMeter.fade : 0f, (fade < hud.foodMeter.fade) ? 0.15f : 0.25f);
+                }
+
+                this.lastFade = fade;
+
+                if (cravingsIconSet) return;
+
+                _internalUpdateTimer--;
+                if(_internalUpdateTimer <= 0)
+                {
+                    UpdateSymbol();
+                    _internalUpdateTimer = DefaultUpdateTimer;
+                    cravingsIconSet = true;
+                }
+            }
+
+            public void UpdateSymbol()
+            {
+                if (Craving is null)
+                {
+                    return;
+                }
+                if (Craving is CreatureTemplate.Type critType)
+                {
+                    IconSymbol.IconSymbolData data = new(critType, AbstractPhysicalObject.AbstractObjectType.Creature, 0);
+                    symbol?.RemoveSprites();
+                    symbol = new CreatureSymbol(data, HUDfContainer);
+                    storedColor = CreatureSymbol.ColorOfCreature(data);
+                    symbol.myColor = storedColor;
+                    symbol.Show(true);
+                    symbol.shadowSprite1.alpha = 0f;
+                    symbol.shadowSprite2.alpha = 0f;
+                }
+                else if (Craving is AbstractPhysicalObject.AbstractObjectType objType)
+                {
+                    IconSymbol.IconSymbolData data = new(CreatureTemplate.Type.StandardGroundCreature, objType, 0);
+                    symbol?.RemoveSprites();
+                    symbol = new ItemSymbol(data, HUDfContainer);
+                    storedColor = ItemSymbol.ColorForItem(objType, 0);
+                    symbol.myColor = storedColor;
+                    symbol.Show(true);
+                    symbol.shadowSprite1.alpha = 0f;
+                    symbol.shadowSprite2.alpha = 0f;
+                }
             }
         }
     }
