@@ -276,12 +276,12 @@ namespace MotherMod
             public void RemoveSprites()
             {
                 symbol?.RemoveSprites();
-
             }
 
             public override void Update()
             {
                 base.Update();
+                symbol?.Update();
 
                 if (firstFade < 0.995f)
                 {
@@ -297,7 +297,7 @@ namespace MotherMod
                     fade = Mathf.Lerp(fade, Show ? hud.foodMeter.fade : 0f, (fade < hud.foodMeter.fade) ? 0.15f : 0.25f);
                 }
 
-                this.lastFade = fade;
+                lastFade = fade;
 
                 if (cravingsIconSet) return;
 
@@ -324,8 +324,6 @@ namespace MotherMod
                     storedColor = CreatureSymbol.ColorOfCreature(data);
                     symbol.myColor = storedColor;
                     symbol.Show(true);
-                    symbol.shadowSprite1.alpha = 0f;
-                    symbol.shadowSprite2.alpha = 0f;
                 }
                 else if (Craving is AbstractPhysicalObject.AbstractObjectType objType)
                 {
@@ -335,8 +333,6 @@ namespace MotherMod
                     storedColor = ItemSymbol.ColorForItem(objType, 0);
                     symbol.myColor = storedColor;
                     symbol.Show(true);
-                    symbol.shadowSprite1.alpha = 0f;
-                    symbol.shadowSprite2.alpha = 0f;
                 }
             }
         }
