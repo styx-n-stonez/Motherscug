@@ -23,6 +23,13 @@ namespace MotherMod
         private int total;
         private bool isLedge;
         private bool prepared;
+        private bool isHop;
+        private Vector2 hopVel;
+        private bool hopTouched;
+        private string hopOutcome = "none";
+        private Vector2 hopTouchPos;
+        private int hopTouchFrames;
+        private float hopTouchAimErr;
         private int boostLeft;
         private float launchFrac = 1f;
         private float wantDist;
@@ -121,6 +128,16 @@ namespace MotherMod
             gatherFramesUsed = fox.GatherFramesFor(p, launchFrac);
             prepared = s.Prepared;
             if (prepared) gatherFramesUsed = 0;
+            isHop = reason == "hop";
+            hopTouched = false;
+            hopOutcome = "none";
+            if (isHop)
+            {
+                gatherFramesUsed = Math.Max(0, s.HopChargeTicks);
+                hopVel = s.HopVel;
+                fox.HopLook.BeginHop(p, s);
+            }
+            else fox.HopLook.Abandon(p, "pounce_began");
             LatchRoutedArc();
             gatherRelease = 0;
             fox.PounceGather = 0f;
@@ -157,6 +174,11 @@ namespace MotherMod
             {
                 fox.RoomRef.MiddleOfTile(plan.LaunchFrom.Tile);
             }
+        }
+
+        private static float DegOf(Vector2 v)
+        {
+            return v.sqrMagnitude <= 0.000001f ? 0f : Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
         }
 
         protected override void OnTick(FoxBreedParams p)
@@ -200,12 +222,15 @@ namespace MotherMod
 
             if (fox.Grounded)
             {
+                float pull = isHop ? p.PounceGatherPull * Mathf.Clamp01(p.HopChargePullFac) : p.PounceGatherPull;
                 BodyChunk[] c = fox.Chunks;
-                for (int i = 0; i < c.Length; i++) c[i].vel -= pounceDir * p.PounceGatherPull;
+                for (int i = 0; i < c.Length; i++) c[i].vel -= pounceDir * pull;
             }
 
+            if (isHop) fox.HopLook.ChargeTick(p, counter);
+
             Creature prey = fox.chaseTarget;
-            if (!isLedge && prey != null && prey.room == fox.RoomRef)
+            if (!isLedge && !isHop && prey != null && prey.room == fox.RoomRef)
             {
                 pounceDir = Fox.Dir(fox.mainBodyChunk.pos, prey.mainBodyChunk.pos);
                 targetPos = prey.mainBodyChunk.pos;
@@ -232,6 +257,11 @@ namespace MotherMod
                 {
                     v = planVel;
                 }
+            }
+
+            if (isHop && hopVel.sqrMagnitude > 0.0001f)
+            {
+                v = hopVel;
             }
 
             Vector2 predicted;
@@ -267,6 +297,8 @@ namespace MotherMod
 
             fox.AssertLaunchTraction();
 
+            if (isHop) fox.HopLook.Launch(p, c, v);
+
             boostLeft = Math.Max(0, p.PounceBoostFrames);
             Stage = Fox.PounceState.Propel;
             counter = 0;
@@ -276,7 +308,7 @@ namespace MotherMod
 
             if (prepared) fox.BreakCamo("bait_pounce");
 
-            fox.voice.Attack();
+            if (!isHop || p.HopLaunchVoice) fox.voice.Attack();
         }
 
         private void UpdateFlight(FoxBreedParams p)
@@ -295,7 +327,8 @@ namespace MotherMod
 
             fox.ClearGoThroughFloors();
 
-            fox.AlignBodyToVelocity(p, fox.BodyFlightVelocity(), "pounce");
+            if (isHop && fox.HopLook.OwnsAttitude) fox.HopLook.FlightTick(p);
+            else fox.AlignBodyToVelocity(p, fox.BodyFlightVelocity(), "pounce");
 
             fox.TryBite(p);
 
@@ -307,6 +340,7 @@ namespace MotherMod
 
             if (counter > p.PounceFlightMaxFrames)
             {
+                if (isHop) hopOutcome = "flight_timeout";
                 EnterRecovery();
             }
         }
@@ -314,7 +348,9 @@ namespace MotherMod
         private void LandPounce(FoxBreedParams p, string reason)
         {
             BodyChunk[] c = fox.Chunks;
-            float comp = p.PounceLandCompress;
+            bool cyanLand = isHop && fox.HopLook.SkipsLandCompress;
+            if (isHop) fox.HopLook.NoteTouchdown(p);
+            float comp = cyanLand ? 0f : p.PounceLandCompress;
             if (comp != 0f)
             {
                 c[2].vel.y += comp;
@@ -330,6 +366,14 @@ namespace MotherMod
             fox.PounceFlight = 0f;
             ReleaseGather(p, "landed");
 
+            if (isHop)
+            {
+                hopTouched = true;
+                hopOutcome = "landed";
+                hopTouchPos = fox.mainBodyChunk.pos;
+                hopTouchFrames = counter;
+                hopTouchAimErr = Vector2.Distance(fox.mainBodyChunk.pos, targetPos);
+            }
             EnterRecovery();
         }
 
@@ -343,13 +387,30 @@ namespace MotherMod
 
         protected override int CooldownOnEnd(FoxBreedParams p, string reason, bool handover)
         {
+            if (isHop) return 0;
             if (handover || reason == "knocked_out") return 0;
+            if (prepared && reason == "launch_refused") return Math.Max(2, p.BaitRefusedRetryTicks);
             return Math.Max(0, p.PounceCooldown);
+        }
+
+        protected override string ShouldAbort(FoxBreedParams p)
+        {
+            if (!isHop) return null;
+            if (fox.grabbedBy != null && fox.grabbedBy.Count > 0) return "grabbed";
+            return null;
         }
 
         protected override bool OnEnd(FoxBreedParams p, string reason, int ran, bool wasRunning, bool handover)
         {
             if (!wasRunning) return false;
+
+            if (isHop && fox.Move != null)
+            {
+                string refused = "none";
+                fox.HopLook.NotePounceEnded(p, reason, hopTouched, handover);
+                fox.Move.Hop.NoteEnded(p, reason, Stage.ToString(), handover, hopTouched, hopOutcome,
+                                       hopTouchPos, hopTouchFrames, hopTouchAimErr, refused, ran);
+            }
 
             bool forced = reason == "overran" || reason == "overran_bite_gate";
 
@@ -358,6 +419,10 @@ namespace MotherMod
             total = 0;
             boostLeft = 0;
             fox.PounceFlight = 0f;
+
+            float landWas = fox.PounceLand, readyWas = fox.PounceGatherReady;
+            fox.PounceLand = 0f;
+            fox.PounceGatherReady = 0f;
 
             if (handover)
             {
@@ -381,6 +446,12 @@ namespace MotherMod
 
             if (reason == "launch_refused")
             {
+                if (prepared)
+                {
+                    gatherRelease = 0;
+                    fox.ResumeAmbushGather();
+                    return true;
+                }
                 ReleaseGather(p, "launch_refused");
                 return true;
             }

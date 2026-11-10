@@ -9,7 +9,6 @@ namespace MotherMod
         private readonly Fox fox;
 
         public int Communicating { get; private set; }
-        public float Flicker { get; private set; }
 
         private bool wasEnabled;
         private int lastHeartbeatTick = -100000;
@@ -43,7 +42,6 @@ namespace MotherMod
                 {
                     wasEnabled = false;
                     Communicating = 0;
-                    Flicker = 0f;
                     flaring = false;
                 }
                 return;
@@ -169,6 +167,15 @@ namespace MotherMod
             LastSentTick = Clock;
         }
 
+        internal void NoteSignal(Fox receiver)
+        {
+            SentSerial++;
+            int slot = SentSerial % SentRingSize;
+            sentRing[slot] = receiver;
+            sentRingSerial[slot] = SentSerial;
+            LastSentTick = Clock;
+        }
+
         internal const int SentRingSize = 8;
         private readonly Fox[] sentRing = new Fox[SentRingSize];
         private readonly int[] sentRingSerial = new int[SentRingSize];
@@ -185,10 +192,7 @@ namespace MotherMod
         private void TickSignal(FoxBreedParams p)
         {
             if (Communicating > 0) Communicating--;
-            float target = Mathf.InverseLerp(0f, Mathf.Max(1, p.PheromoneFlickerFullTicks), Communicating);
-            if (Flicker < target) Flicker = Mathf.Min(target, Flicker + Mathf.Max(0f, p.PheromoneFlickerRise));
-            else Flicker = Mathf.Max(target, Flicker - Mathf.Max(0f, p.PheromoneFlickerFall));
-            if (flaring && Communicating <= 0 && Flicker <= 0f)
+            if (flaring && Communicating <= 0)
             {
                 flaring = false;
             }

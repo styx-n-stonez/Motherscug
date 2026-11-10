@@ -473,5 +473,38 @@
   "color_leg_lower": "FF7931",
   "color_paws": "170D05",
   "color_eye": "0A0A0A",
-  "icon_color": "A17B52"
+  "icon_color": "A17B52",
+  "base_speed": 3.55,
+  "speed_corridor": 0.71,
+  "swim_speed": 0.45,
+  "regain_footing_frames": 3,
+  "pounce_route_goal_seed_radius_tiles": 7.0,
+  "tiles": {
+    "floor": {
+      "resistance": 1.0,
+      "legality": "Allowed"
+    },
+    "curved_floor": {
+      "resistance": 1.0,
+      "legality": "inherit"
+    },
+    "corridor": {
+      "resistance": 1.5,
+      "legality": "Allowed"
+    },
+    "climb": {
+      "resistance": 2.5,
+      "legality": "Allowed"
+    },
+    "wall": {
+      "resistance": 4.0,
+      "legality": "Unallowed"
+    },
+    "ceiling": {
+      "resistance": 4.0,
+      "legality": "Unallowed"
+    }
+  },
+  "climbs_poles": true,
+  "hop_enabled": true
 }

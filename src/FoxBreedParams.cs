@@ -27,7 +27,7 @@ namespace MotherMod
 
         public float OffScreenSpeed = 0.3f;
         public int   AbstractedLaziness = 40;
-        public float RoamInRoomChance = 0.12f;
+        public float RoamInRoomChance = 0.3f;
         public float RoamBetweenRoomsChance = 0.09f;
 
         public int   Grasps = 1;
@@ -35,7 +35,7 @@ namespace MotherMod
         public bool  StowFoodInDen = true;
         public bool  CanSwim = false;
         public string WaterRelationship = "AirAndSurface";
-        public float WaterPathingResistance = 4f;
+        public float WaterPathingResistance = 3.0f;
 
         public float LoadedPerformanceCost = 50f;
 
@@ -75,10 +75,6 @@ namespace MotherMod
 
         public readonly List<FoxRelationship> Relationships = FoxRelationship.Defaults();
 
-        public float ConspecificPackIntensity = 0.3f;
-
-        public int RelationshipsExpectedSkipped = 0;
-
         public string RelRouteAttacks = "prey";
 
         public string RelRouteSocialDependent = "prey";
@@ -112,9 +108,9 @@ namespace MotherMod
         public int PounceRoutePeekSteps = 10;
         public int PounceRouteMaxFinders = 4;
         public int PounceRouteItersPerTick = 100;
-        public int PounceRouteMinTilesOrigin = 5;
+        public int PounceRouteMinTilesOrigin = 3;
         public int PounceRouteMinTilesDest = 3;
-        public bool PounceRouteBlockNarrow = true;
+        public bool PounceRouteBlockNarrow = false;
         public int PounceRouteReplanTicks = 60;
         public string PounceRouteMaxLegality = "unwanted";
         public int MantleRouteScanTiles = 2;
@@ -124,7 +120,7 @@ namespace MotherMod
         public bool MantleRiseFromClimbEnds = true;
         public bool StepUpRampConnWalks = true;
         public float StepArcPeak = 0.32f;
-        public float StepTargetFreezeFrac = 0.80f;
+        public float StepTargetFreezeFrac = 1.0f;
         public int StepSwingMinTicks = 9;
         public int PipeReentryDelayTicks = 100;
         public float PipeMouthShovePx = 4.0f;
@@ -162,8 +158,7 @@ namespace MotherMod
 
         public bool SqueezeArmWhenWedged = true;
         public float SqueezeWedgeUtilityMin = 0f;
-        public bool ZeroGravityInCorridors = true;
-        public bool PounceRouteFlyLaunchVel = false;
+        public bool PounceRouteFlyLaunchVel = true;
         public bool TurnRearAnchorEnabled = true;
         public bool TurnBlockedProbeLevel = true;
         public int PounceRouteGoalSeedSnapRows = 5;
@@ -185,7 +180,7 @@ namespace MotherMod
         public float WeightRain = 0.9f;
         public int   PathStepsPerFrame = 12;
 
-        public int   RememberCreatureFrames = 1200;
+        public int   RememberCreatureFrames = -1;
         public float PreySureToGetDistance = 3f;
         public float PreySureToLoseDistance = 70f;
         public float PreyPersistenceBias = 2f;
@@ -247,9 +242,6 @@ namespace MotherMod
         public float DeathHeadPitchDeg = -30f;
         public float DeathHeadPitchRate = 0.05f;
 
-        public bool DeathBehindFadeEnabled = false;
-        public int DeathBehindFadeTicks = 160;
-        public float DeathBehindFadeMinAlpha = 0.35f;
         public int DeathBehindLayTicks = 40;
         public float DeathBehindLayLimbFac = 0.35f;
 
@@ -288,10 +280,9 @@ namespace MotherMod
         public bool LedgePounceEnabled = true;
         public float LedgePounceMinRise = 30f;
         public float LedgePounceMaxRise = 80f;
-        public int LedgePounceCooldown = 60;
+        public int LedgePounceCooldown = 4;
         public float LedgePounceLeadFac = 0.8f;
         public int LedgePounceHeadroomTiles = 2;
-        public float LedgePounceStandoffPx = 40f;
         public float LedgePounceLandMarginPx = 20f;
 
         public bool  LedgePounceAllowLevel = true;
@@ -320,7 +311,7 @@ namespace MotherMod
         public float MantleMaxRiseSpeed = 4f;
         public int MantleMaxTicks = 60;
         public int MantleCooldown = 30;
-        public int MantleHeadroomTiles = 2;
+        public int MantleHeadroomTiles = 1;
         public int MantleProbeTiles = 1;
         public int MantleMaxScanTiles = 2;
         public bool  MantleFacePlatforms = true;
@@ -339,13 +330,13 @@ namespace MotherMod
         public int ReachLogTicks = 5;
 
         public bool EnterEnabled = true;
-        public int EnterGatherFrames = 22;
+        public int EnterGatherFrames = 8;
         public float EnterGatherCompress = 0.12f;
         public float EnterHeadLead = 0.10f;
-        public float EnterRearLag = 0.08f;
+        public float EnterRearLag = 0.6f;
         public float EnterPull = 1.5f;
         public bool EnterSpinePull = true;
-        public int EnterMaxFrames = 60;
+        public int EnterMaxFrames = 90;
         public int EnterCooldown = 15;
         public float EnterReachPx = 30f;
 
@@ -415,9 +406,9 @@ namespace MotherMod
         public float SqueezeFullFrames = 30f;
         public float SqueezeMinFac = 0.05f;
         public float SqueezeLimbFac = 0.45f;
-        public float SqueezeBodyFac = 0.8f;
-        public float SqueezeTailFac = 0.8f;
-        public float SqueezeSpineLenFac = 0.8f;
+        public float SqueezeBodyFac = 1.0f;
+        public float SqueezeTailFac = 1.0f;
+        public float SqueezeSpineLenFac = 1.0f;
         public bool SqueezeDrawFromTerrain = true;
         public float SqueezeDrawTerrainMax = 1f;
         public float SqueezeDrawTerrainLerp = 0.25f;
@@ -479,17 +470,10 @@ namespace MotherMod
         public bool  PounceEnabled = true;
         public float PounceDistance = 170f;
         public float PounceMinDistance = 40f;
-        public int   PounceCrouchFrames = 22;
-        public int   PouncePropulsionFrames = 9;
-        public int   PounceMaxFrames = 26;
-        public float PounceSpeed = 10f;
-        public float PounceLift = 0.5f;
         public int   PounceCooldown = 110;
         public int   PounceRecoveryStun = 18;
         public float PounceChance = 0.6f;
         public int   PounceRetryDelay = 10;
-        public float PounceCrouchPullback = 0.08f;
-        public float PounceThrustFalloff = 0.5f;
         public int   PounceGateRetryDelay = 5;
 
         public int   PounceGatherFrames = 22;
@@ -572,7 +556,7 @@ namespace MotherMod
         public int   MoveLogTicks = 20;
 
         public int   PathLatchTicks = 14;
-        public float PathLatchArrive = 10f;
+        public float PathLatchArrive = 6.0f;
 
         public int   PathLatchMaxRejects = 3;
 
@@ -586,48 +570,40 @@ namespace MotherMod
 
         public bool  PathTiebreakTravelPreference = true;
 
-        public int   TurnFrames = 16;
         public float TurnTriggerDot = -0.3f;
         public float TurnTriggerMinHorizontal = 0.35f;
-        public float TurnRate = 0.12f;
         public int   TurnCooldown = 40;
-        public float TurnTuck = 0.6f;
-        public bool  TurnSwap = true;
 
         public string TurnMode = "frontpivot";
 
-        public float TurnPivotSpeed = 1.0f;
+        public float TurnPivotSpeed = 0.70f;
         public float TurnPivotFriction = 0.99f;
         public float TurnPivotLead = 0.35f;
         public float TurnPivotMidFac = 0.6f;
         public float TurnPivotBrake = 0.5f;
-        public float TurnPivotJitter = 0.12f;
-        public float TurnPivotStretchPx = 10f;
+        public float TurnPivotJitter = 0.16f;
+        public float TurnPivotStretchPx = 14.00f;
         public bool TurnPivotSpanClamp = true;
         public float TurnPivotCrossFac = 0.12f;
         public float TurnPivotFinish = 0.15f;
         public float TurnPivotReleaseDot = 0.5f;
         public float TurnPivotReleaseSpanFac = 0.6f;
-        public float TurnPivotSwingPx = 6f;
+        public float TurnPivotSwingPx = 9.00f;
         public float TurnPivotGoalDot = 0.5f;
-        public int   TurnPivotMaxTicks = 60;
+        public int   TurnPivotMaxTicks = 80;
         public bool  TurnPivotPushOff = true;
         public float TurnPivotSpanFloorFac = 0.60f;
 
         public bool  TurnFocusHold = true;
         public float TurnFocusHoldDot = 0f;
-        public int   TurnMinIntervalTicks = 40;
+        public int   TurnMinIntervalTicks = 50;
 
-        public float TurnMaxStepPx = 4f;
         public int   TurnLogTicks = 4;
-        public float TurnBrake = 0.35f;
         public int   TurnAbortAirTicks = 3;
         public bool  TurnInWater = true;
         public bool  TurnCarryRotate = true;
         public float TurnSpineRelax = 0f;
         public int   TurnSpineRecoverTicks = 8;
-        public float TurnVerticalHold = 1f;
-        public int   TurnHoldMaxTicks = 60;
 
         public float BodyTurnForeshorten = 0.6f;
 
@@ -644,8 +620,6 @@ namespace MotherMod
         public float LimbSweepSpeedGate = 0.1f;
         public int   LimbSweepMinGrip = 2;
         public float LimbSweepBodySpeedGate = 0.3f;
-
-        public bool  EatInPlaceEnabled = false;
 
         public bool  DenFedEnabled = false;
 
@@ -693,13 +667,6 @@ namespace MotherMod
         public float CarryWaterDropSubmersion = 0.4f;
         public float DropPreyDamage = 0.3f;
 
-        public int EatFrames = 160;
-        public float EatSafeThreat = 0.35f;
-        public float EatReach = 40f;
-        public float EatPoseRate = 0.04f;
-        public float EatCrouchDrop = 4f;
-        public float EatHeadFac = 0.85f;
-        public int EatMeatPerMeal = 1;
         public bool EatsCarrion = true;
         public float CarrionIntensityFac = 1.3f;
         public bool CarrionFromAllPrey = true;
@@ -707,12 +674,12 @@ namespace MotherMod
         public float ConspecificSpacing = 12f;
 
         public float RoamThreatWeight = 1f;
-        public float RoamNoiseWeight = 0.6f;
+        public float RoamNoiseWeight = 1.2f;
         public float RoamDistanceWeight = 0.35f;
         public float RoamPickJitter = 0.25f;
-        public int RoamCandidates = 8;
+        public int RoamCandidates = 12;
 
-        public int DenRestFrames = 400;
+        public int DenRestFrames = 1200;
         public float DenFedPriority = 0.5f;
 
         public bool StalkEnabled = true;
@@ -721,12 +688,6 @@ namespace MotherMod
         public float StalkBreakDistance = 140f;
         public float StalkPreySpeedBreak = 6f;
         public float StalkCrouchFac = 0.5f;
-
-        public float HungerPerCycle = 0.35f;
-        public float StarveRegenFac = 0.2f;
-        public float StarveAggressionFac = 2f;
-        public float MealValue = 0.5f;
-        public bool StarveLethal = false;
 
         public float LandSafeSpeed = 12f;
         public float LandDamageSpeed = 20f;
@@ -783,14 +744,14 @@ namespace MotherMod
         public Color EyeHoleFloor = new Color(0x0A / 255f, 0x0A / 255f, 0x0A / 255f);
         public Color ColorHead = new Color(0x97 / 255f, 0x97 / 255f, 0x97 / 255f);
 
-        public bool SandboxGlowEnabled = true;
+        public bool SandboxGlowEnabled = false;
 
-        public Color SandboxGlowColor = new Color(0x80 / 255f, 0x80 / 255f, 0x80 / 255f);
-        public bool SandboxHideArtCopy = true;
+        public Color SandboxGlowColor = new Color(1f, 1f, 1f);
+        public bool SandboxHideArtCopy = false;
 
         public Color IconColor = new Color(1f, 1f, 1f);
 
-        public float SandboxGlowAlpha = 0.5f;
+        public float SandboxGlowAlpha = 0.0f;
 
         public int PoseLogTicks = 80;
         public int FeetLogTicks = 40;
@@ -863,7 +824,7 @@ namespace MotherMod
         public bool BodySpriteMask = true;
         public float BodySpriteScaleFac = 1f;
         public float BodySpriteStretch = 0.15f;
-        public bool LegSprites = false;
+        public bool LegSprites = true;
         public string LegSpriteFront = "FoxRef_LegStraightMask";
         public string LegSpriteFrontFar = "FoxRef_LegDiagonalMask";
         public string LegSpriteHind = "FoxRef_LegFrontBMask";
@@ -880,6 +841,90 @@ namespace MotherMod
         public int TobyFrameTicks = 10;
         public float TobyFrameScale = 1f;
         public float TobyFrameFeetPx = 17f;
+
+        public bool SpearEnabled = false;
+        public float SpearSeekTiles = 10f;
+        public int SpearSeekScanTicks = 10;
+        public float SpearGrabPx = 50f;
+        public int SpearFetchMaxTicks = 400;
+        public int SpearFetchRetryTicks = 600;
+        public int SpearRefetchCooldownTicks = 80;
+        public float SpearThrowDistPx = 160f;
+        public float SpearThrowLevelMin = 0.95f;
+        public float SpearThrowSpeed = 35f;
+        public int SpearReleaseFrom = 1;
+        public float SpearDamage = 1f;
+        public float SpearStunBonus = 20f;
+        public int SpearThrowCooldownTicks = 40;
+        public int SpearCarryAt = 1;
+        public float SpearMouthAngleDeg = 0f;
+        public float SpearRearDeg = 40f;
+        public int SpearRearTicks = 10;
+        public float SpearGripFrac = 0.32f;
+        public float SpearPawAngleDeg = 58f;
+        public float SpearTransferArcPx = 6f;
+        public float SpearTransferHeadDeg = 15f;
+        public int SpearWindupTicks = 40;
+        public float SpearWindupBackPx = 35f;
+        public float SpearWindupLift = 0.6f;
+        public float SpearWindupWobblePx = 1.96f;
+        public float SpearWindupLeanPx = 3f;
+        public int SpearReleaseTicks = 20;
+        public int SpearSnapTicks = 5;
+        public int SpearHeadPushTicks = 10;
+        public float SpearReleaseLungePx = 5f;
+        public float SpearReleaseDipDeg = 8f;
+        public float SpearLandCompressPx = 3f;
+        public int SpearLandSettleTicks = 10;
+        public int SpearBodyMotion = 1;
+        public int SpearRearLoadTicks = 6;
+        public float SpearRearLoadPx = 4f;
+        public float SpearRearOvershoot = 0.12f;
+        public float SpearHeadSpring = 0.25f;
+        public float SpearHeadDamp = 0.55f;
+        public float SpearTailCounter = 0.15f;
+        public float SpearTailWhip = 3f;
+        public float SpearTuckFold = 1f;
+        public float SpearTuckDrop = 0.5f;
+
+        public bool HopEnabled = false;
+        public string HopWhen = "moving";
+        public bool HopWhileStalking = false;
+        public int HopPeekSteps = 10;
+        public int HopMaxFinders = 4;
+        public int HopItersPerTick = 100;
+        public int HopMinTilesOrigin = 5;
+        public int HopMinTilesDest = 3;
+        public bool HopBlockNarrow = true;
+        public float HopMinSpeedFrac = 0.28f;
+        public float HopSpeedFac = 1f;
+        public float HopCarrySpeedFac = 0.75f;
+        public float HopArcClearNearPx = 10f;
+        public float HopArcClearFarPx = 20f;
+        public float HopPowerMedium = 0.25f;
+        public float HopPowerLarge = 0.75f;
+        public int HopChargeTicksSmall = 15;
+        public int HopChargeTicksMedium = 30;
+        public int HopChargeTicksLarge = 45;
+        public float HopChargePullFac = 0f;
+        public int HopCooldownTicks = 20;
+        public bool HopLaunchVoice = false;
+        public int HopLookCyan = 1;
+        public float HopLookSinkPx = 12f;
+        public float HopLookChargeCouple = 1f;
+        public float HopLookTailShiverPx = 5f;
+        public int HopLookAccent = 0;
+        public int HopLookSnap = 1;
+        public float HopLookBurst = 0.35f;
+        public float HopLookTrail = 0.35f;
+        public int HopLookBubbles = 0;
+        public float HopLookSteer = 1f;
+        public int HopLookSpin = 1;
+        public float HopLookLandSquashPx = 6f;
+        public float HopLookLandStretch = 0.35f;
+        public int HopLookLandTicks = 12;
+        public float HopLookLandWiden = 0.3f;
+        public float HopLookLandRecoilDeg = 12f;
         public float PartsScaleFac = 1f;
         public float PartsRefSpine = 32.3f;
         public float PartsBodyReach = 1f;
@@ -888,17 +933,17 @@ namespace MotherMod
         public bool PartsBodyMesh = true;
         public int PartsBodyQuads = 4;
         public int PartsChestQuads = 3;
-        public float PartsBodyBendFac = 1f;
+        public float PartsBodyBendFac = 0.25f;
         public float PartsBodyBendMax = 3f;
         public float PartsBodyLag = 0.35f;
-        public float PartsBodyLagFac = 1.2f;
+        public float PartsBodyLagFac = 0.3f;
         public float PartsBodyFlexSmooth = 0.3f;
         public float PartsBodySquashAmp = 0.35f;
         public float PartsBodySquashLenGain = 2.5f;
         public float PartsBodySquashGather = 0.5f;
         public float PartsBodySquashFlight = 0.4f;
         public float PartsBodySquashLand = 0.7f;
-        public float PartsBodySquashMax = 0.6f;
+        public float PartsBodySquashMax = 0.3f;
         public float PartsBodyFlexMaxDeg = 9f;
         public float PartsBodyWidthMax = 0.12f;
         public bool PartsLegRootFollowBend = false;
@@ -946,14 +991,12 @@ namespace MotherMod
         public float PartsLegForeOffset = 1.5f;
         public float PartsHaunchLean = 25f;
         public bool PartsHaunchInChain = false;
-        public float PartsHeadTqGate = 0.55f;
-        public float PartsHeadAwayGate = 0.2f;
         public float PartsHeadTqGateEnter = 0.50f;
         public float PartsHeadTqGateExit = 0.60f;
         public float PartsHeadAwayGateEnter = 0.15f;
         public float PartsHeadAwayGateExit = 0.25f;
         public int PartsHeadFrameDwellTicks = 12;
-        public float PartsWaveAmp = 1.6f;
+        public float PartsWaveAmp = 1.0f;
         public float PartsWaveLen = 60f;
         public float PartsWaveSpeedGate = 2f;
         public float PartsWaveSpeedFull = 6f;
@@ -1001,13 +1044,13 @@ namespace MotherMod
         public int HeadNoiseHoldTicks = 80;
         public float HeadBehindYaw = 0.9f;
 
-        public float TurnHeadLead = 0.8f;
+        public float TurnHeadLead = 1.00f;
         public float TurnHeadLeadRate = 0.14f;
-        public float TurnHeadLeadPitchDeg = 5f;
-        public float TurnTailSwing = 0.35f;
+        public float TurnHeadLeadPitchDeg = 8.00f;
+        public float TurnTailSwing = 0.60f;
 
-        public float StepLeadFac = 1f;
-        public float StepLeadSpeedFac = 0.5f;
+        public float StepLeadFac = 0.75f;
+        public float StepLeadSpeedFac = 0.25f;
         public float StepBehindTrigger = 0.75f;
         public float StepSwingSpeedFac = 2.2f;
         public float StepArcLift = 2.5f;
@@ -1015,7 +1058,7 @@ namespace MotherMod
         public float StepSwingFold = 1.15f;
         public float PawCurlDeg = 20f;
         public bool PawCurlPivotAnkle = true;
-        public float GaitPairSpeed = 4.5f;
+        public float GaitPairSpeed = 5.6f;
 
         public int StepPlantCommitTicks = 6;
         public int StepMinGrip = 2;
@@ -1063,7 +1106,7 @@ namespace MotherMod
         public float WalkBob = 1f;
         public float LimbAttachFront = 0.35f;
         public float LimbAttachRear = 0.35f;
-        public float LimbAttachDrop = 2f;
+        public float LimbAttachDrop = 0.0f;
 
         public int TailSegments = 5;
         public float TailLengthFac = 1f;
@@ -1074,7 +1117,7 @@ namespace MotherMod
         public float TailRootThickness = 0.90f;
         public float TailTipThickness = 0.12f;
         public float TailSwellPos = 0.25f;
-        public float TailRootDrop = 1f;
+        public float TailRootDrop = 0.0f;
         public float TailRootDroop = 0.45f;
         public float TailGravityCurve = 2f;
         public float TailMeshOverlap = 0.2f;
@@ -1171,11 +1214,11 @@ namespace MotherMod
 
         public int WallLogTicks = 20;
 
-        public string VoiceHunt = "Lizard_Voice_Green_A";
-        public string VoiceAlert = "Lizard_Voice_Blue_A";
-        public string VoiceAttack = "Lizard_Voice_Pink_B";
-        public string VoiceHurt = "Lizard_Voice_Pink_D";
-        public string VoiceDeath = "Lizard_Voice_Pink_E";
+        public string VoiceHunt = "";
+        public string VoiceAlert = "";
+        public string VoiceAttack = "";
+        public string VoiceHurt = "";
+        public string VoiceDeath = "";
         public string VoicePheromone = "";
         public float VoiceVolume = 1f;
         public float VoicePitch = 1f;
@@ -1187,16 +1230,12 @@ namespace MotherMod
         public string PheromoneReceiverResponse = "none";
         public int PheromoneCommMinTicks = 3;
         public int PheromoneCommMaxTicks = 50;
-        public int PheromoneFlickerFullTicks = 14;
-        public float PheromoneFlickerRise = 0.25f;
-        public float PheromoneFlickerFall = 0.025f;
         public int PheromoneLogTicks = 40;
 
-        public int PheromoneStyle = 1;
-        public float PheromoneWiggleDeg = 12f;
-        public float PheromoneWiggleHz = 3f;
+        public float PheromoneWiggleDeg = 23.0f;
+        public float PheromoneWiggleHz = 1.5f;
         public float PheromoneWiggleLagDeg = 60f;
-        public int PheromoneReleaseTicks = 48;
+        public int PheromoneReleaseTicks = 60;
         public int PheromoneWiggleRiseTicks = 4;
         public int PheromoneWiggleFallTicks = 10;
         public float PheromoneMistOpacity = 0.25f;
@@ -1204,15 +1243,44 @@ namespace MotherMod
         public float PheromoneMistSaturation = 0.55f;
         public float PheromoneMistLightness = 0.76f;
         public float PheromoneMistFog = 0.2f;
-        public float PheromoneMistSize = 0.25f;
-        public int PheromoneMistCount = 6;
-        public float PheromoneMistAim = 0.7f;
-        public float PheromoneMistDrift = 3f;
+        public float PheromoneMistSize = 0.1f;
+        public int PheromoneMistCount = 17;
+        public float PheromoneMistAim = 1.0f;
+        public float PheromoneMistDrift = 4.0f;
         public int PheromoneMistLifetimeTicks = 180;
         public bool PheromoneReceiverSniff = true;
         public float PheromoneSniffReachPx = 8f;
         public float PheromoneSniffReachFac = 0.4f;
-        public int PheromoneSniffDelayTicks = 6;
+
+        public bool FlankEnabled = false;
+        public float FlankSpreadRadiusPx = 300f;
+        public float FlankSpreadCost = 200f;
+        public float FlankMateTileCost = 300f;
+        public float FlankPincerAngleDeg = 180f;
+        public float FlankPincerFanDeg = 45f;
+        public float FlankPincerRadiusTiles = 5f;
+        public int FlankGoalSearchTiles = 3;
+        public float FlankArriveTiles = 2f;
+        public float FlankCommitDistTiles = 3f;
+        public int FlankCircleMaxTicks = 240;
+        public int FlankLeaderLostTicks = 200;
+
+        public int FlankWaysExitSteps = 12;
+        public int FlankWaysOpenTiles = 6;
+        public float FlankWaysMergeDeg = 60f;
+        public int FlankWaysRecheckTicks = 20;
+        public bool FlankBlockEnabled = false;
+        public int FlankBlockMaxWays = 3;
+        public float FlankBlockDistTiles = 4f;
+        public bool FlankHerdEnabled = false;
+        public int FlankHerdSearchTiles = 15;
+        public int FlankHerdSearchStepTiles = 5;
+        public float FlankHerdGapTiles = 5f;
+        public float FlankHerdSpeedFac = 0.5f;
+        public int FlankHerdMaxTicks = 400;
+        public float FlankHerdFanDeg = 60f;
+        public bool FlankSyncEnabled = false;
+        public int FlankSyncMaxWaitTicks = 160;
 
         public bool EvasionEnabled = false;
         public float EvasionChance = 0.6f;
@@ -1342,8 +1410,6 @@ namespace MotherMod
 
         public bool BaitWaitHoldsAgainstHunt = false;
 
-        public string BaitSpringRule = "prey";
-
         public float BaitTriggerRangePx = 40f;
 
         public bool BaitPounceRoll = false;
@@ -1351,6 +1417,10 @@ namespace MotherMod
         public float BaitFaceRunSpeed = 0.35f;
 
         public int BaitFaceMaxTicks = 200;
+
+        public int BaitRefusedRetryTicks = 5;
+
+        public int BaitArriveLineTicks = 40;
 
         public float BaitExitWeight = 0.01f;
 
@@ -1411,11 +1481,8 @@ namespace MotherMod
             p.WaterRelationship = S(o, "water_relationship", p.WaterRelationship);
             p.WaterPathingResistance = F(o, "water_pathing_resistance", p.WaterPathingResistance);
             p.LoadedPerformanceCost = F(o, "loaded_performance_cost", p.LoadedPerformanceCost);
-            p.ConspecificPackIntensity = F(o, "conspecific_pack_intensity", p.ConspecificPackIntensity);
-            p.RelationshipsExpectedSkipped = I(o, "relationships_expected_skipped", p.RelationshipsExpectedSkipped);
             p.RelRouteAttacks = S(o, "rel_route_attacks", p.RelRouteAttacks);
             p.RelRouteSocialDependent = S(o, "rel_route_social_dependent", p.RelRouteSocialDependent);
-            p.DiscomfortEnabled = B(o, "discomfort_enabled", p.DiscomfortEnabled);
             ReadRelationships(o, p);
             ReadRoomAttraction(o, p);
             ReadTiles(o, p);
@@ -1431,64 +1498,37 @@ namespace MotherMod
             p.WeightThreat = F(o, "weight_threat", p.WeightThreat);
             p.WeightPrey = F(o, "weight_prey", p.WeightPrey);
             p.WeightRain = F(o, "weight_rain", p.WeightRain);
-            p.PathStepsPerFrame = I(o, "path_steps_per_frame", p.PathStepsPerFrame);
-            p.RouteHoleAvoid = B(o, "route_hole_avoid", p.RouteHoleAvoid);
             p.RouteHolePenalty = F(o, "route_hole_penalty", p.RouteHolePenalty);
             p.RouteCorridorPenalty = F(o, "route_corridor_penalty", p.RouteCorridorPenalty);
-            p.RouteCorridorDetectSideways = B(o, "route_corridor_detect_sideways", p.RouteCorridorDetectSideways);
             p.RouteHoleLegality = S(o, "route_hole_legality", p.RouteHoleLegality);
             p.RouteHoleProbeTiles = I(o, "route_hole_probe_tiles", p.RouteHoleProbeTiles);
-            p.RouteObstacleEnabled = B(o, "route_obstacle_enabled", p.RouteObstacleEnabled);
             p.RouteObstacleWeight = F(o, "route_obstacle_weight", p.RouteObstacleWeight);
             p.RouteObstacleExponent = F(o, "route_obstacle_exponent", p.RouteObstacleExponent);
-            p.RouteObstacleSkipWhenWedged = B(o, "route_obstacle_skip_when_wedged", p.RouteObstacleSkipWhenWedged);
             p.RouteObstacleEscapeMuteTicks = I(o, "route_obstacle_escape_mute_ticks", p.RouteObstacleEscapeMuteTicks);
             p.PounceRouteEnabled = B(o, "pounce_route_enabled", p.PounceRouteEnabled);
-            p.PounceRouteWhilePatrolling = B(o, "pounce_route_while_patrolling", p.PounceRouteWhilePatrolling);
-            p.PounceRoutePeekSteps = I(o, "pounce_route_peek_steps", p.PounceRoutePeekSteps);
-            p.PounceRouteMaxFinders = I(o, "pounce_route_max_finders", p.PounceRouteMaxFinders);
-            p.PounceRouteItersPerTick = I(o, "pounce_route_iters_per_tick", p.PounceRouteItersPerTick);
             p.PounceRouteMinTilesOrigin = I(o, "pounce_route_min_tiles_origin", p.PounceRouteMinTilesOrigin);
             p.PounceRouteMinTilesDest = I(o, "pounce_route_min_tiles_dest", p.PounceRouteMinTilesDest);
-            p.PounceRouteBlockNarrow = B(o, "pounce_route_block_narrow", p.PounceRouteBlockNarrow);
             p.PounceRouteReplanTicks = I(o, "pounce_route_replan_ticks", p.PounceRouteReplanTicks);
-            p.MantleRouteEnabled = B(o, "mantle_route_enabled", p.MantleRouteEnabled);
-            p.MantleRouteVeto = B(o, "mantle_route_veto", p.MantleRouteVeto);
-            p.MantleRouteVetoOnSilence = B(o, "mantle_route_veto_on_silence", p.MantleRouteVetoOnSilence);
-            p.MantleRouteVetoOnIllegalLanding = B(o, "mantle_route_veto_on_illegal_landing", p.MantleRouteVetoOnIllegalLanding);
-            p.PounceRouteGoalSeedEnabled = B(o, "pounce_route_goal_seed_enabled", p.PounceRouteGoalSeedEnabled);
             p.PounceRouteGoalSeedSnapRows = I(o, "pounce_route_goal_seed_snap_rows", p.PounceRouteGoalSeedSnapRows);
             p.PounceRouteGoalSeedPathFloor = I(o, "pounce_route_goal_seed_path_floor", p.PounceRouteGoalSeedPathFloor);
             p.PounceRouteGoalSeedRadiusTiles = F(o, "pounce_route_goal_seed_radius_tiles", p.PounceRouteGoalSeedRadiusTiles);
             p.PounceRouteGoalSeedLateralTiles = F(o, "pounce_route_goal_seed_lateral_tiles", p.PounceRouteGoalSeedLateralTiles);
             p.PounceRouteGoalSeedMinGainTiles = F(o, "pounce_route_goal_seed_min_gain_tiles", p.PounceRouteGoalSeedMinGainTiles);
             p.PounceRouteGoalMinTilesOrigin = I(o, "pounce_route_goal_min_tiles_origin", p.PounceRouteGoalMinTilesOrigin);
-            p.TurnRearAnchorEnabled = B(o, "turn_rear_anchor_enabled", p.TurnRearAnchorEnabled);
-            p.TurnBlockedProbeLevel = B(o, "turn_blocked_probe_level", p.TurnBlockedProbeLevel);
-            p.PounceRouteFlyLaunchVel = B(o, "pounce_route_fly_launch_vel", p.PounceRouteFlyLaunchVel);
-            p.ZeroGravityInCorridors = B(o, "zero_gravity_in_corridors", p.ZeroGravityInCorridors);
-            p.SqueezeArmWhenWedged = B(o, "squeeze_arm_when_wedged", p.SqueezeArmWhenWedged);
             p.SqueezeWedgeMaxTicks = I(o, "squeeze_wedge_max_ticks", p.SqueezeWedgeMaxTicks);
-            p.SqueezeWedgeRearmInCorridor = B(o, "squeeze_wedge_rearm_in_corridor", p.SqueezeWedgeRearmInCorridor);
             p.SqueezeWedgeMaxRearms = I(o, "squeeze_wedge_max_rearms", p.SqueezeWedgeMaxRearms);
-            p.SqueezeWedgeEscapeEnabled = B(o, "squeeze_wedge_escape_enabled", p.SqueezeWedgeEscapeEnabled);
             p.SqueezeWedgeEscapeTicks = I(o, "squeeze_wedge_escape_ticks", p.SqueezeWedgeEscapeTicks);
             p.SqueezeWedgeEscapeStuckTicks = I(o, "squeeze_wedge_escape_stuck_ticks", p.SqueezeWedgeEscapeStuckTicks);
             p.SqueezeReinflateTicks = I(o, "squeeze_reinflate_ticks", p.SqueezeReinflateTicks);
             p.CorridorTerrainMinChunks = I(o, "corridor_terrain_min_chunks", p.CorridorTerrainMinChunks);
-            p.CorridorNarrowIgnoreDiagonals = B(o, "corridor_narrow_ignore_diagonals", p.CorridorNarrowIgnoreDiagonals);
-            p.CorridorFootingGate = B(o, "corridor_footing_gate", p.CorridorFootingGate);
             p.CorridorEntryFootingFrames = I(o, "corridor_entry_footing_frames", p.CorridorEntryFootingFrames);
             p.CorridorCenterFac = F(o, "corridor_center_fac", p.CorridorCenterFac);
             p.CorridorCenterReachTiles = F(o, "corridor_center_reach_tiles", p.CorridorCenterReachTiles);
-            p.CorridorCenterYieldToTravel = B(o, "corridor_center_yield_to_travel", p.CorridorCenterYieldToTravel);
             p.CorridorFoldFac = F(o, "corridor_fold_fac", p.CorridorFoldFac);
             p.SqueezeWedgeUtilityMin = F(o, "squeeze_wedge_utility_min", p.SqueezeWedgeUtilityMin);
-            p.PounceRouteRevalidationsMax = I(o, "pounce_route_revalidations_max", p.PounceRouteRevalidationsMax);
             p.PounceRouteHoldMaxTicks = I(o, "pounce_route_hold_max_ticks", p.PounceRouteHoldMaxTicks);
             p.PounceRouteMinRise = F(o, "pounce_route_min_rise", p.PounceRouteMinRise);
             p.PounceRouteMaxRise = F(o, "pounce_route_max_rise", p.PounceRouteMaxRise);
-            p.GaitWalkEnabled = B(o, "gait_walk_enabled", p.GaitWalkEnabled);
             p.GaitWalkTrotSpeed = F(o, "gait_walk_trot_speed", p.GaitWalkTrotSpeed);
             p.StepGaitGapShort = F(o, "step_gait_gap_short", p.StepGaitGapShort);
             p.StepGaitGapLong = F(o, "step_gait_gap_long", p.StepGaitGapLong);
@@ -1498,57 +1538,41 @@ namespace MotherMod
             p.PipeReentryDelayTicks = I(o, "pipe_reentry_delay_ticks", p.PipeReentryDelayTicks);
             p.PipeMouthShovePx = F(o, "pipe_mouth_shove_px", p.PipeMouthShovePx);
             p.PipeExitDelayTicks = I(o, "pipe_exit_delay_ticks", p.PipeExitDelayTicks);
-            p.MantleRiseFromClimbEnds = B(o, "mantle_rise_from_climb_ends", p.MantleRiseFromClimbEnds);
-            p.StepUpRampConnWalks = B(o, "step_up_ramp_conn_walks", p.StepUpRampConnWalks);
-            p.PounceRouteSeedAttemptsPerTick = I(o, "pounce_route_seed_attempts_per_tick", p.PounceRouteSeedAttemptsPerTick);
             p.PartsSpineRevMinSpeed = F(o, "parts_spine_rev_min_speed", p.PartsSpineRevMinSpeed);
             p.PounceRouteMaxLegality = S(o, "pounce_route_max_legality", p.PounceRouteMaxLegality);
             p.MantleRouteScanTiles = I(o, "mantle_route_scan_tiles", p.MantleRouteScanTiles);
             p.MantleRouteReplanTicks = I(o, "mantle_route_replan_ticks", p.MantleRouteReplanTicks);
             p.MantleRoutePenalty = F(o, "mantle_route_penalty", p.MantleRoutePenalty);
             p.MantleRouteMaxRise = F(o, "mantle_route_max_rise", p.MantleRouteMaxRise);
-            p.RememberCreatureFrames = I(o, "remember_creature_frames", p.RememberCreatureFrames);
             p.PreySureToGetDistance = F(o, "prey_sure_to_get_distance", p.PreySureToGetDistance);
             p.PreySureToLoseDistance = F(o, "prey_sure_to_lose_distance", p.PreySureToLoseDistance);
             p.PreyPersistenceBias = F(o, "prey_persistence_bias", p.PreyPersistenceBias);
             p.PreyGiveUpUnreachable = I(o, "prey_give_up_unreachable", p.PreyGiveUpUnreachable);
             p.PreyGiveUpGhostGeneration = I(o, "prey_give_up_ghost_generation", p.PreyGiveUpGhostGeneration);
             p.HuntPersistFrames = I(o, "hunt_persist_frames", p.HuntPersistFrames);
-            p.HuntGhostPursue = B(o, "hunt_ghost_pursue", p.HuntGhostPursue);
             p.HearingSkill = F(o, "hearing_skill", p.HearingSkill);
             p.PhysGravity = F(o, "gravity", p.PhysGravity);
             p.PhysSurfaceFriction = F(o, "surface_friction", p.PhysSurfaceFriction);
             p.PhysAirFriction = F(o, "air_friction", p.PhysAirFriction);
             p.PhysBounce = F(o, "bounce", p.PhysBounce);
-            p.PhysGoThroughFloors = B(o, "phys_go_through_floors", p.PhysGoThroughFloors);
             p.PhysWaterFriction = F(o, "water_friction", p.PhysWaterFriction);
             p.PhysBuoyancy = F(o, "buoyancy", p.PhysBuoyancy);
 
-            p.SwimEnabled = B(o, "swim_enabled", p.SwimEnabled);
             p.SwimSpeed = F(o, "swim_speed", p.SwimSpeed);
             p.SwimSubmersionMin = F(o, "swim_submersion_min", p.SwimSubmersionMin);
-            p.SwimSurfaceHold = B(o, "swim_surface_hold", p.SwimSurfaceHold);
             p.SwimSurfaceDamping = F(o, "swim_surface_damping", p.SwimSurfaceDamping);
             p.SwimSurfacePull = F(o, "swim_surface_pull", p.SwimSurfacePull);
             p.SwimSurfaceClamp = F(o, "swim_surface_clamp", p.SwimSurfaceClamp);
-            p.SwimClimbOutFooting = B(o, "swim_climb_out_footing", p.SwimClimbOutFooting);
             p.SwimLogTicks = I(o, "swim_log_ticks", p.SwimLogTicks);
-            p.SwimDiveEnabled = B(o, "swim_dive_enabled", p.SwimDiveEnabled);
             p.SwimDiveDepthTiles = F(o, "swim_dive_depth_tiles", p.SwimDiveDepthTiles);
             p.SwimDiveSpeed = F(o, "swim_dive_speed", p.SwimDiveSpeed);
-            p.SwimSurfaceHoldReleaseOnDive = B(o, "swim_surface_hold_release_on_dive", p.SwimSurfaceHoldReleaseOnDive);
-            p.StunFallEnabled = B(o, "stun_fall_enabled", p.StunFallEnabled);
-            p.StunFallFrictionOnDead = B(o, "stun_fall_friction_on_dead", p.StunFallFrictionOnDead);
-            p.DeathAssertPhysics = B(o, "death_assert_physics", p.DeathAssertPhysics);
             p.StunFallMinStun = I(o, "stun_fall_min_stun", p.StunFallMinStun);
-            p.StunFallRightingOff = B(o, "stun_fall_righting_off", p.StunFallRightingOff);
             p.StunFallSurfaceFriction = F(o, "stun_fall_surface_friction", p.StunFallSurfaceFriction);
             p.StunFallRecoverTicks = I(o, "stun_fall_recover_ticks", p.StunFallRecoverTicks);
             p.BlindEnabled = B(o, "blind_enabled", p.BlindEnabled);
             p.BlindOmniFac = F(o, "blind_omni_fac", p.BlindOmniFac);
             p.BlindHeadScatterPx = F(o, "blind_head_scatter_px", p.BlindHeadScatterPx);
             p.BlindHeadScatterTicks = I(o, "blind_head_scatter_ticks", p.BlindHeadScatterTicks);
-            p.BlindEyeFlicker = B(o, "blind_eye_flicker", p.BlindEyeFlicker);
             p.BlindStunEnabled = B(o, "blind_stun_enabled", p.BlindStunEnabled);
             p.BlindStunTicksNear = I(o, "blind_stun_ticks_near", p.BlindStunTicksNear);
             p.BlindStunTicksFar = I(o, "blind_stun_ticks_far", p.BlindStunTicksFar);
@@ -1561,12 +1585,8 @@ namespace MotherMod
             p.DeathThroesGrabbedFac = F(o, "death_throes_grabbed_fac", p.DeathThroesGrabbedFac);
             p.DeathHeadPitchDeg = F(o, "death_head_pitch_deg", p.DeathHeadPitchDeg);
             p.DeathHeadPitchRate = F(o, "death_head_pitch_rate", p.DeathHeadPitchRate);
-            p.DeathBehindFadeEnabled = B(o, "death_behind_fade_enabled", p.DeathBehindFadeEnabled);
-            p.DeathBehindFadeTicks = I(o, "death_behind_fade_ticks", p.DeathBehindFadeTicks);
-            p.DeathBehindFadeMinAlpha = F(o, "death_behind_fade_min_alpha", p.DeathBehindFadeMinAlpha);
             p.DeathBehindLayTicks = I(o, "death_behind_lay_ticks", p.DeathBehindLayTicks);
             p.DeathBehindLayLimbFac = F(o, "death_behind_lay_limb_fac", p.DeathBehindLayLimbFac);
-            p.DeathLayAllDeaths = B(o, "death_lay_all_deaths", p.DeathLayAllDeaths);
             p.DeathBehindConeDeg = F(o, "death_behind_cone_deg", p.DeathBehindConeDeg);
             p.DeathLimpTicks = I(o, "death_limp_ticks", p.DeathLimpTicks);
             p.DeathBodyFlexMaxDeg = F(o, "death_body_flex_max_deg", p.DeathBodyFlexMaxDeg);
@@ -1595,11 +1615,8 @@ namespace MotherMod
             p.LedgePounceCooldown = I(o, "ledge_pounce_cooldown", p.LedgePounceCooldown);
             p.LedgePounceLeadFac = F(o, "ledge_pounce_lead_fac", p.LedgePounceLeadFac);
             p.LedgePounceHeadroomTiles = I(o, "ledge_pounce_headroom_tiles", p.LedgePounceHeadroomTiles);
-            p.LedgePounceStandoffPx = F(o, "ledge_pounce_standoff_px", p.LedgePounceStandoffPx);
             p.LedgePounceLandMarginPx = F(o, "ledge_pounce_land_margin_px", p.LedgePounceLandMarginPx);
-            p.LedgePounceAllowLevel = B(o, "ledge_pounce_allow_level", p.LedgePounceAllowLevel);
             p.LedgePounceMinGapPx = F(o, "ledge_pounce_min_gap_px", p.LedgePounceMinGapPx);
-            p.LedgePounceAllowDescend = B(o, "ledge_pounce_allow_descend", p.LedgePounceAllowDescend);
             p.LedgePounceMaxDrop = F(o, "ledge_pounce_max_drop", p.LedgePounceMaxDrop);
             p.MantleEnabled = B(o, "mantle_enabled", p.MantleEnabled);
             p.MantleMinRise = F(o, "mantle_min_rise", p.MantleMinRise);
@@ -1615,7 +1632,6 @@ namespace MotherMod
             p.MantleHeadroomTiles = I(o, "mantle_headroom_tiles", p.MantleHeadroomTiles);
             p.MantleProbeTiles = I(o, "mantle_probe_tiles", p.MantleProbeTiles);
             p.MantleMaxScanTiles = I(o, "mantle_max_scan_tiles", p.MantleMaxScanTiles);
-            p.MantleFacePlatforms = B(o, "mantle_face_platforms", p.MantleFacePlatforms);
             p.MantleClearMarginPx = F(o, "mantle_clear_margin_px", p.MantleClearMarginPx);
             p.MantleFootAboveFac = F(o, "mantle_foot_above_fac", p.MantleFootAboveFac);
             p.MantleLogTicks = I(o, "mantle_log_ticks", p.MantleLogTicks);
@@ -1625,22 +1641,16 @@ namespace MotherMod
             p.ReachSpeed = F(o, "reach_speed", p.ReachSpeed);
             p.ReachAccelFac = F(o, "reach_accel_fac", p.ReachAccelFac);
             p.ReachArrivePx = F(o, "reach_arrive_px", p.ReachArrivePx);
-            p.ReachGravityOff = B(o, "reach_gravity_off", p.ReachGravityOff);
             p.ReachCooldown = I(o, "reach_cooldown", p.ReachCooldown);
             p.ReachLogTicks = I(o, "reach_log_ticks", p.ReachLogTicks);
-            p.EnterEnabled = B(o, "enter_enabled", p.EnterEnabled);
             p.EnterGatherFrames = I(o, "enter_gather_frames", p.EnterGatherFrames);
             p.EnterGatherCompress = F(o, "enter_gather_compress", p.EnterGatherCompress);
             p.EnterHeadLead = F(o, "enter_head_lead", p.EnterHeadLead);
             p.EnterRearLag = F(o, "enter_rear_lag", p.EnterRearLag);
             p.EnterPull = F(o, "enter_pull", p.EnterPull);
-            p.EnterSpinePull = B(o, "enter_spine_pull", p.EnterSpinePull);
             p.EnterMaxFrames = I(o, "enter_max_frames", p.EnterMaxFrames);
             p.EnterCooldown = I(o, "enter_cooldown", p.EnterCooldown);
             p.EnterReachPx = F(o, "enter_reach_px", p.EnterReachPx);
-            p.EnterThroughFloors = B(o, "enter_through_floors", p.EnterThroughFloors);
-            p.EnterShortcutEnabled = B(o, "enter_shortcut_enabled", p.EnterShortcutEnabled);
-            p.EnterShortcutNeedsGround = B(o, "enter_shortcut_needs_ground", p.EnterShortcutNeedsGround);
             p.EnterShortcutScanTiles = I(o, "enter_shortcut_scan_tiles", p.EnterShortcutScanTiles);
             p.EnterShortcutNearTiles = I(o, "enter_shortcut_near_tiles", p.EnterShortcutNearTiles);
             p.MoveActionLogTicks = I(o, "move_action_log_ticks", p.MoveActionLogTicks);
@@ -1652,7 +1662,6 @@ namespace MotherMod
             p.LedgePounceLipSurfaces = S(o, "ledge_pounce_lip_surfaces", p.LedgePounceLipSurfaces);
             p.LedgePounceGatherSlackFac = F(o, "ledge_pounce_gather_slack_fac", p.LedgePounceGatherSlackFac);
             p.PounceMaxLaunchDeg = F(o, "pounce_max_launch_deg", p.PounceMaxLaunchDeg);
-            p.SqueezeEnabled = B(o, "squeeze_enabled", p.SqueezeEnabled);
             p.SqueezeStartFrames = F(o, "squeeze_start_frames", p.SqueezeStartFrames);
             p.SqueezeFullFrames = F(o, "squeeze_full_frames", p.SqueezeFullFrames);
             p.SqueezeMinFac = F(o, "squeeze_min_fac", p.SqueezeMinFac);
@@ -1660,24 +1669,15 @@ namespace MotherMod
             p.SqueezeBodyFac = F(o, "squeeze_body_fac", p.SqueezeBodyFac);
             p.SqueezeTailFac = F(o, "squeeze_tail_fac", p.SqueezeTailFac);
             p.SqueezeSpineLenFac = F(o, "squeeze_spine_len_fac", p.SqueezeSpineLenFac);
-            p.SqueezeDrawFromTerrain = B(o, "squeeze_draw_from_terrain", p.SqueezeDrawFromTerrain);
             p.SqueezeDrawTerrainMax = F(o, "squeeze_draw_terrain_max", p.SqueezeDrawTerrainMax);
             p.SqueezeDrawTerrainLerp = F(o, "squeeze_draw_terrain_lerp", p.SqueezeDrawTerrainLerp);
             p.SqueezeSlopesOffFrames = I(o, "squeeze_slopes_off_frames", p.SqueezeSlopesOffFrames);
-            p.SqueezeSpinePull = B(o, "squeeze_spine_pull", p.SqueezeSpinePull);
             p.SqueezeBacklogSteps = I(o, "squeeze_backlog_steps", p.SqueezeBacklogSteps);
             p.SqueezeProgressPx = F(o, "squeeze_progress_px", p.SqueezeProgressPx);
             p.SqueezeProgressWindow = I(o, "squeeze_progress_window", p.SqueezeProgressWindow);
             p.SqueezeSpanMinFac = F(o, "squeeze_span_min_fac", p.SqueezeSpanMinFac);
-            p.SpanFloorCorrectPx = F(o, "span_floor_correct_px", p.SpanFloorCorrectPx);
-            p.SpanCollapseWarnTicks = I(o, "span_collapse_warn_ticks", p.SpanCollapseWarnTicks);
             p.SpanLogTicks = I(o, "span_log_ticks", p.SpanLogTicks);
             p.SpanLogFloorTicks = I(o, "span_log_floor_ticks", p.SpanLogFloorTicks);
-            p.SpanFloorGraceTicks = I(o, "span_floor_grace_ticks", p.SpanFloorGraceTicks);
-            p.SqueezeSpinePullAlways = B(o, "squeeze_spine_pull_always", p.SqueezeSpinePullAlways);
-            p.DriveHeadLed = B(o, "drive_head_led", p.DriveHeadLed);
-            p.DriveGroundDescentClamp = B(o, "drive_ground_descent_clamp", p.DriveGroundDescentClamp);
-            p.DriveSlopeHorizontal = B(o, "drive_slope_horizontal", p.DriveSlopeHorizontal);
             p.DriveTrailSlackPx = F(o, "drive_trail_slack_px", p.DriveTrailSlackPx);
             p.DriveTrailBackstepFac = F(o, "drive_trail_backstep_fac", p.DriveTrailBackstepFac);
             p.DriveMidSpeedFac = F(o, "drive_mid_speed_fac", p.DriveMidSpeedFac);
@@ -1697,20 +1697,17 @@ namespace MotherMod
             p.IdleSwitchMinFrames = I(o, "idle_switch_min_frames", p.IdleSwitchMinFrames);
             p.IdleSwitchMaxFrames = I(o, "idle_switch_max_frames", p.IdleSwitchMaxFrames);
             p.PanicUtilityThreshold = F(o, "panic_utility_threshold", p.PanicUtilityThreshold);
-            p.FleeReevaluations = I(o, "flee_reevaluations", p.FleeReevaluations);
             p.FleeMaxDistance = I(o, "flee_max_distance", p.FleeMaxDistance);
             p.BiteDamage = F(o, "bite_damage", p.BiteDamage);
             p.BiteStunBonus = F(o, "bite_stun_bonus", p.BiteStunBonus);
             p.BiteRadius = F(o, "bite_radius", p.BiteRadius);
             p.BiteCooldown = I(o, "bite_cooldown", p.BiteCooldown);
             p.BiteMomentumFac = F(o, "bite_momentum_fac", p.BiteMomentumFac);
-            p.BiteThroughWalls = B(o, "bite_through_walls", p.BiteThroughWalls);
             p.BiteContactRadius = F(o, "bite_contact_radius", p.BiteContactRadius);
             p.BiteContactGap = F(o, "bite_contact_gap", p.BiteContactGap);
             p.BiteFacingDot = F(o, "bite_facing_dot", p.BiteFacingDot);
             p.BiteFacingPounceDot = F(o, "bite_facing_pounce_dot", p.BiteFacingPounceDot);
             p.BiteFacingChargeDot = F(o, "bite_facing_charge_dot", p.BiteFacingChargeDot);
-            p.BiteSweptContact = B(o, "bite_swept_contact", p.BiteSweptContact);
             p.BiteSweptMinSpeed = F(o, "bite_swept_min_speed", p.BiteSweptMinSpeed);
             p.LungeSpeed = F(o, "lunge_speed", p.LungeSpeed);
             p.LungeMaxSpeed = F(o, "lunge_max_speed", p.LungeMaxSpeed);
@@ -1718,18 +1715,9 @@ namespace MotherMod
             p.PounceEnabled = B(o, "pounce_enabled", p.PounceEnabled);
             p.PounceDistance = F(o, "pounce_distance", p.PounceDistance);
             p.PounceMinDistance = F(o, "pounce_min_distance", p.PounceMinDistance);
-            p.PounceCrouchFrames = I(o, "pounce_crouch_frames", p.PounceCrouchFrames);
-            p.PouncePropulsionFrames = I(o, "pounce_propulsion_frames", p.PouncePropulsionFrames);
-            p.PounceMaxFrames = I(o, "pounce_max_frames", p.PounceMaxFrames);
-            p.PounceSpeed = F(o, "pounce_speed", p.PounceSpeed);
-            p.PounceLift = F(o, "pounce_lift", p.PounceLift);
             p.PounceCooldown = I(o, "pounce_cooldown", p.PounceCooldown);
             p.PounceRecoveryStun = I(o, "pounce_recovery_stun", p.PounceRecoveryStun);
             p.PounceChance = F(o, "pounce_chance", p.PounceChance);
-            p.PounceRetryDelay = I(o, "pounce_retry_delay", p.PounceRetryDelay);
-            p.PounceCrouchPullback = F(o, "pounce_crouch_pullback", p.PounceCrouchPullback);
-            p.PounceThrustFalloff = F(o, "pounce_thrust_falloff", p.PounceThrustFalloff);
-            p.PounceGateRetryDelay = I(o, "pounce_gate_retry_delay", p.PounceGateRetryDelay);
 
             p.PounceGatherFrames = I(o, "pounce_gather_frames", p.PounceGatherFrames);
             p.PounceGatherPull = F(o, "pounce_gather_pull", p.PounceGatherPull);
@@ -1750,7 +1738,6 @@ namespace MotherMod
             p.PounceLandFrames = I(o, "pounce_land_frames", p.PounceLandFrames);
             p.PounceLandDamp = F(o, "pounce_land_damp", p.PounceLandDamp);
             p.PounceLandCompress = F(o, "pounce_land_compress", p.PounceLandCompress);
-            p.PounceRangeScaling = B(o, "pounce_range_scaling", p.PounceRangeScaling);
             p.PounceLaunchMinFrac = F(o, "pounce_launch_min_frac", p.PounceLaunchMinFrac);
             p.PounceRangeOvershootFac = F(o, "pounce_range_overshoot_fac", p.PounceRangeOvershootFac);
             p.PounceRiseMargin = F(o, "pounce_rise_margin", p.PounceRiseMargin);
@@ -1759,12 +1746,7 @@ namespace MotherMod
             p.PounceVariationDev = F(o, "pounce_variation_dev", p.PounceVariationDev);
             p.PounceVariationK = F(o, "pounce_variation_k", p.PounceVariationK);
             p.PounceVariationGatherFac = F(o, "pounce_variation_gather_fac", p.PounceVariationGatherFac);
-            p.PounceRoomClamp = B(o, "pounce_room_clamp", p.PounceRoomClamp);
             p.PounceRoomMargin = F(o, "pounce_room_margin", p.PounceRoomMargin);
-            p.PounceRequireLanding = B(o, "pounce_require_landing", p.PounceRequireLanding);
-            p.PounceLandingScanTiles = I(o, "pounce_landing_scan_tiles", p.PounceLandingScanTiles);
-            p.PounceLandingCheckObstruction = B(o, "pounce_landing_check_obstruction", p.PounceLandingCheckObstruction);
-            p.PounceLandingRequireStandingRoom = B(o, "pounce_landing_require_standing_room", p.PounceLandingRequireStandingRoom);
             p.PounceAlignRate = F(o, "pounce_align_rate", p.PounceAlignRate);
             p.PounceAlignMaxDeg = F(o, "pounce_align_max_deg", p.PounceAlignMaxDeg);
             p.PounceAlignMinSpeed = F(o, "pounce_align_min_speed", p.PounceAlignMinSpeed);
@@ -1785,44 +1767,22 @@ namespace MotherMod
             p.ChargeMaxFrames = I(o, "charge_max_frames", p.ChargeMaxFrames);
             p.ChargeMaxSpeed = F(o, "charge_max_speed", p.ChargeMaxSpeed);
             p.ChargeAimTrack = F(o, "charge_aim_track", p.ChargeAimTrack);
-            p.ChargeRequireGrounded = B(o, "charge_require_grounded", p.ChargeRequireGrounded);
             p.ChargeRecoveryStun = I(o, "charge_recovery_stun", p.ChargeRecoveryStun);
             p.ChargeCooldown = I(o, "charge_cooldown", p.ChargeCooldown);
-            p.AttackStateCeilingTicks = I(o, "attack_state_ceiling_ticks", p.AttackStateCeilingTicks);
-            p.ChargeGateRetryDelay = I(o, "charge_gate_retry_delay", p.ChargeGateRetryDelay);
             p.ChargeRoomMargin = F(o, "charge_room_margin", p.ChargeRoomMargin);
-            p.ChargeRequireLanding = B(o, "charge_require_landing", p.ChargeRequireLanding);
-            p.ChargeLandingSamples = I(o, "charge_landing_samples", p.ChargeLandingSamples);
             p.ChargeStallSpeed = F(o, "charge_stall_speed", p.ChargeStallSpeed);
             p.ChargeStallGrace = I(o, "charge_stall_grace", p.ChargeStallGrace);
-
-            MigrateRetiredPounceKey(o, "pounce_crouch_frames", "pounce_gather_frames",
-                                    p.PounceCrouchFrames, ref p.PounceGatherFrames);
-            MigrateRetiredPounceKeyF(o, "pounce_crouch_pullback", "pounce_gather_pull",
-                                     p.PounceCrouchPullback, ref p.PounceGatherPull);
-            MigrateRetiredPounceKeyF(o, "pounce_speed", "pounce_launch_speed",
-                                     p.PounceSpeed, ref p.PounceLaunchSpeed);
-            MigrateRetiredPounceKeyF(o, "pounce_lift", "pounce_launch_lift",
-                                     p.PounceLift, ref p.PounceLaunchLift);
 
             p.MoveLogTicks = I(o, "move_log_ticks", p.MoveLogTicks);
             p.PathLatchTicks = I(o, "path_latch_ticks", p.PathLatchTicks);
             p.PathLatchArrive = F(o, "path_latch_arrive", p.PathLatchArrive);
             p.PathLatchMaxRejects = I(o, "path_latch_max_rejects", p.PathLatchMaxRejects);
-            p.PathBodyTieBreak = B(o, "path_body_tie_break", p.PathBodyTieBreak);
             p.PathTieBreakMaxStreak = I(o, "path_tiebreak_max_streak", p.PathTieBreakMaxStreak);
             p.PathTiebreakCommitTicks = I(o, "path_tiebreak_commit_ticks", p.PathTiebreakCommitTicks);
-            p.PathTiebreakNormaliseTurn = B(o, "path_tiebreak_normalise_turn", p.PathTiebreakNormaliseTurn);
-            p.PathTiebreakTravelPreference = B(o, "path_tiebreak_travel_preference", p.PathTiebreakTravelPreference);
-            p.TurnFrames = I(o, "turn_frames", p.TurnFrames);
             p.TurnTriggerDot = F(o, "turn_trigger_dot", p.TurnTriggerDot);
             p.TurnTriggerMinHorizontal = F(o, "turn_trigger_min_horizontal", p.TurnTriggerMinHorizontal);
-            p.TurnRate = F(o, "turn_rate", p.TurnRate);
             p.TurnCooldown = I(o, "turn_cooldown", p.TurnCooldown);
-            p.TurnTuck = F(o, "turn_tuck", p.TurnTuck);
-            p.TurnSwap = B(o, "turn_swap", p.TurnSwap);
             p.TurnMode = S(o, "turn_mode", p.TurnMode);
-            p.TurnMaxStepPx = F(o, "turn_max_step_px", p.TurnMaxStepPx);
             p.TurnPivotSpeed = F(o, "turn_pivot_speed", p.TurnPivotSpeed);
             p.TurnPivotFriction = F(o, "turn_pivot_friction", p.TurnPivotFriction);
             p.TurnPivotLead = F(o, "turn_pivot_lead", p.TurnPivotLead);
@@ -1830,8 +1790,6 @@ namespace MotherMod
             p.TurnPivotBrake = F(o, "turn_pivot_brake", p.TurnPivotBrake);
             p.TurnPivotJitter = F(o, "turn_pivot_jitter", p.TurnPivotJitter);
             p.TurnPivotStretchPx = F(o, "turn_pivot_stretch_px", p.TurnPivotStretchPx);
-            p.TurnPivotSpanClamp = B(o, "turn_pivot_span_clamp", p.TurnPivotSpanClamp);
-            p.TurnFocusHold = B(o, "turn_focus_hold", p.TurnFocusHold);
             p.TurnFocusHoldDot = F(o, "turn_focus_hold_dot", p.TurnFocusHoldDot);
             p.TurnMinIntervalTicks = I(o, "turn_min_interval_ticks", p.TurnMinIntervalTicks);
             p.TurnPivotCrossFac = F(o, "turn_pivot_cross_fac", p.TurnPivotCrossFac);
@@ -1841,23 +1799,12 @@ namespace MotherMod
             p.TurnPivotSwingPx = F(o, "turn_pivot_swing_px", p.TurnPivotSwingPx);
             p.TurnPivotGoalDot = F(o, "turn_pivot_goal_dot", p.TurnPivotGoalDot);
             p.TurnPivotMaxTicks = I(o, "turn_pivot_max_ticks", p.TurnPivotMaxTicks);
-            p.TurnPivotPushOff = B(o, "turn_pivot_push_off", p.TurnPivotPushOff);
             p.TurnPivotSpanFloorFac = F(o, "turn_pivot_span_floor_fac", p.TurnPivotSpanFloorFac);
             p.TurnLogTicks = I(o, "turn_log_ticks", p.TurnLogTicks);
-            p.TurnBrake = F(o, "turn_brake", p.TurnBrake);
             p.TurnAbortAirTicks = I(o, "turn_abort_air_ticks", p.TurnAbortAirTicks);
-            p.TurnInWater = B(o, "turn_in_water", p.TurnInWater);
-            p.TurnCarryRotate = B(o, "turn_carry_rotate", p.TurnCarryRotate);
             p.TurnSpineRelax = F(o, "turn_spine_relax", p.TurnSpineRelax);
             p.TurnSpineRecoverTicks = I(o, "turn_spine_recover_ticks", p.TurnSpineRecoverTicks);
-            p.TurnVerticalHold = F(o, "turn_vertical_hold", p.TurnVerticalHold);
-            p.TurnHoldMaxTicks = I(o, "turn_hold_max_ticks", p.TurnHoldMaxTicks);
-            if (o.TryGet("turn_swap").HasValue && !o.TryGet("turn_mode").HasValue)
-            {
-                p.TurnMode = p.TurnSwap ? "swap" : "pivot";
-            }
             p.BodyTurnForeshorten = F(o, "body_turn_foreshorten", p.BodyTurnForeshorten);
-            p.DepthVerticalHold = B(o, "depth_vertical_hold", p.DepthVerticalHold);
             p.DepthVerticalHoldBand = F(o, "depth_vertical_hold_band", p.DepthVerticalHoldBand);
             p.DrawUpSignLatch = B(o, "draw_up_sign_latch", p.DrawUpSignLatch);
             p.DrawUpSignDeadband = F(o, "draw_up_sign_deadband", p.DrawUpSignDeadband);
@@ -1865,11 +1812,8 @@ namespace MotherMod
             p.LimbSweepSpeedGate = F(o, "limb_sweep_speed_gate", p.LimbSweepSpeedGate);
             p.LimbSweepMinGrip = I(o, "limb_sweep_min_grip", p.LimbSweepMinGrip);
             p.LimbSweepBodySpeedGate = F(o, "limb_sweep_body_speed_gate", p.LimbSweepBodySpeedGate);
-            p.EatInPlaceEnabled = B(o, "eat_in_place_enabled", p.EatInPlaceEnabled);
-            p.DenFedEnabled = B(o, "den_fed_enabled", p.DenFedEnabled);
             p.ConspecificAwareness = B(o, "conspecific_awareness", p.ConspecificAwareness);
             p.RoamRadiusTiles = I(o, "roam_radius_tiles", p.RoamRadiusTiles);
-            p.RoamAttemptsPerCandidate = I(o, "roam_attempts_per_candidate", p.RoamAttemptsPerCandidate);
             p.HuntForgetFrames = I(o, "hunt_forget_frames", p.HuntForgetFrames);
             p.DenRainUtilityThreshold = F(o, "den_rain_utility_threshold", p.DenRainUtilityThreshold);
             p.DenHealthThreshold = F(o, "den_health_threshold", p.DenHealthThreshold);
@@ -1880,11 +1824,9 @@ namespace MotherMod
             p.VisionPeripheralAngle = F(o, "vision_peripheral_angle", p.VisionPeripheralAngle);
             p.SenseRadius = F(o, "sense_radius", p.SenseRadius);
             p.SenseMaxScore = F(o, "sense_max_score", p.SenseMaxScore);
-            p.SenseThroughWalls = B(o, "sense_through_walls", p.SenseThroughWalls);
             p.SenseWallRadiusFac = F(o, "sense_wall_radius_fac", p.SenseWallRadiusFac);
             p.SenseWallScoreFac = F(o, "sense_wall_score_fac", p.SenseWallScoreFac);
             p.SenseOmniIntervalTicks = I(o, "sense_omni_interval_ticks", p.SenseOmniIntervalTicks);
-            p.SenseOmniInLosFull = B(o, "sense_omni_in_los_full", p.SenseOmniInLosFull);
 
             p.ScentEnabled = B(o, "scent_enabled", p.ScentEnabled);
             p.ScentRadiusTiles = F(o, "scent_radius_tiles", p.ScentRadiusTiles);
@@ -1906,13 +1848,6 @@ namespace MotherMod
             p.CarryLagDropMomentum = F(o, "carry_lag_drop_momentum", p.CarryLagDropMomentum);
             p.CarryWaterDropSubmersion = F(o, "carry_water_drop_submersion", p.CarryWaterDropSubmersion);
             p.DropPreyDamage = F(o, "drop_prey_damage", p.DropPreyDamage);
-            p.EatFrames = I(o, "eat_frames", p.EatFrames);
-            p.EatSafeThreat = F(o, "eat_safe_threat", p.EatSafeThreat);
-            p.EatReach = F(o, "eat_reach", p.EatReach);
-            p.EatPoseRate = F(o, "eat_pose_rate", p.EatPoseRate);
-            p.EatCrouchDrop = F(o, "eat_crouch_drop", p.EatCrouchDrop);
-            p.EatHeadFac = F(o, "eat_head_fac", p.EatHeadFac);
-            p.EatMeatPerMeal = I(o, "eat_meat_per_meal", p.EatMeatPerMeal);
             p.EatsCarrion = B(o, "eats_carrion", p.EatsCarrion);
             p.CarrionIntensityFac = F(o, "carrion_intensity_fac", p.CarrionIntensityFac);
             p.CarrionFromAllPrey = B(o, "carrion_from_all_prey", p.CarrionFromAllPrey);
@@ -1921,7 +1856,6 @@ namespace MotherMod
             p.RoamNoiseWeight = F(o, "roam_noise_weight", p.RoamNoiseWeight);
             p.RoamDistanceWeight = F(o, "roam_distance_weight", p.RoamDistanceWeight);
             p.RoamPickJitter = F(o, "roam_pick_jitter", p.RoamPickJitter);
-            p.RoamCandidates = I(o, "roam_candidates", p.RoamCandidates);
             p.DenRestFrames = I(o, "den_rest_frames", p.DenRestFrames);
             p.DenFedPriority = F(o, "den_fed_priority", p.DenFedPriority);
             p.StalkEnabled = B(o, "stalk_enabled", p.StalkEnabled);
@@ -1930,12 +1864,6 @@ namespace MotherMod
             p.StalkBreakDistance = F(o, "stalk_break_distance", p.StalkBreakDistance);
             p.StalkPreySpeedBreak = F(o, "stalk_prey_speed_break", p.StalkPreySpeedBreak);
             p.StalkCrouchFac = F(o, "stalk_crouch_fac", p.StalkCrouchFac);
-
-            p.HungerPerCycle = F(o, "hunger_per_cycle", p.HungerPerCycle);
-            p.StarveRegenFac = F(o, "starve_regen_fac", p.StarveRegenFac);
-            p.StarveAggressionFac = F(o, "starve_aggression_fac", p.StarveAggressionFac);
-            p.MealValue = F(o, "meal_value", p.MealValue);
-            p.StarveLethal = B(o, "starve_lethal", p.StarveLethal);
 
             p.LandSafeSpeed = F(o, "land_safe_speed", p.LandSafeSpeed);
             p.LandDamageSpeed = F(o, "land_damage_speed", p.LandDamageSpeed);
@@ -1949,12 +1877,9 @@ namespace MotherMod
             p.LandRightMinFallSpeed = F(o, "land_right_min_fall_speed", p.LandRightMinFallSpeed);
             p.LandRightFallHysteresis = F(o, "land_right_fall_hysteresis", p.LandRightFallHysteresis);
             p.LandRightSuppressFac = F(o, "land_right_suppress_fac", p.LandRightSuppressFac);
-            p.LandRightAxisSignLatch = B(o, "land_right_axis_sign_latch", p.LandRightAxisSignLatch);
             p.LandRightAxisSignBand = F(o, "land_right_axis_sign_band", p.LandRightAxisSignBand);
-            p.LandRightAirAlways = B(o, "land_right_air_always", p.LandRightAirAlways);
             p.LandRightAirFac = F(o, "land_right_air_fac", p.LandRightAirFac);
             p.LandRightAirMinTicks = I(o, "land_right_air_min_ticks", p.LandRightAirMinTicks);
-            p.LandRightSuppressInCorridor = B(o, "land_right_suppress_in_corridor", p.LandRightSuppressInCorridor);
             p.LandSound = S(o, "land_sound", p.LandSound);
 
             p.CamoEnabled = B(o, "camo_enabled", p.CamoEnabled);
@@ -2009,11 +1934,12 @@ namespace MotherMod
             p.BaitCooldownTicks = I(o, "bait_cooldown_ticks", p.BaitCooldownTicks);
             p.BaitHoldsAgainstHunt = B(o, "bait_holds_against_hunt", p.BaitHoldsAgainstHunt);
             p.BaitWaitHoldsAgainstHunt = B(o, "bait_wait_holds_against_hunt", p.BaitWaitHoldsAgainstHunt);
-            p.BaitSpringRule = S(o, "bait_spring_rule", p.BaitSpringRule);
             p.BaitTriggerRangePx = F(o, "bait_trigger_range_px", p.BaitTriggerRangePx);
             p.BaitPounceRoll = B(o, "bait_pounce_roll", p.BaitPounceRoll);
             p.BaitFaceRunSpeed = F(o, "bait_face_run_speed", p.BaitFaceRunSpeed);
             p.BaitFaceMaxTicks = I(o, "bait_face_max_ticks", p.BaitFaceMaxTicks);
+            p.BaitRefusedRetryTicks = I(o, "bait_refused_retry_ticks", p.BaitRefusedRetryTicks);
+            p.BaitArriveLineTicks = I(o, "bait_arrive_line_ticks", p.BaitArriveLineTicks);
             p.BaitExitWeight = F(o, "bait_exit_weight", p.BaitExitWeight);
             p.BaitExitReachBonus = F(o, "bait_exit_reach_bonus", p.BaitExitReachBonus);
             p.BaitExitCentreBonus = F(o, "bait_exit_centre_bonus", p.BaitExitCentreBonus);
@@ -2049,86 +1975,129 @@ namespace MotherMod
             p.ColorLegLower = C(o, "color_leg_lower", p.ColorLegLower);
             p.ColorEye = C(o, "color_eye", p.ColorEye);
             p.EyeInkTintFloor = F(o, "eye_ink_tint_floor", p.EyeInkTintFloor);
-            p.EyeHoleFloor = C(o, "eye_hole_floor", p.EyeHoleFloor);
             p.ColorHead = C(o, "color_head", p.ColorHead);
 
-            p.SandboxGlowEnabled = B(o, "sandbox_glow_enabled", p.SandboxGlowEnabled);
-            p.SandboxGlowColor = C(o, "sandbox_glow_color", p.SandboxGlowColor);
-            p.SandboxHideArtCopy = B(o, "sandbox_hide_art_copy", p.SandboxHideArtCopy);
             p.IconColor = C(o, "icon_color", p.IconColor);
-            p.SandboxGlowAlpha = F(o, "sandbox_glow_alpha", p.SandboxGlowAlpha);
 
             p.PoseLogTicks = I(o, "pose_log_ticks", p.PoseLogTicks);
             p.FeetLogTicks = I(o, "feet_log_ticks", p.FeetLogTicks);
-            p.BodyCircles = I(o, "body_circles", p.BodyCircles);
             p.BodyMeshRadFac = F(o, "body_mesh_rad_fac", p.BodyMeshRadFac);
-            p.BodyMeshPoints = I(o, "body_mesh_points", p.BodyMeshPoints);
             p.BodyProfileNeck = F(o, "body_profile_neck", p.BodyProfileNeck);
             p.BodyProfileChest = F(o, "body_profile_chest", p.BodyProfileChest);
             p.BodyProfileWaist = F(o, "body_profile_waist", p.BodyProfileWaist);
             p.BodyProfileHaunch = F(o, "body_profile_haunch", p.BodyProfileHaunch);
             p.BodyFrontCap = F(o, "body_front_cap", p.BodyFrontCap);
-            p.BodyMeshOverlap = F(o, "body_mesh_overlap", p.BodyMeshOverlap);
             p.BodyRideHeight = F(o, "body_ride_height", p.BodyRideHeight);
             p.BodyRideCorridorFac = F(o, "body_ride_corridor_fac", p.BodyRideCorridorFac);
             p.BodyRideCorridorLerp = F(o, "body_ride_corridor_lerp", p.BodyRideCorridorLerp);
             p.BodyRideDeathFac = F(o, "body_ride_death_fac", p.BodyRideDeathFac);
             p.BodyRideDeathTicks = I(o, "body_ride_death_ticks", p.BodyRideDeathTicks);
-            p.BodyRideStunCollapse = B(o, "body_ride_stun_collapse", p.BodyRideStunCollapse);
             p.BodyRideStunCollapseFac = F(o, "body_ride_stun_collapse_fac", p.BodyRideStunCollapseFac);
             p.DrawSmoothing = F(o, "draw_smoothing", p.DrawSmoothing);
             p.HeadSize = F(o, "head_size", p.HeadSize);
             p.HeadSprite = B(o, "head_sprite", p.HeadSprite);
-            p.HeadSpriteElement = S(o, "head_sprite_element", p.HeadSpriteElement);
-            p.HeadEyeElement = S(o, "head_eye_element", p.HeadEyeElement);
-            p.HeadSpriteMask = B(o, "head_sprite_mask", p.HeadSpriteMask);
             p.HeadSpriteScale = F(o, "head_sprite_scale", p.HeadSpriteScale);
             p.HeadSpriteAnchorX = F(o, "head_sprite_anchor_x", p.HeadSpriteAnchorX);
             p.HeadSpriteAnchorY = F(o, "head_sprite_anchor_y", p.HeadSpriteAnchorY);
-            p.HeadDrop = F(o, "head_drop", p.HeadDrop);
-            p.HeadNeckSlack = F(o, "head_neck_slack", p.HeadNeckSlack);
-            p.HeadGravity = F(o, "head_gravity", p.HeadGravity);
             p.HeadLookFac = F(o, "head_look_fac", p.HeadLookFac);
             p.HeadPitchMax = F(o, "head_pitch_max", p.HeadPitchMax);
-            p.HeadMuzzleDroop = F(o, "head_muzzle_droop", p.HeadMuzzleDroop);
             p.HeadMuzzleLength = F(o, "head_muzzle_length", p.HeadMuzzleLength);
             p.HeadMuzzleWidth = F(o, "head_muzzle_width", p.HeadMuzzleWidth);
             p.HeadMuzzleTip = F(o, "head_muzzle_tip", p.HeadMuzzleTip);
-            p.HeadForeshorten = F(o, "head_foreshorten", p.HeadForeshorten);
-            p.EyeLength = F(o, "eye_length", p.EyeLength);
             p.EyeThickness = F(o, "eye_thickness", p.EyeThickness);
-            p.EyeAlong = F(o, "eye_along", p.EyeAlong);
-            p.EyeUp = F(o, "eye_up", p.EyeUp);
-            p.NeckStiffness = F(o, "neck_stiffness", p.NeckStiffness);
             p.LimbLengthFac = F(o, "limb_length_fac", p.LimbLengthFac);
             p.LimbSize = F(o, "limb_size", p.LimbSize);
             p.LimbThickness = F(o, "limb_thickness", p.LimbThickness);
-            p.LimbKneeBend = F(o, "limb_knee_bend", p.LimbKneeBend);
             p.LimbUpperFac = F(o, "limb_upper_fac", p.LimbUpperFac);
             p.LimbPawLength = F(o, "limb_paw_length", p.LimbPawLength);
-            p.LimbPawWidth = F(o, "limb_paw_width", p.LimbPawWidth);
             p.LimbBendSmooth = F(o, "limb_bend_smooth", p.LimbBendSmooth);
             p.LimbBendFlipDeadband = F(o, "limb_bend_flip_deadband", p.LimbBendFlipDeadband);
             p.LegSprites = B(o, "leg_sprites", p.LegSprites);
-            p.LegSpriteFront = S(o, "leg_sprite_front", p.LegSpriteFront);
-            p.LegSpriteFrontFar = S(o, "leg_sprite_front_far", p.LegSpriteFrontFar);
-            p.LegSpriteHind = S(o, "leg_sprite_hind", p.LegSpriteHind);
-            p.LegSpriteHindFar = S(o, "leg_sprite_hind_far", p.LegSpriteHindFar);
-            p.LegSpriteMask = B(o, "leg_sprite_mask", p.LegSpriteMask);
-            p.TailSpriteElement = S(o, "tail_sprite_element", p.TailSpriteElement);
             p.BodySprite = B(o, "body_sprite", p.BodySprite);
-            p.BodySpriteElement = S(o, "body_sprite_element", p.BodySpriteElement);
-            p.BodySpriteMask = B(o, "body_sprite_mask", p.BodySpriteMask);
-            p.BodySpriteScaleFac = F(o, "body_sprite_scale_fac", p.BodySpriteScaleFac);
-            p.BodySpriteStretch = F(o, "body_sprite_stretch", p.BodySpriteStretch);
-            p.LegSpriteWidthFac = F(o, "leg_sprite_width_fac", p.LegSpriteWidthFac);
-            p.PartsRig = B(o, "parts_rig", p.PartsRig);
             p.PartsPrefix = S(o, "parts_prefix", p.PartsPrefix);
             p.PartsMask = B(o, "parts_mask", p.PartsMask);
             p.TobyDraw = I(o, "toby_draw", p.TobyDraw);
             p.TobyFrameTicks = I(o, "toby_frame_ticks", p.TobyFrameTicks);
             p.TobyFrameScale = F(o, "toby_frame_scale", p.TobyFrameScale);
             p.TobyFrameFeetPx = F(o, "toby_frame_feet_px", p.TobyFrameFeetPx);
+            p.SpearEnabled = B(o, "spear_enabled", p.SpearEnabled);
+            p.SpearSeekTiles = F(o, "spear_seek_tiles", p.SpearSeekTiles);
+            p.SpearSeekScanTicks = I(o, "spear_seek_scan_ticks", p.SpearSeekScanTicks);
+            p.SpearGrabPx = F(o, "spear_grab_px", p.SpearGrabPx);
+            p.SpearFetchMaxTicks = I(o, "spear_fetch_max_ticks", p.SpearFetchMaxTicks);
+            p.SpearFetchRetryTicks = I(o, "spear_fetch_retry_ticks", p.SpearFetchRetryTicks);
+            p.SpearRefetchCooldownTicks = I(o, "spear_refetch_cooldown_ticks", p.SpearRefetchCooldownTicks);
+            p.SpearThrowDistPx = F(o, "spear_throw_dist_px", p.SpearThrowDistPx);
+            p.SpearThrowLevelMin = F(o, "spear_throw_level_min", p.SpearThrowLevelMin);
+            p.SpearThrowSpeed = F(o, "spear_throw_speed", p.SpearThrowSpeed);
+            p.SpearReleaseFrom = I(o, "spear_release_from", p.SpearReleaseFrom);
+            p.SpearDamage = F(o, "spear_damage", p.SpearDamage);
+            p.SpearStunBonus = F(o, "spear_stun_bonus", p.SpearStunBonus);
+            p.SpearThrowCooldownTicks = I(o, "spear_throw_cooldown_ticks", p.SpearThrowCooldownTicks);
+            p.SpearCarryAt = I(o, "spear_carry_at", p.SpearCarryAt);
+            p.SpearMouthAngleDeg = F(o, "spear_mouth_angle_deg", p.SpearMouthAngleDeg);
+            p.SpearRearDeg = F(o, "spear_rear_deg", p.SpearRearDeg);
+            p.SpearRearTicks = I(o, "spear_rear_ticks", p.SpearRearTicks);
+            p.SpearGripFrac = F(o, "spear_grip_frac", p.SpearGripFrac);
+            p.SpearPawAngleDeg = F(o, "spear_paw_angle_deg", p.SpearPawAngleDeg);
+            p.SpearTransferArcPx = F(o, "spear_transfer_arc_px", p.SpearTransferArcPx);
+            p.SpearTransferHeadDeg = F(o, "spear_transfer_head_deg", p.SpearTransferHeadDeg);
+            p.SpearWindupTicks = I(o, "spear_windup_ticks", p.SpearWindupTicks);
+            p.SpearWindupBackPx = F(o, "spear_windup_back_px", p.SpearWindupBackPx);
+            p.SpearWindupLift = F(o, "spear_windup_lift", p.SpearWindupLift);
+            p.SpearWindupWobblePx = F(o, "spear_windup_wobble_px", p.SpearWindupWobblePx);
+            p.SpearWindupLeanPx = F(o, "spear_windup_lean_px", p.SpearWindupLeanPx);
+            p.SpearReleaseTicks = I(o, "spear_release_ticks", p.SpearReleaseTicks);
+            p.SpearSnapTicks = I(o, "spear_snap_ticks", p.SpearSnapTicks);
+            p.SpearHeadPushTicks = I(o, "spear_head_push_ticks", p.SpearHeadPushTicks);
+            p.SpearReleaseLungePx = F(o, "spear_release_lunge_px", p.SpearReleaseLungePx);
+            p.SpearReleaseDipDeg = F(o, "spear_release_dip_deg", p.SpearReleaseDipDeg);
+            p.SpearLandCompressPx = F(o, "spear_land_compress_px", p.SpearLandCompressPx);
+            p.SpearLandSettleTicks = I(o, "spear_land_settle_ticks", p.SpearLandSettleTicks);
+            p.SpearBodyMotion = I(o, "spear_body_motion", p.SpearBodyMotion);
+            p.SpearRearLoadTicks = I(o, "spear_rear_load_ticks", p.SpearRearLoadTicks);
+            p.SpearRearLoadPx = F(o, "spear_rear_load_px", p.SpearRearLoadPx);
+            p.SpearRearOvershoot = F(o, "spear_rear_overshoot", p.SpearRearOvershoot);
+            p.SpearHeadSpring = F(o, "spear_head_spring", p.SpearHeadSpring);
+            p.SpearHeadDamp = F(o, "spear_head_damp", p.SpearHeadDamp);
+            p.SpearTailCounter = F(o, "spear_tail_counter", p.SpearTailCounter);
+            p.SpearTailWhip = F(o, "spear_tail_whip", p.SpearTailWhip);
+            p.SpearTuckFold = F(o, "spear_tuck_fold", p.SpearTuckFold);
+            p.SpearTuckDrop = F(o, "spear_tuck_drop", p.SpearTuckDrop);
+            p.HopEnabled = B(o, "hop_enabled", p.HopEnabled);
+            p.HopWhen = S(o, "hop_when", p.HopWhen);
+            p.HopWhileStalking = B(o, "hop_while_stalking", p.HopWhileStalking);
+            p.HopMinTilesOrigin = I(o, "hop_min_tiles_origin", p.HopMinTilesOrigin);
+            p.HopMinTilesDest = I(o, "hop_min_tiles_dest", p.HopMinTilesDest);
+            p.HopMinSpeedFrac = F(o, "hop_min_speed_frac", p.HopMinSpeedFrac);
+            p.HopSpeedFac = F(o, "hop_speed_fac", p.HopSpeedFac);
+            p.HopCarrySpeedFac = F(o, "hop_carry_speed_fac", p.HopCarrySpeedFac);
+            p.HopArcClearNearPx = F(o, "hop_arc_clear_near_px", p.HopArcClearNearPx);
+            p.HopArcClearFarPx = F(o, "hop_arc_clear_far_px", p.HopArcClearFarPx);
+            p.HopPowerMedium = F(o, "hop_power_medium", p.HopPowerMedium);
+            p.HopPowerLarge = F(o, "hop_power_large", p.HopPowerLarge);
+            p.HopChargeTicksSmall = I(o, "hop_charge_ticks_small", p.HopChargeTicksSmall);
+            p.HopChargeTicksMedium = I(o, "hop_charge_ticks_medium", p.HopChargeTicksMedium);
+            p.HopChargeTicksLarge = I(o, "hop_charge_ticks_large", p.HopChargeTicksLarge);
+            p.HopChargePullFac = F(o, "hop_charge_pull_fac", p.HopChargePullFac);
+            p.HopCooldownTicks = I(o, "hop_cooldown_ticks", p.HopCooldownTicks);
+            p.HopLaunchVoice = B(o, "hop_launch_voice", p.HopLaunchVoice);
+            p.HopLookCyan = I(o, "hop_look_cyan", p.HopLookCyan);
+            p.HopLookSinkPx = F(o, "hop_look_sink_px", p.HopLookSinkPx);
+            p.HopLookChargeCouple = F(o, "hop_look_charge_couple", p.HopLookChargeCouple);
+            p.HopLookTailShiverPx = F(o, "hop_look_tail_shiver_px", p.HopLookTailShiverPx);
+            p.HopLookAccent = I(o, "hop_look_accent", p.HopLookAccent);
+            p.HopLookSnap = I(o, "hop_look_snap", p.HopLookSnap);
+            p.HopLookBurst = F(o, "hop_look_burst", p.HopLookBurst);
+            p.HopLookTrail = F(o, "hop_look_trail", p.HopLookTrail);
+            p.HopLookBubbles = I(o, "hop_look_bubbles", p.HopLookBubbles);
+            p.HopLookSteer = F(o, "hop_look_steer", p.HopLookSteer);
+            p.HopLookSpin = I(o, "hop_look_spin", p.HopLookSpin);
+            p.HopLookLandSquashPx = F(o, "hop_look_land_squash_px", p.HopLookLandSquashPx);
+            p.HopLookLandStretch = F(o, "hop_look_land_stretch", p.HopLookLandStretch);
+            p.HopLookLandTicks = I(o, "hop_look_land_ticks", p.HopLookLandTicks);
+            p.HopLookLandWiden = F(o, "hop_look_land_widen", p.HopLookLandWiden);
+            p.HopLookLandRecoilDeg = F(o, "hop_look_land_recoil_deg", p.HopLookLandRecoilDeg);
             p.PartsScaleFac = F(o, "parts_scale_fac", p.PartsScaleFac);
             p.PartsRefSpine = F(o, "parts_ref_spine", p.PartsRefSpine);
             p.PartsBodyReach = F(o, "parts_body_reach", p.PartsBodyReach);
@@ -2160,7 +2129,6 @@ namespace MotherMod
             p.PartsBodySquashMax = F(o, "parts_body_squash_max", p.PartsBodySquashMax);
             p.PartsBodyFlexMaxDeg = F(o, "parts_body_flex_max_deg", p.PartsBodyFlexMaxDeg);
             p.PartsBodyWidthMax = F(o, "parts_body_width_max", p.PartsBodyWidthMax);
-            p.PartsLegRootFollowBend = B(o, "parts_leg_root_follow_bend", p.PartsLegRootFollowBend);
             p.PartsBodyLandSpeed = F(o, "parts_body_land_speed", p.PartsBodyLandSpeed);
             p.PartsBodyLandDecay = F(o, "parts_body_land_decay", p.PartsBodyLandDecay);
             p.PartsChestAlong = F(o, "parts_chest_along", p.PartsChestAlong);
@@ -2187,12 +2155,9 @@ namespace MotherMod
             p.PartsKneeMaxStep = F(o, "parts_knee_max_step", p.PartsKneeMaxStep);
             p.PartsKneeStepSpeedFac = F(o, "parts_knee_step_speed_fac", p.PartsKneeStepSpeedFac);
             p.PartsKneeReseedDist = F(o, "parts_knee_reseed_dist", p.PartsKneeReseedDist);
-            p.PartsLegSingleSprite = B(o, "parts_leg_single_sprite", p.PartsLegSingleSprite);
             p.PartsLegForeOffset = F(o, "parts_leg_fore_offset", p.PartsLegForeOffset);
             p.PartsHaunchLean = F(o, "parts_haunch_lean", p.PartsHaunchLean);
             p.PartsHaunchInChain = B(o, "parts_haunch_in_chain", p.PartsHaunchInChain);
-            p.PartsHeadTqGate = F(o, "parts_head_tq_gate", p.PartsHeadTqGate);
-            p.PartsHeadAwayGate = F(o, "parts_head_away_gate", p.PartsHeadAwayGate);
             p.PartsHeadTqGateEnter = F(o, "parts_head_tq_gate_enter", p.PartsHeadTqGateEnter);
             p.PartsHeadTqGateExit = F(o, "parts_head_tq_gate_exit", p.PartsHeadTqGateExit);
             p.PartsHeadAwayGateEnter = F(o, "parts_head_away_gate_enter", p.PartsHeadAwayGateEnter);
@@ -2204,7 +2169,6 @@ namespace MotherMod
             p.PartsWaveSpeedFull = F(o, "parts_wave_speed_full", p.PartsWaveSpeedFull);
             p.PartsWaveGroundFade = F(o, "parts_wave_ground_fade", p.PartsWaveGroundFade);
             p.PartsLegMaxExtend = F(o, "parts_leg_max_extend", p.PartsLegMaxExtend);
-            p.PartsTurnStep = B(o, "parts_turn_step", p.PartsTurnStep);
             p.PartsTurnStepFrontAt = F(o, "parts_turn_step_front_at", p.PartsTurnStepFrontAt);
             p.PartsTurnStepHindAt = F(o, "parts_turn_step_hind_at", p.PartsTurnStepHindAt);
             p.PartsTurnStepStagger = F(o, "parts_turn_step_stagger", p.PartsTurnStepStagger);
@@ -2224,7 +2188,6 @@ namespace MotherMod
             p.HeadCarryPx = F(o, "head_carry_px", p.HeadCarryPx);
             p.HeadPitchRate = F(o, "head_pitch_rate", p.HeadPitchRate);
             p.HeadLookPitchFac = F(o, "head_look_pitch_fac", p.HeadLookPitchFac);
-            p.HeadIdleEnabled = B(o, "head_idle_enabled", p.HeadIdleEnabled);
             p.HeadIdleSpeed = F(o, "head_idle_speed", p.HeadIdleSpeed);
             p.HeadSniffChance = F(o, "head_sniff_chance", p.HeadSniffChance);
             p.HeadSniffTicks = I(o, "head_sniff_ticks", p.HeadSniffTicks);
@@ -2237,7 +2200,6 @@ namespace MotherMod
             p.HeadLookCooldownTicks = I(o, "head_look_cooldown_ticks", p.HeadLookCooldownTicks);
             p.HeadYawRate = F(o, "head_yaw_rate", p.HeadYawRate);
             p.HeadYawDepth = F(o, "head_yaw_depth", p.HeadYawDepth);
-            p.HeadNoiseEnabled = B(o, "head_noise_enabled", p.HeadNoiseEnabled);
             p.HeadNoiseMaxAge = I(o, "head_noise_max_age", p.HeadNoiseMaxAge);
             p.HeadNoiseHoldTicks = I(o, "head_noise_hold_ticks", p.HeadNoiseHoldTicks);
             p.HeadBehindYaw = F(o, "head_behind_yaw", p.HeadBehindYaw);
@@ -2258,19 +2220,12 @@ namespace MotherMod
             p.StepPlantCommitTicks = I(o, "step_plant_commit_ticks", p.StepPlantCommitTicks);
             p.StepMinGrip = I(o, "step_min_grip", p.StepMinGrip);
             p.StepSwingMaxTicks = I(o, "step_swing_max_ticks", p.StepSwingMaxTicks);
-            p.StepPlantWorldLock = B(o, "step_plant_world_lock", p.StepPlantWorldLock);
-            p.StepTargetClamp = B(o, "step_target_clamp", p.StepTargetClamp);
             p.StepTargetMaxAboveFac = F(o, "step_target_max_above_fac", p.StepTargetMaxAboveFac);
             p.StepReachClampFac = F(o, "step_reach_clamp_fac", p.StepReachClampFac);
-            p.StepReachFloorFollowsFold = B(o, "step_reach_floor_follows_fold", p.StepReachFloorFollowsFold);
-            p.StepPlantAhead = B(o, "step_plant_ahead", p.StepPlantAhead);
             p.StepPlantAheadMinSpeed = F(o, "step_plant_ahead_min_speed", p.StepPlantAheadMinSpeed);
             p.StepPlantAheadFullSpeed = F(o, "step_plant_ahead_full_speed", p.StepPlantAheadFullSpeed);
             p.StepPlantAheadTravelFac = F(o, "step_plant_ahead_travel_fac", p.StepPlantAheadTravelFac);
-            p.StepTrueStance = B(o, "step_true_stance", p.StepTrueStance);
             p.StepEventLog = B(o, "step_event_log", p.StepEventLog);
-            p.PartsGaitChainAll = B(o, "parts_gait_chain_all", p.PartsGaitChainAll);
-            p.StepHindAxisFlip = B(o, "step_hind_axis_flip", p.StepHindAxisFlip);
             p.RunPitchAmp = F(o, "run_pitch_amp", p.RunPitchAmp);
             p.RunHeightAmp = F(o, "run_height_amp", p.RunHeightAmp);
             p.RunTailAmp = F(o, "run_tail_amp", p.RunTailAmp);
@@ -2279,7 +2234,6 @@ namespace MotherMod
             p.PouncePropelPitch = F(o, "pounce_propel_pitch", p.PouncePropelPitch);
             p.PartsLegRootFront = F(o, "parts_leg_root_front", p.PartsLegRootFront);
             p.PartsLegRootHind = F(o, "parts_leg_root_hind", p.PartsLegRootHind);
-            p.GaitDiagonal = B(o, "gait_diagonal", p.GaitDiagonal);
             p.TailNoTuck = B(o, "tail_no_tuck", p.TailNoTuck);
             p.TailRearBias = F(o, "tail_rear_bias", p.TailRearBias);
             p.TailUpBias = F(o, "tail_up_bias", p.TailUpBias);
@@ -2303,13 +2257,9 @@ namespace MotherMod
             p.TailLengthVsBody = F(o, "tail_length_vs_body", p.TailLengthVsBody);
             p.TailHeightVsBody = F(o, "tail_height_vs_body", p.TailHeightVsBody);
             p.TailTipTaper = F(o, "tail_tip_taper", p.TailTipTaper);
-            p.TailRootThickness = F(o, "tail_root_thickness", p.TailRootThickness);
-            p.TailTipThickness = F(o, "tail_tip_thickness", p.TailTipThickness);
-            p.TailSwellPos = F(o, "tail_swell_pos", p.TailSwellPos);
             p.TailRootDrop = F(o, "tail_root_drop", p.TailRootDrop);
             p.TailRootDroop = F(o, "tail_root_droop", p.TailRootDroop);
             p.TailGravityCurve = F(o, "tail_gravity_curve", p.TailGravityCurve);
-            p.TailMeshOverlap = F(o, "tail_mesh_overlap", p.TailMeshOverlap);
             p.TailStiffness = F(o, "tail_stiffness", p.TailStiffness);
             p.TailStiffnessDecline = F(o, "tail_stiffness_decline", p.TailStiffnessDecline);
             p.TailGravity = F(o, "tail_gravity", p.TailGravity);
@@ -2351,7 +2301,6 @@ namespace MotherMod
             p.PoleLegMetaDegFront = F(o, "pole_leg_meta_deg_front", p.PoleLegMetaDegFront);
             p.PoleLegMetaDegHind = F(o, "pole_leg_meta_deg_hind", p.PoleLegMetaDegHind);
             p.PolePawSpeedFac = F(o, "pole_paw_speed_fac", p.PolePawSpeedFac);
-            p.PoleBackDown = B(o, "pole_back_down", p.PoleBackDown);
             p.PolePullPulseFac = F(o, "pole_pull_pulse_fac", p.PolePullPulseFac);
             p.PoleBodySwayPx = F(o, "pole_body_sway_px", p.PoleBodySwayPx);
             p.PoleBodySwayCycles = I(o, "pole_body_sway_cycles", p.PoleBodySwayCycles);
@@ -2368,12 +2317,9 @@ namespace MotherMod
             p.PoleMeetWaitTicks = I(o, "pole_meet_wait_ticks", p.PoleMeetWaitTicks);
             p.PoleMeetAsideTiles = I(o, "pole_meet_aside_tiles", p.PoleMeetAsideTiles);
             p.PoleMeetGiveUpTicks = I(o, "pole_meet_give_up_ticks", p.PoleMeetGiveUpTicks);
-            p.PoleAscentHeadFirst = B(o, "pole_ascent_head_first", p.PoleAscentHeadFirst);
-            p.PoleAlignOrder = B(o, "pole_align_order", p.PoleAlignOrder);
             p.PoleAlignFarMaxPx = F(o, "pole_align_far_max_px", p.PoleAlignFarMaxPx);
             p.PoleAlignSwingPx = F(o, "pole_align_swing_px", p.PoleAlignSwingPx);
             p.PoleFloorRegrabTicks = I(o, "pole_floor_regrab_ticks", p.PoleFloorRegrabTicks);
-            p.PoleDestFilter = B(o, "pole_dest_filter", p.PoleDestFilter);
             p.WallOverhangAllowed = B(o, "wall_overhang_allowed", p.WallOverhangAllowed);
             p.WallWanderDest = B(o, "wall_wander_dest", p.WallWanderDest);
             p.WallGrabMaxSpeed = F(o, "wall_grab_max_speed", p.WallGrabMaxSpeed);
@@ -2397,11 +2343,7 @@ namespace MotherMod
             p.PheromoneReceiverResponse = S(o, "pheromone_receiver_response", p.PheromoneReceiverResponse);
             p.PheromoneCommMinTicks = I(o, "pheromone_comm_min_ticks", p.PheromoneCommMinTicks);
             p.PheromoneCommMaxTicks = I(o, "pheromone_comm_max_ticks", p.PheromoneCommMaxTicks);
-            p.PheromoneFlickerFullTicks = I(o, "pheromone_flicker_full_ticks", p.PheromoneFlickerFullTicks);
-            p.PheromoneFlickerRise = F(o, "pheromone_flicker_rise", p.PheromoneFlickerRise);
-            p.PheromoneFlickerFall = F(o, "pheromone_flicker_fall", p.PheromoneFlickerFall);
             p.PheromoneLogTicks = I(o, "pheromone_log_ticks", p.PheromoneLogTicks);
-            p.PheromoneStyle = I(o, "pheromone_style", p.PheromoneStyle);
             p.PheromoneWiggleDeg = F(o, "pheromone_wiggle_deg", p.PheromoneWiggleDeg);
             p.PheromoneWiggleHz = F(o, "pheromone_wiggle_hz", p.PheromoneWiggleHz);
             p.PheromoneWiggleLagDeg = F(o, "pheromone_wiggle_lag_deg", p.PheromoneWiggleLagDeg);
@@ -2421,7 +2363,34 @@ namespace MotherMod
             p.PheromoneReceiverSniff = B(o, "pheromone_receiver_sniff", p.PheromoneReceiverSniff);
             p.PheromoneSniffReachPx = F(o, "pheromone_sniff_reach_px", p.PheromoneSniffReachPx);
             p.PheromoneSniffReachFac = F(o, "pheromone_sniff_reach_fac", p.PheromoneSniffReachFac);
-            p.PheromoneSniffDelayTicks = I(o, "pheromone_sniff_delay_ticks", p.PheromoneSniffDelayTicks);
+            p.FlankEnabled = B(o, "flank_enabled", p.FlankEnabled);
+            p.FlankSpreadRadiusPx = F(o, "flank_spread_radius_px", p.FlankSpreadRadiusPx);
+            p.FlankSpreadCost = F(o, "flank_spread_cost", p.FlankSpreadCost);
+            p.FlankMateTileCost = F(o, "flank_mate_tile_cost", p.FlankMateTileCost);
+            p.FlankPincerAngleDeg = F(o, "flank_pincer_angle_deg", p.FlankPincerAngleDeg);
+            p.FlankPincerFanDeg = F(o, "flank_pincer_fan_deg", p.FlankPincerFanDeg);
+            p.FlankPincerRadiusTiles = F(o, "flank_pincer_radius_tiles", p.FlankPincerRadiusTiles);
+            p.FlankGoalSearchTiles = I(o, "flank_goal_search_tiles", p.FlankGoalSearchTiles);
+            p.FlankArriveTiles = F(o, "flank_arrive_tiles", p.FlankArriveTiles);
+            p.FlankCommitDistTiles = F(o, "flank_commit_dist_tiles", p.FlankCommitDistTiles);
+            p.FlankCircleMaxTicks = I(o, "flank_circle_max_ticks", p.FlankCircleMaxTicks);
+            p.FlankLeaderLostTicks = I(o, "flank_leader_lost_ticks", p.FlankLeaderLostTicks);
+            p.FlankWaysExitSteps = I(o, "flank_ways_exit_steps", p.FlankWaysExitSteps);
+            p.FlankWaysOpenTiles = I(o, "flank_ways_open_tiles", p.FlankWaysOpenTiles);
+            p.FlankWaysMergeDeg = F(o, "flank_ways_merge_deg", p.FlankWaysMergeDeg);
+            p.FlankWaysRecheckTicks = I(o, "flank_ways_recheck_ticks", p.FlankWaysRecheckTicks);
+            p.FlankBlockEnabled = B(o, "flank_block_enabled", p.FlankBlockEnabled);
+            p.FlankBlockMaxWays = I(o, "flank_block_max_ways", p.FlankBlockMaxWays);
+            p.FlankBlockDistTiles = F(o, "flank_block_dist_tiles", p.FlankBlockDistTiles);
+            p.FlankHerdEnabled = B(o, "flank_herd_enabled", p.FlankHerdEnabled);
+            p.FlankHerdSearchTiles = I(o, "flank_herd_search_tiles", p.FlankHerdSearchTiles);
+            p.FlankHerdSearchStepTiles = I(o, "flank_herd_search_step_tiles", p.FlankHerdSearchStepTiles);
+            p.FlankHerdGapTiles = F(o, "flank_herd_gap_tiles", p.FlankHerdGapTiles);
+            p.FlankHerdSpeedFac = F(o, "flank_herd_speed_fac", p.FlankHerdSpeedFac);
+            p.FlankHerdMaxTicks = I(o, "flank_herd_max_ticks", p.FlankHerdMaxTicks);
+            p.FlankHerdFanDeg = F(o, "flank_herd_fan_deg", p.FlankHerdFanDeg);
+            p.FlankSyncEnabled = B(o, "flank_sync_enabled", p.FlankSyncEnabled);
+            p.FlankSyncMaxWaitTicks = I(o, "flank_sync_max_wait_ticks", p.FlankSyncMaxWaitTicks);
             p.EvasionEnabled = B(o, "evasion_enabled", p.EvasionEnabled);
             p.EvasionChance = F(o, "evasion_chance", p.EvasionChance);
             p.EvasionReactionMinTicks = I(o, "evasion_reaction_min_ticks", p.EvasionReactionMinTicks);
@@ -2433,10 +2402,6 @@ namespace MotherMod
             p.VoiceCooldownFrames = I(o, "voice_cooldown_frames", p.VoiceCooldownFrames);
             ReadCosmetics(o, p);
 
-            p.PounceCrouchFrames = ClampI(o, "pounce_crouch_frames", p.PounceCrouchFrames,
-                Math.Max(0, p.PounceCrouchFrames), "must_not_be_negative");
-            p.PouncePropulsionFrames = ClampI(o, "pounce_propulsion_frames", p.PouncePropulsionFrames,
-                Math.Max(1, p.PouncePropulsionFrames), "at_least_one_thrust_frame");
             p.EnterGatherFrames = ClampI(o, "enter_gather_frames", p.EnterGatherFrames,
                 Math.Max(0, p.EnterGatherFrames), "must_not_be_negative");
             p.EnterMaxFrames = ClampI(o, "enter_max_frames", p.EnterMaxFrames,
@@ -2479,14 +2444,6 @@ namespace MotherMod
                 Mathf.Clamp(p.DepthVerticalHoldBand, 0f, 0.49f), "range_0_to_0.49_zero_is_off");
             p.DrawUpSignDeadband = ClampF(o, "draw_up_sign_deadband", p.DrawUpSignDeadband,
                 Mathf.Clamp(p.DrawUpSignDeadband, 0f, 0.5f), "range_0_to_0.5_zero_is_off");
-            p.TurnRate = ClampF(o, "turn_rate", p.TurnRate,
-                Mathf.Clamp(p.TurnRate, 0.001f, 1f), "range_0.001_to_1");
-            p.TurnFrames = ClampI(o, "turn_frames", p.TurnFrames,
-                Math.Max(0, p.TurnFrames), "must_not_be_negative");
-            p.TurnMaxStepPx = ClampF(o, "turn_max_step_px", p.TurnMaxStepPx,
-                Mathf.Clamp(p.TurnMaxStepPx, 0.5f, 32f), "range_0.5_to_32");
-            p.TurnBrake = ClampF(o, "turn_brake", p.TurnBrake,
-                Mathf.Clamp01(p.TurnBrake), "range_0_to_1");
             p.TurnAbortAirTicks = ClampI(o, "turn_abort_air_ticks", p.TurnAbortAirTicks,
                 Math.Max(1, p.TurnAbortAirTicks), "at_least_one_tick");
             p.TurnLogTicks = ClampI(o, "turn_log_ticks", p.TurnLogTicks,
@@ -2495,10 +2452,6 @@ namespace MotherMod
                 Mathf.Clamp01(p.TurnSpineRelax), "range_0_to_1");
             p.TurnSpineRecoverTicks = ClampI(o, "turn_spine_recover_ticks", p.TurnSpineRecoverTicks,
                 Math.Max(0, p.TurnSpineRecoverTicks), "must_not_be_negative");
-            p.TurnVerticalHold = ClampF(o, "turn_vertical_hold", p.TurnVerticalHold,
-                Mathf.Clamp01(p.TurnVerticalHold), "range_0_to_1");
-            p.TurnHoldMaxTicks = ClampI(o, "turn_hold_max_ticks", p.TurnHoldMaxTicks,
-                Math.Max(1, p.TurnHoldMaxTicks), "at_least_one_tick");
             p.DriveTrailBackstepFac = ClampF(o, "drive_trail_backstep_fac", p.DriveTrailBackstepFac,
                 Mathf.Clamp01(p.DriveTrailBackstepFac), "range_0_to_1");
             p.PathLatchMaxRejects = ClampI(o, "path_latch_max_rejects", p.PathLatchMaxRejects,
@@ -2558,10 +2511,6 @@ namespace MotherMod
                 Mathf.Clamp(p.PathTiebreakCommitTicks, 0, 60), "range_0_to_60_ticks_zero_is_off");
             p.LimbSweepMinGrip = ClampI(o, "limb_sweep_min_grip", p.LimbSweepMinGrip,
                 Math.Max(0, p.LimbSweepMinGrip), "must_not_be_negative");
-            p.PounceMaxFrames = ClampI(o, "pounce_max_frames", p.PounceMaxFrames,
-                Math.Max(1, p.PounceMaxFrames), "at_least_one_propulsion_frame");
-            p.PathStepsPerFrame = ClampI(o, "path_steps_per_frame", p.PathStepsPerFrame,
-                Mathf.Clamp(p.PathStepsPerFrame, 1, 100), "range_1_to_100");
             p.BodyMass = ClampF(o, "body_mass", p.BodyMass, Mathf.Max(0.1f, p.BodyMass), "min_0.1");
             p.BodySizeFac = ClampF(o, "body_size_fac", p.BodySizeFac, Mathf.Clamp(p.BodySizeFac, 0.05f, 10f),
                 "range_0.05_to_10_it_becomes_a_per_draw_loop_bound");
@@ -2572,6 +2521,26 @@ namespace MotherMod
             p.LoadedPerformanceCost = ClampF(o, "loaded_performance_cost", p.LoadedPerformanceCost,
                 Mathf.Max(10f, p.LoadedPerformanceCost), "min_10_fisobs_documented_minimum");
             p.Grasps = ClampI(o, "grasps", p.Grasps, Mathf.Clamp(p.Grasps, 0, 2), "range_0_to_2");
+            p.SpearSeekScanTicks = ClampI(o, "spear_seek_scan_ticks", p.SpearSeekScanTicks,
+                Math.Max(1, p.SpearSeekScanTicks), "min_1_it_is_a_scan_period");
+            p.SpearFetchMaxTicks = ClampI(o, "spear_fetch_max_ticks", p.SpearFetchMaxTicks,
+                Math.Max(1, p.SpearFetchMaxTicks), "min_1_dd215_a_fetch_must_end");
+            p.SpearRearTicks = ClampI(o, "spear_rear_ticks", p.SpearRearTicks,
+                Math.Max(1, p.SpearRearTicks), "min_1_it_is_a_divisor");
+            p.SpearWindupTicks = ClampI(o, "spear_windup_ticks", p.SpearWindupTicks,
+                Math.Max(1, p.SpearWindupTicks), "min_1_it_is_a_divisor");
+            p.SpearReleaseTicks = ClampI(o, "spear_release_ticks", p.SpearReleaseTicks,
+                Math.Max(1, p.SpearReleaseTicks), "min_1_it_is_a_divisor");
+            p.SpearRearLoadTicks = ClampI(o, "spear_rear_load_ticks", p.SpearRearLoadTicks,
+                Math.Max(1, p.SpearRearLoadTicks), "min_1_it_is_a_divisor");
+            p.SpearLandSettleTicks = ClampI(o, "spear_land_settle_ticks", p.SpearLandSettleTicks,
+                Math.Max(1, p.SpearLandSettleTicks), "min_1_it_is_a_divisor");
+            p.SpearGripFrac = ClampF(o, "spear_grip_frac", p.SpearGripFrac,
+                Mathf.Clamp01(p.SpearGripFrac), "range_0_to_1_a_fraction_of_the_spear");
+            p.SpearRearOvershoot = ClampF(o, "spear_rear_overshoot", p.SpearRearOvershoot,
+                Mathf.Clamp(p.SpearRearOvershoot, 0.001f, 0.6f), "range_0.001_to_0.6_the_spring_needs_a_real_overshoot");
+            p.SpearTuckFold = ClampF(o, "spear_tuck_fold", p.SpearTuckFold,
+                Mathf.Clamp01(p.SpearTuckFold), "range_0_to_1");
             p.IdleSwitchMaxFrames = ClampI(o, "idle_switch_max_frames", p.IdleSwitchMaxFrames,
                 Math.Max(p.IdleSwitchMinFrames + 1, p.IdleSwitchMaxFrames),
                 "must_exceed_idle_switch_min_frames");
@@ -2599,13 +2568,7 @@ namespace MotherMod
                 Math.Max(1, p.ScentSniffTicks), "at_least_one_tick_or_no_sniff_is_visible");
             p.ScentSniffCooldownTicks = ClampI(o, "scent_sniff_cooldown_ticks", p.ScentSniffCooldownTicks,
                 Math.Max(0, p.ScentSniffCooldownTicks), "min_0_ticks");
-            p.RoamCandidates = ClampI(o, "roam_candidates", p.RoamCandidates,
-                Mathf.Clamp(p.RoamCandidates, 1, 64), "range_1_to_64");
-            p.EatFrames = ClampI(o, "eat_frames", p.EatFrames,
-                Math.Max(1, p.EatFrames), "at_least_one_feeding_frame");
 
-            p.BodyCircles = ClampI(o, "body_circles", p.BodyCircles,
-                Mathf.Clamp(p.BodyCircles, 1, 64), "range_1_to_64");
             p.TailSegments = ClampI(o, "tail_segments", p.TailSegments,
                 Mathf.Clamp(p.TailSegments, 1, 32), "range_1_to_32");
             p.LimbGripDelay = ClampI(o, "limb_grip_delay", p.LimbGripDelay,
@@ -2710,8 +2673,6 @@ namespace MotherMod
                 Mathf.Clamp(p.CorridorCenterReachTiles, 0f, 2f), "range_0_to_2_tiles_zero_is_off_two_is_two_spine_links");
             p.DrawSmoothing = ClampF(o, "draw_smoothing", p.DrawSmoothing,
                 Mathf.Clamp(p.DrawSmoothing, 0f, 0.95f), "range_0_to_0.95_body_must_still_follow");
-            p.TailSwellPos = ClampF(o, "tail_swell_pos", p.TailSwellPos,
-                Mathf.Clamp(p.TailSwellPos, 0.01f, 0.99f), "range_0.01_to_0.99");
             p.LimbLengthFac = ClampF(o, "limb_length_fac", p.LimbLengthFac,
                 Mathf.Clamp(p.LimbLengthFac, 0.05f, 10f),
                 "range_0.05_to_10_it_becomes_a_per_draw_loop_bound");
@@ -2753,22 +2714,12 @@ namespace MotherMod
                 Math.Max(0, p.BlindStunTicksFar), "must_not_be_negative_zero_is_off");
             p.HeadSize = ClampF(o, "head_size", p.HeadSize,
                 Mathf.Max(0.05f, p.HeadSize), "min_0.05");
-            p.BodyMeshPoints = ClampI(o, "body_mesh_points", p.BodyMeshPoints,
-                Mathf.Clamp(p.BodyMeshPoints, 3, 32), "range_3_to_32");
             p.LimbUpperFac = ClampF(o, "limb_upper_fac", p.LimbUpperFac,
                 Mathf.Clamp(p.LimbUpperFac, 0.1f, 0.9f), "range_0.1_to_0.9_both_bones_need_length");
             p.LimbBendSmooth = ClampF(o, "limb_bend_smooth", p.LimbBendSmooth,
                 Mathf.Clamp(p.LimbBendSmooth, 0.01f, 1f), "range_0.01_to_1");
             p.TailRootDroop = ClampF(o, "tail_root_droop", p.TailRootDroop,
                 Mathf.Clamp01(p.TailRootDroop), "range_0_to_1");
-            p.HeadNeckSlack = ClampF(o, "head_neck_slack", p.HeadNeckSlack,
-                Mathf.Clamp(p.HeadNeckSlack, 0.05f, 2f), "range_0.05_to_2");
-            p.StarveRegenFac = ClampF(o, "starve_regen_fac", p.StarveRegenFac,
-                Mathf.Clamp01(p.StarveRegenFac), "range_0_to_1_multiplies_a_heal");
-            p.BodySpriteScaleFac = ClampF(o, "body_sprite_scale_fac", p.BodySpriteScaleFac,
-                Mathf.Max(0.05f, p.BodySpriteScaleFac), "min_0.05_a_zero_scale_draws_nothing");
-            p.BodySpriteStretch = ClampF(o, "body_sprite_stretch", p.BodySpriteStretch,
-                Mathf.Clamp01(p.BodySpriteStretch), "range_0_to_1");
 
             p.LedgePounceMaxRise = ClampF(o, "ledge_pounce_max_rise", p.LedgePounceMaxRise,
                 Mathf.Clamp(p.LedgePounceMaxRise, 0f, Fox.MAX_SWEEP_RISE_PX), "range_0_to_2000_px_it_is_a_loop_bound");
@@ -2786,30 +2737,29 @@ namespace MotherMod
                 Math.Min(p.LedgePounceHeadroomTiles, 50), "max_50_tiles_it_is_a_per_tick_loop_bound");
             p.LedgePounceMaxDrop = ClampF(o, "ledge_pounce_max_drop", p.LedgePounceMaxDrop,
                 Mathf.Clamp(p.LedgePounceMaxDrop, 0f, 1000f), "range_0_to_1000_px_it_is_a_per_tick_loop_bound");
-            p.PounceLandingScanTiles = ClampI(o, "pounce_landing_scan_tiles", p.PounceLandingScanTiles,
-                Mathf.Clamp(p.PounceLandingScanTiles, 0, 200), "range_0_to_200_tiles_it_is_a_loop_bound");
             p.MantleMaxScanTiles = ClampI(o, "mantle_max_scan_tiles", p.MantleMaxScanTiles,
                 Math.Min(p.MantleMaxScanTiles, 50), "max_50_tiles_it_is_a_per_tick_loop_bound");
             p.RouteHoleProbeTiles = ClampI(o, "route_hole_probe_tiles", p.RouteHoleProbeTiles,
                 Math.Min(p.RouteHoleProbeTiles, 50), "max_50_tiles_it_is_a_per_tick_loop_bound");
-            p.PounceRoutePeekSteps = ClampI(o, "pounce_route_peek_steps", p.PounceRoutePeekSteps,
-                Math.Min(p.PounceRoutePeekSteps, 200), "max_200_steps_it_is_a_per_tick_loop_bound");
-            p.PounceRouteItersPerTick = ClampI(o, "pounce_route_iters_per_tick", p.PounceRouteItersPerTick,
-                Math.Min(p.PounceRouteItersPerTick, 5000), "max_5000_it_is_a_per_tick_loop_bound");
-            p.PounceRouteMaxFinders = ClampI(o, "pounce_route_max_finders", p.PounceRouteMaxFinders,
-                Math.Min(p.PounceRouteMaxFinders, 32),
-                "max_32_its_count_bounds_five_per_tick_loops");
             p.PounceRouteGoalSeedSnapRows = ClampI(o, "pounce_route_goal_seed_snap_rows",
                 p.PounceRouteGoalSeedSnapRows, Math.Min(p.PounceRouteGoalSeedSnapRows, 50),
                 "max_50_rows_it_is_a_per_tick_loop_bound");
-            p.PounceRouteSeedAttemptsPerTick = ClampI(o, "pounce_route_seed_attempts_per_tick",
-                p.PounceRouteSeedAttemptsPerTick, Math.Min(p.PounceRouteSeedAttemptsPerTick, 500),
-                "max_500_it_is_a_per_tick_loop_bound");
-            p.RoamAttemptsPerCandidate = ClampI(o, "roam_attempts_per_candidate", p.RoamAttemptsPerCandidate,
-                Math.Min(p.RoamAttemptsPerCandidate, 200), "max_200_it_is_a_per_tick_loop_bound");
-            p.LedgePounceStandoffPx = ClampF(o, "ledge_pounce_standoff_px", p.LedgePounceStandoffPx,
-                Mathf.Clamp(p.LedgePounceStandoffPx, 0f, 4000f),
-                "range_0_to_4000_px_it_becomes_a_per_tick_loop_bound");
+            p.HopChargeTicksSmall = ClampI(o, "hop_charge_ticks_small", p.HopChargeTicksSmall,
+                Mathf.Clamp(p.HopChargeTicksSmall, 0, 200), "range_0_to_200_it_is_the_pounce_gather");
+            p.HopChargeTicksMedium = ClampI(o, "hop_charge_ticks_medium", p.HopChargeTicksMedium,
+                Mathf.Clamp(p.HopChargeTicksMedium, 0, 200), "range_0_to_200_it_is_the_pounce_gather");
+            p.HopChargeTicksLarge = ClampI(o, "hop_charge_ticks_large", p.HopChargeTicksLarge,
+                Mathf.Clamp(p.HopChargeTicksLarge, 0, 200), "range_0_to_200_it_is_the_pounce_gather");
+            p.HopMinSpeedFrac = ClampF(o, "hop_min_speed_frac", p.HopMinSpeedFrac,
+                Mathf.Clamp(p.HopMinSpeedFrac, 0f, 1f), "range_0_to_1_it_is_a_fraction_of_the_leap");
+            p.HopSpeedFac = ClampF(o, "hop_speed_fac", p.HopSpeedFac,
+                Mathf.Clamp(p.HopSpeedFac, 0f, 4f), "range_0_to_4_it_scales_the_launch_impulse");
+            p.HopChargePullFac = ClampF(o, "hop_charge_pull_fac", p.HopChargePullFac,
+                Mathf.Clamp(p.HopChargePullFac, 0f, 1f), "range_0_to_1_it_is_a_fraction_of_the_gather_pull");
+            if (p.HopWhen != "moving" && p.HopWhen != "hunting" && p.HopWhen != "hurry")
+            {
+                p.HopWhen = "moving";
+            }
             p.LandSoftFac = ClampF(o, "land_soft_fac", p.LandSoftFac,
                 Mathf.Clamp(p.LandSoftFac, 0f, 8f), "range_0_to_8_it_scales_both_landing_thresholds");
 
@@ -2863,6 +2813,10 @@ namespace MotherMod
                 Mathf.Max(0f, p.BaitTriggerRangePx), "min_0_a_negative_radius_contains_nothing_and_only_a_grab_could_spring_the_trap");
             p.BaitFaceMaxTicks = ClampI(o, "bait_face_max_ticks", p.BaitFaceMaxTicks,
                 Math.Max(0, p.BaitFaceMaxTicks), "min_0_which_means_never_turn");
+            p.BaitRefusedRetryTicks = ClampI(o, "bait_refused_retry_ticks", p.BaitRefusedRetryTicks,
+                Math.Max(2, p.BaitRefusedRetryTicks), "min_2_at_1_the_refused_launch_and_its_landing_walk_would_run_every_tick");
+            p.BaitArriveLineTicks = ClampI(o, "bait_arrive_line_ticks", p.BaitArriveLineTicks,
+                Math.Max(0, p.BaitArriveLineTicks), "min_0_which_means_re_choose_the_spot_at_once");
 
             p.DeriveLeapEnvelope();
 
@@ -3027,20 +2981,6 @@ namespace MotherMod
             cost = new PathCost(F(obj.Value, "resistance", 1f), legality);
 
             return true;
-        }
-
-        private static void MigrateRetiredPounceKey(JsonObject o, string oldKey, string newKey,
-                                                    int oldValue, ref int target)
-        {
-            if (!o.TryGet(oldKey).HasValue || o.TryGet(newKey).HasValue) return;
-            target = oldValue;
-        }
-
-        private static void MigrateRetiredPounceKeyF(JsonObject o, string oldKey, string newKey,
-                                                     float oldValue, ref float target)
-        {
-            if (!o.TryGet(oldKey).HasValue || o.TryGet(newKey).HasValue) return;
-            target = oldValue;
         }
 
         private static void BadValue(string key, JsonException e, object fallback)

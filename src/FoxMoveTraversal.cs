@@ -329,6 +329,7 @@ namespace MotherMod
 
         public string LipSurface;
         public int VoidCols;
+        public string SkipReason;
 
         public string Describe()
         {
@@ -387,6 +388,8 @@ namespace MotherMod
             public string Kind;
 
             public FoxReachVerdict Reach;
+            public float StandoffPx;
+            public float SlidePx;
         }
 
         private static Solved Unsolved()
@@ -443,9 +446,11 @@ namespace MotherMod
             int downRows = Math.Max(0, p.LedgePounceDescendRows);
 
             int mask = p.LedgePounceLipSurfaceMask;
+            m.SkipReason = "none";
 
             FoxLipMeasure best = m;
             bool haveAny = false;
+            string skipWhy = "none";
             int voidRun = 0;
 
             for (int d = 1; d <= scan; d++)
@@ -463,6 +468,7 @@ namespace MotherMod
                 string refuse = RefuseLip(p, cand);
                 if (refuse == null)
                 {
+                    cand.SkipReason = skipWhy;
                     return cand;
                 }
                 if (!haveAny) { best = cand; haveAny = true; }
@@ -470,6 +476,10 @@ namespace MotherMod
                 bool canWalkPast = refuse == "below_leap_band" || refuse == "platform_overhang"
                                    || refuse == "overhang_not_a_step" || refuse == "gap_too_small"
                                    || refuse == "drop_too_far";
+                if (canWalkPast)
+                {
+                    skipWhy = refuse;
+                }
                 if (!canWalkPast)
                 {
                     best = cand;
@@ -480,6 +490,7 @@ namespace MotherMod
 
             if (haveAny)
             {
+                best.SkipReason = skipWhy;
                 return best;
             }
             m.Why = "no_face";
@@ -655,6 +666,15 @@ namespace MotherMod
                            : fox.CanReachLeap(p, so.Aim, GatherSlackPx(p));
                 if (!so.Reach.Ok) so.Refuse = "out_of_reach";
             }
+
+            if (!so.FromPlan && so.Lip.Found)
+            {
+                float frac, wantD, wantR;
+                Vector2 dir = Fox.Dir(from, so.Aim);
+                fox.SolveLaunchScaling(p, dir, so.Aim, out frac, out wantD, out wantR);
+                so.SlidePx = fox.GatherSlidePx(p, sign, dir, frac);
+                so.StandoffPx = fox.LedgeStandoffPx(p, so.Rise, so.SlidePx);
+            }
             return so;
         }
 
@@ -733,7 +753,7 @@ namespace MotherMod
 
             if (!routedTile)
             {
-                bool atLaunch = p.LedgePounceStandoffPx <= 0f || ahead >= p.LedgePounceStandoffPx;
+                bool atLaunch = ahead >= so.StandoffPx;
                 if (!atLaunch)
                 {
                     return false;
@@ -744,7 +764,7 @@ namespace MotherMod
             if (!so.FromPlan && fox.AI != null)
             {
                 float landY = so.Lip.Found ? so.Lip.TopY - 1f : so.Aim.y;
-                FoxAscentPlan answer = fox.AI.RequestAscent(new Vector2(so.Aim.x, landY), ahead);
+                FoxAscentPlan answer = fox.AI.RequestAscent(new Vector2(so.Aim.x, landY), ahead, so.StandoffPx);
                 if (answer != null)
                 {
                     if (answer.Kind != FoxAscentKind.Pounce)
@@ -776,7 +796,7 @@ namespace MotherMod
             Solved so = Solve(p, s, sign, plan);
             if (so.Refuse != null) return so.Refuse;
             if (Cooldown > 0 || fox.PounceCooldownTicks > 0) return "leap_cooldown";
-            if (!so.FromPlan && p.LedgePounceStandoffPx > 0f && so.Lip.Gap < p.LedgePounceStandoffPx)
+            if (!so.FromPlan && so.Lip.Gap < so.StandoffPx)
             {
                 return "no_standoff_room";
             }
@@ -846,8 +866,7 @@ namespace MotherMod
                 else if (Cooldown > 0) refuse = "ledge_cooldown";
                 else if (fox.WallBarsLaunch) refuse = "ledge_wall_hold";
                 else if (!fox.Grounded) refuse = "ledge_airborne";
-                else if (!so.FromPlan && p.LedgePounceStandoffPx > 0f && ahead < p.LedgePounceStandoffPx
-                         && !WallPressExhausted(p))
+                else if (!so.FromPlan && ahead < so.StandoffPx && !WallPressExhausted(p))
                 {
                     refuse = "no_standoff_room";
                 }
@@ -860,8 +879,7 @@ namespace MotherMod
                 return FoxMoveBid.No(refuse, Measure(p, so));
             }
 
-            string source = (p.LedgePounceStandoffPx > 0f && ahead < p.LedgePounceStandoffPx)
-                            ? "wall_fallback" : "arbiter";
+            string source = (!so.FromPlan && ahead < so.StandoffPx) ? "wall_fallback" : "arbiter";
             Latch(p, s, so, ahead, source, false);
             return FoxMoveBid.Yes(source, Measure(p, so));
         }

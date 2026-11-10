@@ -104,17 +104,13 @@ namespace MotherMod
         private readonly int[] releaseCounts = new int[REL_REASONS];
 
         private bool stepAirborne;
-        private int stepLiftTick;
-        private float stepLiftY, stepMaxY;
+        private float stepMaxY;
 
         private float swingPhase;
         public float SwingPhase { get { return swingPhase; } }
 
         private bool swingTargetFrozen;
         private Vector2 frozenTarget;
-
-        private Vector2 gripAnchor;
-        private float slipPath, slipDrift, lastSlipPath, lastSlipDrift;
 
         private float lastTargetAbove;
 
@@ -168,8 +164,6 @@ namespace MotherMod
             pendingReleaseWhy = REL_NONE;
             for (int r = 0; r < releaseCounts.Length; r++) releaseCounts[r] = 0;
             stepAirborne = false;
-            stepLiftTick = 0;
-            stepLiftY = resetPoint.y;
             stepMaxY = resetPoint.y;
             gaitHoldOdo = -1f;
             swingTravel = 0f;
@@ -178,11 +172,6 @@ namespace MotherMod
             lastStrideRef = 0f;
             swingTargetFrozen = false;
             frozenTarget = resetPoint;
-            slipPath = 0f;
-            slipDrift = 0f;
-            lastSlipPath = 0f;
-            lastSlipDrift = 0f;
-            gripAnchor = resetPoint;
             lastTargetAbove = 0f;
             groundReach = 0f;
             standDrop = 0f;
@@ -237,6 +226,7 @@ namespace MotherMod
                 : jointDist;
 
             bool hindDrive = p.PounceHindPlant && limbNumber >= 2
+                             && !gfx.fox.HopLook.OwnsPose
                              && gfx.fox.PounceFlight > 0f
                              && gfx.fox.PounceTicks <= Math.Max(0, p.PounceHindReleaseTicks);
             if (hindDrive != hindDriving)
@@ -783,58 +773,6 @@ namespace MotherMod
             return Mathf.Clamp01(at);
         }
 
-        public void SwapFootWith(FoxLimb other)
-        {
-            if (other == null || other == this) return;
-            Vector2 v;
-            v = pos; pos = other.pos; other.pos = v;
-            v = lastPos; lastPos = other.lastPos; other.lastPos = v;
-            v = vel; vel = other.vel; other.vel = v;
-            v = absoluteHuntPos; absoluteHuntPos = other.absoluteHuntPos; other.absoluteHuntPos = v;
-            Mode m = mode; mode = other.mode; other.mode = m;
-            bool b;
-            b = reachingForTerrain; reachingForTerrain = other.reachingForTerrain; other.reachingForTerrain = b;
-            b = retract; retract = other.retract; other.retract = b;
-            b = extraLongStep; extraLongStep = other.extraLongStep; other.extraLongStep = b;
-            b = turnStepping; turnStepping = other.turnStepping; other.turnStepping = b;
-            b = plantCommitted; plantCommitted = other.plantCommitted; other.plantCommitted = b;
-            b = swingSeeded; swingSeeded = other.swingSeeded; other.swingSeeded = b;
-            b = stepStance; stepStance = other.stepStance; other.stepStance = b;
-            b = swingTargetFrozen; swingTargetFrozen = other.swingTargetFrozen; other.swingTargetFrozen = b;
-            int st = swingTicks; swingTicks = other.swingTicks; other.swingTicks = st;
-            Vector2 vp;
-            vp = frozenTarget; frozenTarget = other.frozenTarget; other.frozenTarget = vp;
-            vp = plantTarget; plantTarget = other.plantTarget; other.plantTarget = vp;
-            vp = gripAnchor; gripAnchor = other.gripAnchor; other.gripAnchor = vp;
-            int n = gripCounter; gripCounter = other.gripCounter; other.gripCounter = n;
-            n = plantedTicks; plantedTicks = other.plantedTicks; other.plantedTicks = n;
-            float f;
-            f = slipPath; slipPath = other.slipPath; other.slipPath = f;
-            f = slipDrift; slipDrift = other.slipDrift; other.slipDrift = f;
-            f = lastSlipPath; lastSlipPath = other.lastSlipPath; other.lastSlipPath = f;
-            f = lastSlipDrift; lastSlipDrift = other.lastSlipDrift; other.lastSlipDrift = f;
-            f = swingStartBehind; swingStartBehind = other.swingStartBehind; other.swingStartBehind = f;
-            f = swingStartOdo; swingStartOdo = other.swingStartOdo; other.swingStartOdo = f;
-            f = swingPhase; swingPhase = other.swingPhase; other.swingPhase = f;
-            f = lastSwingPhase; lastSwingPhase = other.lastSwingPhase; other.lastSwingPhase = f;
-            f = swingProgress; swingProgress = other.swingProgress; other.swingProgress = f;
-            f = swing; swing = other.swing; other.swing = f;
-            f = lastSwing; lastSwing = other.lastSwing; other.lastSwing = f;
-            f = flip; flip = other.flip; other.flip = f;
-            b = trulyPlanted; trulyPlanted = other.trulyPlanted; other.trulyPlanted = b;
-            n = trueStanceTicks; trueStanceTicks = other.trueStanceTicks; other.trueStanceTicks = n;
-            b = stepAirborne; stepAirborne = other.stepAirborne; other.stepAirborne = b;
-            n = stepLiftTick; stepLiftTick = other.stepLiftTick; other.stepLiftTick = n;
-            f = stepLiftY; stepLiftY = other.stepLiftY; other.stepLiftY = f;
-            f = stepMaxY; stepMaxY = other.stepMaxY; other.stepMaxY = f;
-        }
-
-        public void ReseedBend()
-        {
-            bend = BackwardSign();
-            lastBend = bend;
-        }
-
         private float BackwardSign()
         {
             if (gfx == null) return 1f;
@@ -865,26 +803,10 @@ namespace MotherMod
                            && (reachedSnapPosition || (OverLappingHuntPos && terrainContact));
             if (holding)
             {
-                if (gripCounter == 0)
-                {
-                    gripAnchor = pos;
-                    slipPath = 0f;
-                    slipDrift = 0f;
-                }
-                else
-                {
-                    slipPath += Vector2.Distance(pos, lastPos);
-                    slipDrift = Vector2.Distance(pos, gripAnchor);
-                }
                 gripCounter++;
             }
             else
             {
-                if (gripCounter > 0)
-                {
-                    lastSlipPath = slipPath;
-                    lastSlipDrift = slipDrift;
-                }
                 gripCounter = 0;
             }
 
@@ -1064,10 +986,7 @@ namespace MotherMod
         {
             int why = (pendingReleaseWhy != REL_NONE) ? pendingReleaseWhy : REL_LOST;
             if (why >= REL_TURN) releaseCounts[why]++;
-            int tick = gfx.fox.MoveTick;
             stepAirborne = true;
-            stepLiftTick = tick;
-            stepLiftY = lastPos.y;
             stepMaxY = Mathf.Max(lastPos.y, pos.y);
         }
 

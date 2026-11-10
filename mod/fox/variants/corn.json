@@ -460,7 +460,6 @@
   "parts_prefix": "FoxCorn_",
   "climbs_poles": true,
   "pheromone_enabled": true,
-  "pheromone_style": 2,
   "cosmetics": [
     {
       "layer": "Ears",
@@ -523,5 +522,10 @@
   "color_legs": "725719",
   "color_leg_lower": "82631C",
   "color_paws": "594313",
-  "icon_color": "E6BB54"
+  "icon_color": "E6BB54",
+  "swim_speed": 0.3,
+  "flank_enabled": true,
+  "flank_block_enabled": true,
+  "flank_herd_enabled": true,
+  "flank_sync_enabled": true
 }

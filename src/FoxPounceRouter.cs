@@ -12,7 +12,7 @@ namespace MotherMod
         private const float TRIAL_MAX_DEG = 80f;
         private const int TRACE_CACHE = 64;
 
-        private static PathCost.Legality Ceiling(FoxBreedParams p)
+        internal static PathCost.Legality Ceiling(FoxBreedParams p)
         {
             if (string.Equals(p.PounceRouteMaxLegality, "allowed", System.StringComparison.OrdinalIgnoreCase))
                 return PathCost.Legality.Allowed;
@@ -575,7 +575,7 @@ namespace MotherMod
             Clear("new_room");
         }
 
-        internal FoxAscentPlan RequestAscent(FoxBreedParams p, Vector2 lipAt, float runUpPx)
+        internal FoxAscentPlan RequestAscent(FoxBreedParams p, Vector2 lipAt, float runUpPx, float standoffPx)
         {
             Room room = fox.RoomRef;
             if (room == null) return null;
@@ -584,7 +584,7 @@ namespace MotherMod
             IntVector2 lipTile = room.GetTilePosition(lipAt);
             WorldCoordinate lipCoord = new WorldCoordinate(room.abstractRoom.index, lipTile.x, lipTile.y, -1);
 
-            bool haveRunUp = runUpPx >= p.LedgePounceStandoffPx;
+            bool haveRunUp = runUpPx >= standoffPx;
 
             int headroom = 0;
             int want = Math.Max(1, p.LedgePounceHeadroomTiles);
@@ -720,8 +720,9 @@ namespace MotherMod
 
             float runUpPx;
             int lipHeadroom;
+            float standoffPx;
             string ruledOut = RuleOutLeapAtLip(p, room, col, lipRow, sign, rise, footTile.y,
-                                               out runUpPx, out lipHeadroom);
+                                               out runUpPx, out lipHeadroom, out standoffPx);
             if (ruledOut == null)
             {
                 return false;
@@ -772,10 +773,12 @@ namespace MotherMod
         }
 
         private string RuleOutLeapAtLip(FoxBreedParams p, Room room, int col, int lipRow, int sign,
-                                        float rise, int footRow, out float runUpPx, out int lipHeadroom)
+                                        float rise, int footRow, out float runUpPx, out int lipHeadroom,
+                                        out float standoffPx)
         {
             runUpPx = 0f;
             lipHeadroom = 0;
+            standoffPx = 0f;
 
             if (!p.LedgePounceEnabled || !p.PounceEnabled) return "leap_disabled";
             string band = FoxLedgePounceAction.RefuseRiseBand(p, rise);
@@ -785,7 +788,9 @@ namespace MotherMod
             while (lipHeadroom < want && !room.GetTile(col, lipRow + 1 + lipHeadroom).Solid) lipHeadroom++;
             if (lipHeadroom < want) return "headroom_low";
 
-            int maxTiles = Mathf.CeilToInt(Mathf.Max(0f, p.LedgePounceStandoffPx) / 20f) + 1;
+            standoffPx = fox.LedgeStandoffPx(p, rise, 0f);
+            if (float.IsInfinity(standoffPx)) return "no_run_up";
+            int maxTiles = Mathf.CeilToInt(standoffPx / 20f) + 1;
             int clear = 0;
             for (int k = 1; k <= maxTiles; k++)
             {
@@ -801,7 +806,7 @@ namespace MotherMod
                 clear++;
             }
             runUpPx = clear * 20f;
-            if (runUpPx < p.LedgePounceStandoffPx) return "no_run_up";
+            if (runUpPx < standoffPx) return "no_run_up";
 
             return null;
         }
@@ -836,6 +841,11 @@ namespace MotherMod
             return cheaper;
         }
 
+        private static string Res(PathFinder.PathingCell c)
+        {
+            return c == null ? "none" : c.costToGoal.resistance.ToString("0.00");
+        }
+
         private sealed class ArcFinder
         {
             private readonly Fox fox;
@@ -850,6 +860,7 @@ namespace MotherMod
 
             internal PathFinder.PathingCell BestCell;
             internal Vector2 BestVel;
+            internal int BestTicks;
 
             private Vector2 pos, lastPos, vel, trialVel;
             private int trialTick, boostLeft;
@@ -908,8 +919,10 @@ namespace MotherMod
                     vel.y += p.PounceBoost * ((float)boostLeft / p.PounceBoostFrames);
                     boostLeft--;
                 }
-                vel.y -= fox.gravity;
-                vel *= fox.airFriction;
+                float g, airFric;
+                fox.FlightArcInputs(p, out g, out airFric);
+                vel.y -= g;
+                vel *= airFric;
                 pos += vel;
 
                 int n;
@@ -964,6 +977,7 @@ namespace MotherMod
                     {
                         BestCell = cell;
                         BestVel = trialVel;
+                        BestTicks = trialTick;
                     }
                 }
 

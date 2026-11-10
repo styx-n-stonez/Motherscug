@@ -25,6 +25,8 @@ namespace MotherMod
 
         public static readonly CreatureType MotherFoxToby = new CreatureType("MotherFoxToby", true);
 
+        public static readonly CreatureType MotherFoxTrain = new CreatureType("MotherFoxTrain", true);
+
         public static readonly CreatureCommunities.CommunityID FoxCommunity =
             new CreatureCommunities.CommunityID("MotherFoxes", true);
 
@@ -43,6 +45,8 @@ namespace MotherMod
                 new FoxCritob(MotherFoxPotato,   variantId: "potato",   creatureName: "Potato Fox"),
 
                 new FoxCritob(MotherFoxToby,     variantId: "toby",     creatureName: "Toby Fox"),
+
+                new FoxCritob(MotherFoxTrain,    variantId: "train",    creatureName: "Train Fox"),
             };
         }
 
@@ -415,11 +419,6 @@ namespace MotherMod
             if (!ExtEnumBase.TryParse(typeof(CreatureTemplate.Relationship.Type), name, true, out ExtEnumBase parsed)) return false;
             type = (CreatureTemplate.Relationship.Type)parsed;
             return type.Index != -1;
-        }
-
-        public override CreatureState CreateState(AbstractCreature acrit)
-        {
-            return new FoxState(acrit);
         }
 
         public override Creature CreateRealizedCreature(AbstractCreature acrit)

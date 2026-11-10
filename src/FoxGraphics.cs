@@ -304,7 +304,6 @@ namespace MotherMod
             }
 
             WireGaitPartners(p);
-            lastTurnSwapCount = fox.TurnSwapCount;
         }
 
         public int AddCosmetic(int spriteIndex, FoxCosmetic cosmetic)
@@ -503,8 +502,6 @@ namespace MotherMod
 
             UpdateUpSign(p);
 
-            CheckTurnSwap(p);
-
             UpdateAim(p);
             UpdateDrawPositions(p);
             if (partsRigActive)
@@ -515,6 +512,7 @@ namespace MotherMod
             BuildArtFrame(p, drawPositions[2, 0], drawPositions[0, 0], headDepth,
                           out artOrigin, out artFwd, out artUp, out artSx, out artSy);
             UpdateLimbs(p);
+            UpdateSpearLayer(p);
             UpdateTail(p);
             UpdateHead(p);
             if (partsRigActive) UpdatePartsHeadFrame(p);
@@ -568,12 +566,8 @@ namespace MotherMod
 
             LimbsAimFor = target;
 
-            float eat = Mathf.Clamp01(fox.EatPose);
-            if (eat > 0f)
-            {
-                target = Vector2.Lerp(target, fox.EatAimPos, Mathf.Clamp01(p.EatHeadFac) * eat);
-            }
-            if (eat <= 0f) target = ApplyHeadLook(p, target);
+            target = ApplyHeadLook(p, target);
+            if (fox.HopLook.LooksAtGoal) target = fox.HopLook.Goal;
             lookPos = lookInitialized ? Vector2.Lerp(lookPos, target, 0.2f) : target;
             lookInitialized = true;
         }
@@ -629,14 +623,7 @@ namespace MotherMod
                 for (int i = 0; i < fox.bodyChunks.Length; i++) drawPositions[i, 0].y -= drop;
             }
 
-            float eat = Mathf.Clamp01(fox.EatPose);
-            if (eat > 0f)
-            {
-                float drop = p.EatCrouchDrop * eat;
-                for (int i = 0; i < fox.bodyChunks.Length; i++) drawPositions[i, 0].y -= drop;
-            }
-
-            float pounceGather = Mathf.Clamp01(fox.PounceGather);
+            float pounceGather = Mathf.Clamp01(fox.DrawPounceGather);
             float enterGather = Mathf.Clamp01(fox.EnterGather);
             bool enterOwnsPose = enterGather > pounceGather;
             float gather = Mathf.Max(pounceGather, enterGather);
@@ -657,7 +644,7 @@ namespace MotherMod
                 }
             }
 
-            float flight = Mathf.Clamp01(fox.PounceFlight);
+            float flight = Mathf.Clamp01(fox.DrawPounceFlight);
             if (flight > 0f && p.PounceFlightStretch > 0f)
             {
                 Vector2 v = fox.bodyChunks[1].vel;
@@ -671,7 +658,7 @@ namespace MotherMod
                 }
             }
 
-            float pland = Mathf.Clamp01(fox.PounceLand);
+            float pland = Mathf.Clamp01(fox.DrawPounceLand);
             if (pland > 0f && p.PounceLandCompress != 0f)
             {
                 Vector2 lUp = BodyUp;
@@ -681,7 +668,7 @@ namespace MotherMod
                 drawPositions[2, 0] += lUp * (c * 0.5f);
             }
 
-            float landing = Mathf.Clamp01(fox.LandingPose);
+            float landing = Mathf.Clamp01(fox.DrawLandingPose);
             if (landing > 0f && p.LandingPoseLevel > 0f)
             {
                 float level = Mathf.Clamp01(p.LandingPoseLevel) * landing;
@@ -689,6 +676,10 @@ namespace MotherMod
                 drawPositions[0, 0].y = Mathf.Lerp(drawPositions[0, 0].y, mean, level);
                 drawPositions[2, 0].y = Mathf.Lerp(drawPositions[2, 0].y, mean, level);
             }
+
+            ApplyHopLookPose(p);
+
+            ApplySpearBodyPose(p);
         }
 
         private void UpdateLimbs(FoxBreedParams p)
@@ -749,7 +740,7 @@ namespace MotherMod
             tail[0].connectedPoint = tailRoot;
 
             if (lastPounceState == Fox.PounceState.Crouch && fox.pounce == Fox.PounceState.Propel
-                && p.PounceTailWhip != 0f)
+                && p.PounceTailWhip != 0f && !fox.HopLook.OwnsPose)
             {
                 float n = p.PounceTailWhip;
                 Vector2 back = Fox.Dir(drawPositions[0, 0], drawPositions[2, 0]);
@@ -759,6 +750,8 @@ namespace MotherMod
                     n /= 1.7f;
                 }
             }
+
+            ApplyHopLookTail();
 
             for (int i = tailSegmentCount - 1; i >= 0; i--)
             {
@@ -797,6 +790,7 @@ namespace MotherMod
             if (partsRigActive)
             {
                 ApplyTailLife(p, tailRoot, -partsFwd, partsUp);
+                ApplySpearTail(p, partsUp);
             }
         }
 
@@ -871,7 +865,7 @@ namespace MotherMod
                 headDepth = Mathf.Lerp(headDepth, wantDepth, 0.25f);
                 return;
             }
-            if (turnProg > 0f && turnProg < 0.5f && p.TurnDepthFac > 0f && !fox.TurnStalled)
+            if (turnProg > 0f && turnProg < 0.5f && p.TurnDepthFac > 0f)
             {
                 wantDepth = Mathf.Lerp(wantDepth, 0f, Mathf.Clamp01(p.TurnDepthFac));
                 rate = 0.25f;
@@ -918,7 +912,6 @@ namespace MotherMod
             lastVelAlong = Vector2.Dot(fox.bodyChunks[1].vel, bodyAxis);
             lastHeadDepthForTrend = headDepth;
             glanceTicks = 0;
-            lastTurnSwapCount = fox.TurnSwapCount;
 
             bodyBend = 0f;
             lastBodyBend = 0f;
@@ -1317,16 +1310,6 @@ namespace MotherMod
 
             ApplyCamoBlend(sLeaser, rCam, p, headChunk, midChunk, rearChunk);
 
-            float deathAlpha = fox.DeathFadeAlpha;
-            if (deathAlpha < 1f)
-            {
-                for (int i = 0; i < sLeaser.sprites.Length; i++)
-                {
-                    FSprite s = sLeaser.sprites[i];
-                    if (s != null) s.alpha = deathAlpha;
-                }
-            }
-
             base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
         }
 
@@ -1535,7 +1518,8 @@ namespace MotherMod
             if (partsRigActive)
             {
                 float deg = Mathf.Lerp(lastHeadPitchDeg, headPitchDeg, timeStacker);
-                DrawHeadDir = PitchFromNeck(neckLine, Mathf.Clamp(deg, -p.HeadPitchMax, p.HeadPitchMax));
+                float pitchLim = SpearHeadPitchLimit(p);
+                DrawHeadDir = PitchFromNeck(neckLine, Mathf.Clamp(deg, -pitchLim, pitchLim));
             }
             else
             {

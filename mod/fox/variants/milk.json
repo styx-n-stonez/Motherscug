@@ -435,11 +435,9 @@
   "prey_give_up_unreachable": 1800,
   "prey_give_up_ghost_generation": 120,
   "hunt_persist_frames": 700,
-  "base_speed": 4.6,
   "acceleration": 0.8,
   "run_speed_idle": 0.4,
   "ledge_pounce_max_rise": 190.0,
-  "ledge_pounce_standoff_px": 60.0,
   "idle_wander_chance": 0.01,
   "idle_stay_chance": 0.05,
   "scent_radius_tiles": 95,
@@ -495,7 +493,6 @@
   "limb_speed": 4.3,
   "tail_length_vs_body": 1.05,
   "stalk_crouch_drop": 7.25,
-  "voice_pitch": 1.12,
   "cosmetics": [
     {
       "layer": "Ears",
@@ -560,6 +557,5 @@
   "color_paws": "6B6152",
   "color_eye": "2A251E",
   "icon_color": "E4DFD2",
-  "pounce_route_goal_seed_radius_tiles": 7.0,
   "prey_persistence_bias": 3.2
 }

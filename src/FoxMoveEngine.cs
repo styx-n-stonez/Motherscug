@@ -29,6 +29,8 @@ namespace MotherMod
 
         internal readonly FoxEnterAction Enter;
 
+        internal readonly FoxHopAction Hop;
+
         private readonly FoxMoveAction[] ticked;
 
         private readonly FoxMoveAction[] all;
@@ -47,8 +49,9 @@ namespace MotherMod
             Charge = new FoxChargeAction(fox);
             Lunge = new FoxLungeAction(fox);
             Enter = new FoxEnterAction(fox);
+            Hop = new FoxHopAction(fox);
             ticked = new FoxMoveAction[] { Mantle, Reach, StepUp, LedgePounce, Enter };
-            all = new FoxMoveAction[] { Turn, Mantle, Reach, StepUp, LedgePounce, Charge, Pounce, Lunge, Enter };
+            all = new FoxMoveAction[] { Turn, Mantle, Reach, StepUp, LedgePounce, Charge, Pounce, Lunge, Enter, Hop };
         }
 
         internal FoxMoveAction DriveOwner
@@ -83,9 +86,14 @@ namespace MotherMod
 
         internal string RunningActionNameExcept(FoxMoveAction skip)
         {
+            return RunningActionNameExcept(skip, null);
+        }
+
+        internal string RunningActionNameExcept(FoxMoveAction skip, FoxMoveAction skip2)
+        {
             for (int i = 0; i < all.Length; i++)
             {
-                if (ReferenceEquals(all[i], skip)) continue;
+                if (ReferenceEquals(all[i], skip) || ReferenceEquals(all[i], skip2)) continue;
                 if (all[i].Running) return all[i].Name;
             }
             return null;
@@ -220,6 +228,11 @@ namespace MotherMod
             if (Mantle.Running) return true;
 
             if (LedgePounce.ConsiderApproach(p, s))
+            {
+                return true;
+            }
+
+            if (Hop.Consider(p, s))
             {
                 return true;
             }

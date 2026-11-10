@@ -46,6 +46,12 @@ namespace MotherMod
         public string Why;
         public bool Prepared;
         public bool NoChanceRoll;
+        public Vector2 HopVel;
+        public int HopChargeTicks;
+        public float HopPower;
+        public int HopFlightTicks;
+        public RWCustom.IntVector2 HopStartTile;
+        public Vector2 HopLandingDir;
     }
 
     internal abstract class FoxMoveAction

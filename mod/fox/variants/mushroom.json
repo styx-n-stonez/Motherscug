@@ -483,5 +483,37 @@
   "bait_wait_max_ticks": 0,
   "bait_holds_against_hunt": true,
   "bait_wait_holds_against_hunt": true,
-  "bait_enabled": true
+  "bait_enabled": true,
+  "base_speed": 2.78,
+  "speed_corridor": 0.71,
+  "swim_speed": 0.25,
+  "regain_footing_frames": 5,
+  "tiles": {
+    "floor": {
+      "resistance": 1.0,
+      "legality": "Allowed"
+    },
+    "curved_floor": {
+      "resistance": 1.0,
+      "legality": "inherit"
+    },
+    "corridor": {
+      "resistance": 1.5,
+      "legality": "Allowed"
+    },
+    "climb": {
+      "resistance": 2.5,
+      "legality": "Allowed"
+    },
+    "wall": {
+      "resistance": 4.0,
+      "legality": "Allowed"
+    },
+    "ceiling": {
+      "resistance": 4.0,
+      "legality": "Unallowed"
+    }
+  },
+  "climbs_poles": true,
+  "climbs_walls": true
 }

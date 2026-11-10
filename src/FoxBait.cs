@@ -82,6 +82,54 @@ namespace MotherMod
             return l;
         }
 
+        internal bool BaitSpotLandingOk(FoxBreedParams p, Vector2 from, Vector2 bait,
+                                       out string why, out string aimName, out Vector2 landAt, out int flown)
+        {
+            why = null;
+            aimName = "none";
+            landAt = from;
+            flown = 0;
+            if (room == null) return true;
+            float r = Mathf.Max(0f, p.BaitTriggerRangePx);
+            float away = (bait.x >= from.x) ? 1f : -1f;
+            for (int a = 0; a < 3; a++)
+            {
+                Vector2 aim = a == 0 ? bait : (a == 1 ? bait + new Vector2(away * r, 0f) : bait + new Vector2(0f, r));
+                float d = Vector2.Distance(from, aim);
+                if (d > p.PounceDistance || d < p.PounceMinDistance) continue;
+                if (LaunchTooSteep(p, LaunchAngleDegFrom(from, aim))) continue;
+                flown++;
+
+                Vector2 dir = Dir(from, aim);
+                float frac, wantDist, wantRise;
+                SolveLaunchScalingFrom(p, from, dir, aim, out frac, out wantDist, out wantRise);
+                Vector2 v = LaunchVelocity(p, dir, EffectiveLaunchSpeed(p) * frac);
+
+                Vector2 predicted;
+                if (p.PounceRoomClamp && !PredictedLandingInRoomFrom(p, from, v, out predicted))
+                {
+                    why = "leaves_room";
+                    aimName = a == 0 ? "bait" : (a == 1 ? "far" : "upper");
+                    landAt = predicted;
+                    return false;
+                }
+                if (p.PounceRequireLanding)
+                {
+                    IntVector2 landTile;
+                    string landWhy, landEntry;
+                    Vector2 at;
+                    if (!PredictedLeapLandingSurvivableFrom(p, from, v, out at, out landTile, out landWhy, out landEntry))
+                    {
+                        why = landWhy;
+                        aimName = a == 0 ? "bait" : (a == 1 ? "far" : "upper");
+                        landAt = at;
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
         private int baitReachTick = NEVER_LOGGED;
         private FoxBreedParams baitReachParams;
         private float baitReachPx;
@@ -181,6 +229,12 @@ namespace MotherMod
             ambushGather = 0f;
         }
 
+        internal void ResumeAmbushGather()
+        {
+            ambushGather = Mathf.Clamp01(PounceGather);
+            ambushGatherTick = GameTick;
+        }
+
         private void TickAmbushGather(FoxBreedParams p)
         {
             if (ambushGather <= 0f) return;
@@ -231,6 +285,8 @@ namespace MotherMod
         private int stageTicks;
         private AbstractPhysicalObject item;
         private IntVector2 baitTile, prepTile;
+        private int arriveLineTicks;
+        private readonly List<IntVector2> excludedPreps = new List<IntVector2>(4);
         private Vector2 placedPos;
         private int cooldown, chooseCountdown, planCountdown, planAttempts;
 
@@ -464,6 +520,8 @@ namespace MotherMod
             }
 
             item = best;
+            excludedPreps.Clear();
+            arriveLineTicks = 0;
             Enter(Stage.Seek);
             return true;
         }
@@ -554,6 +612,7 @@ namespace MotherMod
             if (!ok) { Abort(p, "line_lost", null); return; }
             baitTile = actual;
             prepTile = prep;
+            arriveLineTicks = 0;
             Enter(Stage.GoPrep);
         }
 
@@ -562,14 +621,59 @@ namespace MotherMod
             string gone = BaitGone(p, true);
             if (gone != null) { Abort(p, gone, null); return; }
 
-            if (AtTile(p, prepTile))
+            if (AtTile(p, prepTile, true))
             {
-                ResetStand();
-                Enter(Stage.Wait);
-                return;
+                PhysicalObject obj = item.realizedObject;
+                FoxBaitLine l = fox.BaitLine(p, fox.mainBodyChunk.pos, obj.firstChunk.pos, ray);
+                if (l.Ok)
+                {
+                    string landWhy, landAim;
+                    Vector2 landAt;
+                    int flown;
+                    if (!fox.BaitSpotLandingOk(p, fox.mainBodyChunk.pos, obj.firstChunk.pos, out landWhy,
+                                               out landAim, out landAt, out flown))
+                    {
+                        l.Ok = false;
+                        l.Fail = 7;
+                    }
+                }
+                if (l.Ok)
+                {
+                    arriveLineTicks = 0;
+                    ResetStand();
+                    Enter(Stage.Wait);
+                    return;
+                }
+                arriveLineTicks++;
+                if (arriveLineTicks > Math.Max(0, p.BaitArriveLineTicks))
+                {
+                    if (!Replan(p, l)) return;
+                }
             }
             if (stageTicks > Math.Max(1, p.BaitCarryMaxTicks)) { Abort(p, "prep_timeout", null); return; }
             Go(p, prepTile, stuckBoost);
+        }
+
+        private bool Replan(FoxBreedParams p, FoxBaitLine failed)
+        {
+            IntVector2 was = prepTile;
+            if (!IsExcludedPrep(was)) excludedPreps.Add(was);
+            arriveLineTicks = 0;
+            PhysicalObject obj = item.realizedObject;
+            IntVector2 actual = fox.room.GetTilePosition(obj.firstChunk.pos);
+            var c = new Census();
+            IntVector2 prep;
+            FoxBaitLine line;
+            float score, d, lv, cv;
+            bool ok = BestPrepFor(p, actual, actual, false, ref c, out prep, out line, out score, out d, out lv, out cv);
+            if (!ok)
+            {
+                Abort(p, "line_lost_at_arrival", null);
+                return false;
+            }
+            baitTile = actual;
+            prepTile = prep;
+            return true;
         }
 
         private void ActWait(FoxBreedParams p, float stuckBoost)
@@ -760,8 +864,6 @@ namespace MotherMod
         private bool IsSubject(FoxBreedParams p, Creature c)
         {
             if (c == null || c == fox || c.dead || c.abstractCreature == null) return false;
-            if (FoxAI.IsRouteKey(p.BaitSpringRule, "anything")) return true;
-            if (FoxAI.IsRouteKey(p.BaitSpringRule, "player")) return c is Player;
             string src;
             return FoxAI.RouteFor(ai.AmbushRelationship(c.abstractCreature, out src).type, p)
                    == FoxAI.RelRoute.Prey;
@@ -818,6 +920,7 @@ namespace MotherMod
         {
             internal int BaitExamined;
             internal int Reach;
+            internal int Corridor;
             internal bool HasNear;
             internal FoxBaitLine Near;
         }
@@ -1016,6 +1119,12 @@ namespace MotherMod
                     {
                         int x = bait.x + sign * dx, y = bait.y + dy;
                         if (!FloorSpot(room, x, y)) { continue; }
+                        IntVector2 corridorTile;
+                        if (PrepBodyInCorridor(x, y, out corridorTile))
+                        {
+                            c.Corridor++;
+                            continue;
+                        }
 
                         FoxBaitLine line = fox.BaitLine(p, room.MiddleOfTile(x, y), aim, ray);
                         if (!line.Ok)
@@ -1032,9 +1141,24 @@ namespace MotherMod
                             continue;
                         }
                         var tile = new IntVector2(x, y);
+                        if (IsExcludedPrep(tile))
+                        {
+                            continue;
+                        }
                         if (!Reachable(tile))
                         {
                             line.Fail = 6;
+                            NoteRejected(ref c, line, x, y, bait);
+                            continue;
+                        }
+                        string landWhy, landAim;
+                        Vector2 landAt;
+                        int flown;
+                        if (!fox.BaitSpotLandingOk(p, room.MiddleOfTile(x, y), aim, out landWhy, out landAim,
+                                                   out landAt, out flown))
+                        {
+                            line.Fail = 7;
+                            line.Ok = false;
                             NoteRejected(ref c, line, x, y, bait);
                             continue;
                         }
@@ -1071,6 +1195,21 @@ namespace MotherMod
             return room.aimap.TileAccessibleToCreature(x, y, fox.Template);
         }
 
+        private bool PrepBodyInCorridor(int x, int y, out IntVector2 hit)
+        {
+            hit = new IntVector2(x, y);
+            int span = Math.Max(0, Mathf.CeilToInt(fox.SpineRestSpan / TilePx));
+            for (int dy = 0; dy <= 1; dy++)
+            {
+                for (int dx = -span; dx <= span; dx++)
+                {
+                    var t = new IntVector2(x + dx, y + dy);
+                    if (fox.TileIsCorridorLike(t)) { hit = t; return true; }
+                }
+            }
+            return false;
+        }
+
         private bool Holding()
         {
             PhysicalObject held = fox.HeldItem;
@@ -1087,16 +1226,23 @@ namespace MotherMod
             return null;
         }
 
-        private bool AtTile(FoxBreedParams p, IntVector2 tile)
+        private bool AtTile(FoxBreedParams p, IntVector2 tile, bool headOnly = false)
         {
             if (fox.room == null) return false;
             Vector2 c = fox.room.MiddleOfTile(tile.x, tile.y);
             float r = Mathf.Max(5f, p.BaitArrivePx);
-            for (int i = 0; i < fox.bodyChunks.Length; i++)
+            int n = headOnly ? 1 : fox.bodyChunks.Length;
+            for (int i = 0; i < n; i++)
             {
                 Vector2 d = fox.bodyChunks[i].pos - c;
                 if (Mathf.Abs(d.x) <= r && Mathf.Abs(d.y) <= r + TilePx) return true;
             }
+            return false;
+        }
+
+        private bool IsExcludedPrep(IntVector2 tile)
+        {
+            for (int i = 0; i < excludedPreps.Count; i++) if (excludedPreps[i] == tile) return true;
             return false;
         }
 
@@ -1137,6 +1283,8 @@ namespace MotherMod
             strikeBit = false;
             trigSubject = null;
             trigCause = null;
+            excludedPreps.Clear();
+            arriveLineTicks = 0;
             ResetStand();
             Enter(Stage.None);
         }

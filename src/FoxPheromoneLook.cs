@@ -19,7 +19,6 @@ namespace MotherMod
         private int pherRelDone;
         private float pherEnv;
         private int pherWt;
-        private bool pherDelaySniffSent;
         private readonly List<Fox> pherRelRx = new List<Fox>(4);
         private FoxSpines pherHorns;
         private bool pherHornsLooked;
@@ -64,13 +63,12 @@ namespace MotherMod
                 if (mod != null) pherSeenSent = mod.SentSerial;
                 return;
             }
-            int style = Mathf.Clamp(p.PheromoneStyle, 1, 3);
             int now = RigClock;
 
             if (mod.SentSerial != pherSeenSent)
             {
                 bool fresh = now - mod.LastSentTick <= PherFreshTicks;
-                if (fresh && style >= 2 && fox.Consious)
+                if (fresh && fox.Consious)
                 {
                     bool starting = pherRelLeft <= 0;
                     if (starting) BeginPheromoneRelease(p, now);
@@ -87,37 +85,21 @@ namespace MotherMod
             if (pherRelLeft > 0)
             {
                 if (!fox.Consious) EndPheromoneRelease("cut_unconscious", now);
-                else if (style < 2) EndPheromoneRelease("cut_style", now);
             }
 
             if (pherRelLeft > 0)
             {
                 int done = pherRelTicks - pherRelLeft + 1;
                 int want = Mathf.FloorToInt(pherRelCount * (float)done / pherRelTicks + 0.5f);
-                if (style == 2)
+                while (pherRelDone < want)
                 {
-                    while (pherRelDone < want)
-                    {
-                        pherRelDone++;
-                        SpawnPheromoneMist(p, now);
-                    }
+                    pherRelDone++;
+                    SpawnPheromoneMist(p, now);
                 }
                 pherRelLeft--;
-                if (style == 3 && !pherDelaySniffSent && pherRelLeft > 0
-                    && pherRelTicks - pherRelLeft >= Math.Max(0, p.PheromoneSniffDelayTicks))
-                {
-                    pherDelaySniffSent = true;
-                    for (int i = 0; i < pherRelRx.Count; i++)
-                    {
-                        Fox r = pherRelRx[i];
-                        if (r != null && r.room == fox.room && r.graphicsModule is FoxGraphics rg)
-                            rg.RequestPheromoneSniff(fox, pherRelSerial, "delay");
-                    }
-                }
             }
 
-            if (style < 2) pherEnv = 0f;
-            else if (pherRelLeft > 0) pherEnv = Mathf.Min(1f, pherEnv + 1f / Math.Max(1, p.PheromoneWiggleRiseTicks));
+            if (pherRelLeft > 0) pherEnv = Mathf.Min(1f, pherEnv + 1f / Math.Max(1, p.PheromoneWiggleRiseTicks));
             else pherEnv = Mathf.Max(0f, pherEnv - 1f / Math.Max(1, p.PheromoneWiggleFallTicks));
             if (pherEnv > 0f || pherRelLeft > 0) pherWt++;
             if (pherEnv > pherEnvPeak) pherEnvPeak = pherEnv;
@@ -131,7 +113,6 @@ namespace MotherMod
             pherRelCount = Mathf.Clamp(p.PheromoneMistCount, 0, PherMaxPuffsPerRelease);
             pherRelDone = 0;
             pherWt = 0;
-            pherDelaySniffSent = false;
             pherRelRx.Clear();
             pherEnvPeak = pherEnv;
         }

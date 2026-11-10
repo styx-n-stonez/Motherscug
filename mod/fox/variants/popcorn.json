@@ -1,5 +1,4 @@
 {
-  "relationships_expected_skipped": 9,
   "relationships": {
     "Rat": {
       "type": "Eats",
@@ -495,5 +494,9 @@
   "color_legs": "8C562E",
   "color_leg_lower": "9E653A",
   "color_paws": "5E3A1E",
-  "icon_color": "F0D8B4"
+  "icon_color": "F0D8B4",
+  "base_speed": 2.34,
+  "speed_corridor": 0.71,
+  "swim_speed": 0.35,
+  "regain_footing_frames": 4
 }

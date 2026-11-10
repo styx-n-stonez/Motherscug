@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Reflection;
 using RWCustom;
 using UnityEngine;
 
@@ -19,6 +21,8 @@ namespace MotherMod
             internal int DodgeTick;
             internal string Move;
             internal float Roll;
+            internal string SkipReason;
+            internal float MissPx;
         }
 
         private const int EVADE_DONE = 0;
@@ -38,6 +42,31 @@ namespace MotherMod
 
         private Vector2[] evadeBodyPos;
         private float[] evadeRise;
+
+        private static readonly Func<Weapon, IntVector2> evadeThrowDirGetter = BuildThrowDirGetter();
+
+        private static Func<Weapon, IntVector2> BuildThrowDirGetter()
+        {
+            try
+            {
+                FieldInfo f = typeof(Weapon).GetField("throwDir", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (f == null || f.FieldType != typeof(IntVector2)) return null;
+                ParameterExpression w = Expression.Parameter(typeof(Weapon), "w");
+                return Expression.Lambda<Func<Weapon, IntVector2>>(Expression.Field(w, f), w).Compile();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static IntVector2 ThrowDirOf(Weapon w)
+        {
+            if (evadeThrowDirGetter != null) return evadeThrowDirGetter(w);
+            Vector2 v = w.firstChunk.vel;
+            if (Mathf.Abs(v.x) >= Mathf.Abs(v.y)) return new IntVector2(v.x >= 0f ? 1 : -1, 0);
+            return new IntVector2(0, v.y >= 0f ? 1 : -1);
+        }
 
         internal bool EvadeStaggering { get { return GameTick < evadeStaggerUntil; } }
 
@@ -84,8 +113,13 @@ namespace MotherMod
             EvadeTrace t = TraceSpear(weapon, 0, horizon);
             float clearNow = SpearClearNow(weapon);
             bool hits = t.HitTick > 0;
-            bool passes = !hits && t.MinClear < clearNow && (t.MinClearTick < horizon || t.StopTick > 0);
+            bool passes = !hits && t.MinClear < clearNow && (t.MinClearTick < horizon || t.StopTick >= 0);
             if (!hits && !passes) return;
+
+            if (passes && t.StopTick >= 0 && t.MinClearTick == t.StopTick)
+            {
+                return;
+            }
 
             rec = new EvadeRec
             {
@@ -97,6 +131,8 @@ namespace MotherMod
                 LastSeenTick = now,
                 ImpactTicks = t.HitTick,
                 Move = "none",
+                SkipReason = "none",
+                MissPx = t.MinClear,
             };
             if (evadeRecs.Count >= EVADE_MAX_RECS) DropOldestEvadeRec();
             evadeRecs.Add(rec);
@@ -104,28 +140,34 @@ namespace MotherMod
             string busy = EvadeBusy();
             if (busy != null)
             {
+                rec.SkipReason = "busy";
                 return;
             }
             if (now < evadeCooldownUntil)
             {
+                rec.SkipReason = "cooldown";
                 return;
             }
             if (AI == null || !AI.VisualContact(weapon.firstChunk))
             {
+                rec.SkipReason = "unseen";
                 return;
             }
             if (!hits)
             {
+                rec.SkipReason = "off_path";
                 return;
             }
             if (t.HitTick < p.EvasionReactionMinTicks)
             {
+                rec.SkipReason = "point_blank";
                 return;
             }
             float roll = UnityEngine.Random.value;
             rec.Roll = roll;
             if (p.EvasionChance < 1f && roll >= p.EvasionChance)
             {
+                rec.SkipReason = "roll";
                 return;
             }
             rec.State = EVADE_ARMED;
@@ -143,23 +185,29 @@ namespace MotherMod
             EvadeTrace t = TraceSpear(w, 0, horizon);
             if (t.HitTick <= 0)
             {
+                if (t.StopTick >= 0 && t.MinClearTick == t.StopTick) return;
                 rec.State = EVADE_DONE;
+                rec.SkipReason = "off_path";
+                rec.MissPx = t.MinClear;
                 return;
             }
             string busy = EvadeBusy();
             if (busy != null)
             {
                 rec.State = EVADE_DONE;
+                rec.SkipReason = "busy";
                 return;
             }
             if (now < evadeCooldownUntil)
             {
                 rec.State = EVADE_DONE;
+                rec.SkipReason = "cooldown";
                 return;
             }
             if (t.HitTick < min)
             {
                 rec.State = EVADE_DONE;
+                rec.SkipReason = "no_move";
                 return;
             }
 
@@ -203,12 +251,17 @@ namespace MotherMod
             {
                 if (t.HitTick - 1 >= min) return;
                 rec.State = EVADE_DONE;
+                rec.SkipReason = "no_move";
                 return;
             }
 
             if (move != null && move.Charge.Running)
             {
                 move.Charge.End(p, "evaded");
+            }
+            if (move != null && move.Pounce.Running)
+            {
+                move.Pounce.End(p, "evaded");
             }
             if (chosen == "duck")
             {
@@ -231,6 +284,8 @@ namespace MotherMod
             rec.DodgeTick = now;
             rec.ImpactTicks = t.HitTick;
             rec.Move = chosen;
+            rec.SkipReason = "dodged";
+            rec.MissPx = chosen == "duck" ? duckClear : hopClear;
         }
 
         private void TickEvasion()
@@ -263,16 +318,20 @@ namespace MotherMod
         private void EvadeNoteHit(BodyChunk source)
         {
             Weapon w = source != null ? source.owner as Weapon : null;
-            if (w == null) return;
+            if (w == null || !(w is Spear)) return;
             EvadeRec r = FindEvadeRec(w);
-            if (r == null) return;
+            if (r == null)
+            {
+                return;
+            }
             if (r.State == EVADE_DODGED)
             {
+                r.SkipReason = "hit_after_dodge";
             }
             else if (r.State == EVADE_ARMED)
             {
+                r.SkipReason = "hit_before_move";
             }
-            else return;
             r.State = EVADE_DONE;
         }
 
@@ -311,12 +370,12 @@ namespace MotherMod
             if (dead) return "dead";
             if (!Consious) return "stunned";
             if (grabbedBy != null && grabbedBy.Count > 0) return "held";
-            if (pounce != PounceState.None || GatherIsActive || PounceFlight > 0f) return "pounce";
+            if (pounce == PounceState.Propel || PounceFlight > 0f) return "pounce";
             if (PoleHeld || PoleOwnsGravity) return "pole";
             if (WallHeld || WallOwnsGravity) return "wall";
             if (ClimbOwnsGravity) return "climb";
             if (EngineOwnsBody || inShortcut) return "shortcut";
-            string action = move != null ? move.RunningActionNameExcept(move.Charge) : null;
+            string action = move != null ? move.RunningActionNameExcept(move.Charge, move.Pounce) : null;
             if (action != null) return "action_" + action;
             return null;
         }
@@ -396,12 +455,52 @@ namespace MotherMod
             float projRad = SpearHitRad(w);
             ticks = Math.Min(ticks, EVADE_MAX_TRACE_TICKS);
 
+            IntVector2 dir = ThrowDirOf(w);
+            IntVector2 contact = sc.ContactPoint;
+            int bounceFrames = w.floorBounceFrames;
+            int modeFrames = w.throwModeFrames;
+            float exitSpeed = w.overrideExitThrownSpeed > 0f ? w.overrideExitThrownSpeed : w.exitThrownModeSpeed;
+            float terrRad = Mathf.Max(sc.rad * sc.terrainSqueeze, 1f);
+            bool collide = sc.collideWithTerrain;
+
             for (int k = 1; k <= ticks; k++)
             {
+                if (k > 1 && bounceFrames > 0 && dir.y == 0)
+                {
+                    bounceFrames--;
+                    if (contact.y != 0 && Mathf.Abs(v.x) > 5f)
+                    {
+                        v.y = (Mathf.Abs(v.y) + 1f) * -contact.y + (contact.y < 0 ? 4.5f : 0f);
+                        v.x = Mathf.Max(exitSpeed + 1f, Mathf.Abs(v.x)) * Mathf.Sign(v.x);
+                        bounceFrames /= 2;
+                    }
+                }
+                if (modeFrames > 0) modeFrames--;
+                if ((v.magnitude < exitSpeed && !w.doNotTumbleAtLowSpeed) || modeFrames == 0)
+                {
+                    EvadeStop(ref t, k - 1, modeFrames == 0 ? "frames" : "slow", s);
+                    return t;
+                }
+                if (bounceFrames > 0 && dir.x != 0 && (contact.x != 0 || contact.y != 0)
+                    && room.GetTile(s).Terrain == Room.Tile.TerrainType.Slope)
+                {
+                    EvadeStop(ref t, k - 1, "redirect", s);
+                    return t;
+                }
+                if (contact == dir)
+                {
+                    EvadeStop(ref t, k - 1, "wall", s + dir.ToVector2() * (terrRad + 1f));
+                    return t;
+                }
+
                 Vector2 prev = s;
                 v.y -= g;
                 v *= af;
                 s += v;
+                IntVector2 hitTile = new IntVector2(-1, -1);
+                if (collide) contact = SpearCollide(prev, ref s, ref v, terrRad, w.bounce, w.surfaceFriction,
+                                                    g, !sc.goThroughFloors, sc.collideWithSlopes, out hitTile);
+                else contact = new IntVector2(0, 0);
                 v.y += lift;
 
                 for (int l = 0; l <= lag; l++)
@@ -419,14 +518,166 @@ namespace MotherMod
                 }
                 if (t.HitTick > 0) return t;
 
-                Room.Tile.TerrainType tt = room.GetTile(s).Terrain;
-                if (tt == Room.Tile.TerrainType.Solid || tt == Room.Tile.TerrainType.Slope)
+                if (contact == dir)
                 {
                     t.StopTick = k;
                     return t;
                 }
             }
             return t;
+        }
+
+        private void EvadeStop(ref EvadeTrace t, int tick, string reason, Vector2 at)
+        {
+            t.StopTick = tick;
+        }
+
+        private IntVector2 SpearCollide(Vector2 last, ref Vector2 s, ref Vector2 v, float r, float bounce,
+                                        float fric, float g, bool floors, bool slopes, out IntVector2 hitTile)
+        {
+            IntVector2 c = new IntVector2(0, 0);
+            hitTile = new IntVector2(-1, -1);
+            float rest = 1f + 9f * (1f - bounce);
+            float along = Mathf.Clamp01(fric * 2f);
+            int colL = TileIndex(s.x - r + 1f), colR = TileIndex(s.x + r - 1f);
+
+            if (s.y < last.y)
+            {
+                int from = TileIndex(last.y - r), to = TileIndex(s.y - r - 0.01f);
+                for (int row = from; row >= to && c.y == 0; row--)
+                {
+                    float top = (row + 1) * 20f;
+                    if (last.y - r < top - 0.01f) continue;
+                    for (int col = colL; col <= colR; col++)
+                    {
+                        if (!SpearFloorAt(col, row, floors) || SpearFloorAt(col, row + 1, floors)) continue;
+                        s.y = top + r;
+                        c.y = -1;
+                        hitTile = new IntVector2(col, row);
+                        v.y = Mathf.Abs(v.y) * bounce;
+                        if (v.y < g || v.y < rest) v.y = 0f;
+                        v.x *= along;
+                        break;
+                    }
+                }
+            }
+            else if (s.y > last.y)
+            {
+                int from = TileIndex(last.y + r), to = TileIndex(s.y + r + 0.01f);
+                for (int row = from; row <= to && c.y == 0; row++)
+                {
+                    float bottom = row * 20f;
+                    if (last.y + r > bottom + 0.01f) continue;
+                    for (int col = colL; col <= colR; col++)
+                    {
+                        if (!SpearSolidAt(col, row) || SpearSolidAt(col, row - 1)) continue;
+                        s.y = bottom - r;
+                        c.y = 1;
+                        hitTile = new IntVector2(col, row);
+                        v.y = -Mathf.Abs(v.y) * bounce;
+                        if (Mathf.Abs(v.y) < rest) v.y = 0f;
+                        v.x *= along;
+                        break;
+                    }
+                }
+            }
+
+            if (slopes && c.y == 0)
+            {
+                IntVector2 tile;
+                Room.SlopeDirection sd = SpearSlopeNear(s, r, out tile);
+                if (sd != Room.SlopeDirection.Broken)
+                {
+                    float left = tile.x * 20f, bottom = tile.y * 20f;
+                    float u = Mathf.Clamp(s.x - left, 0f, 20f);
+                    if (sd == Room.SlopeDirection.UpLeft || sd == Room.SlopeDirection.UpRight)
+                    {
+                        float surf = bottom + (sd == Room.SlopeDirection.UpLeft ? u : 20f - u);
+                        if (s.y <= surf + 2f * r)
+                        {
+                            s.y = surf + 2f * r;
+                            c.y = -1;
+                            hitTile = tile;
+                            v.y = 0f;
+                            v.x *= 1f - fric;
+                        }
+                    }
+                    else
+                    {
+                        float surf = bottom + (sd == Room.SlopeDirection.DownLeft ? 20f - u : u);
+                        if (s.y >= surf - 2f * r)
+                        {
+                            s.y = surf - 2f * r;
+                            c.y = 1;
+                            hitTile = tile;
+                            v.y = 0f;
+                            v.x *= 1f - fric;
+                        }
+                    }
+                }
+            }
+
+            if (v.x != 0f && s.x != last.x)
+            {
+                int sgn = s.x > last.x ? 1 : -1;
+                int lastCol = TileIndex(last.x);
+                int from = TileIndex(last.x + sgn * r), to = TileIndex(s.x + sgn * (r + 0.01f));
+                int rowB = TileIndex(s.y - r + 1f), rowT = TileIndex(s.y + r - 1f);
+                bool done = false;
+                for (int col = from; !done && (sgn > 0 ? col <= to : col >= to); col += sgn)
+                {
+                    if (sgn > 0 ? col <= lastCol : col >= lastCol) continue;
+                    for (int row = rowB; row <= rowT; row++)
+                    {
+                        if (!SpearSolidAt(col, row) || SpearSolidAt(col - sgn, row)) continue;
+                        s.x = sgn > 0 ? col * 20f - r : (col + 1) * 20f + r;
+                        c.x = sgn;
+                        hitTile = new IntVector2(col, row);
+                        v.x = -sgn * Mathf.Abs(v.x) * bounce;
+                        if (Mathf.Abs(v.x) < rest) v.x = 0f;
+                        v.y *= along;
+                        done = true;
+                        break;
+                    }
+                }
+            }
+            return c;
+        }
+
+        private static int TileIndex(float px) { return Mathf.FloorToInt(px / 20f); }
+
+        private bool SpearSolidAt(int x, int y)
+        {
+            return room.GetTile(x, y).Terrain == Room.Tile.TerrainType.Solid;
+        }
+
+        private bool SpearFloorAt(int x, int y, bool floors)
+        {
+            Room.Tile.TerrainType tt = room.GetTile(x, y).Terrain;
+            return tt == Room.Tile.TerrainType.Solid || (floors && tt == Room.Tile.TerrainType.Floor);
+        }
+
+        private Room.SlopeDirection SpearSlopeNear(Vector2 s, float r, out IntVector2 tile)
+        {
+            IntVector2 here = room.GetTilePosition(s);
+            tile = here;
+            Room.SlopeDirection sd = room.IdentifySlope(here);
+            if (sd != Room.SlopeDirection.Broken) return sd;
+            if (SlopeProbe(here, new IntVector2(here.x, TileIndex(s.y - r)), ref tile, ref sd)) return sd;
+            if (SlopeProbe(here, new IntVector2(here.x, TileIndex(s.y + r)), ref tile, ref sd)) return sd;
+            if (SlopeProbe(here, new IntVector2(TileIndex(s.x - r), here.y), ref tile, ref sd)) return sd;
+            if (SlopeProbe(here, new IntVector2(TileIndex(s.x + r), here.y), ref tile, ref sd)) return sd;
+            return Room.SlopeDirection.Broken;
+        }
+
+        private bool SlopeProbe(IntVector2 here, IntVector2 probe, ref IntVector2 tile, ref Room.SlopeDirection sd)
+        {
+            if (probe == here) return false;
+            Room.SlopeDirection d = room.IdentifySlope(probe);
+            if (d == Room.SlopeDirection.Broken) return false;
+            tile = probe;
+            sd = d;
+            return true;
         }
 
         private float SpearClearNow(Weapon w)

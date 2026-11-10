@@ -106,7 +106,6 @@ namespace MotherMod
         private bool headPitchSeeded;
         private const int HEAD_LOOK_LOG_TICKS = 40;
         private int headLookLogCounter;
-        private int lastTurnSwapCount;
 
         private bool partsBodyMeshActive;
         private int partsBodyQuads = 4, partsChestQuads = 3;
@@ -468,7 +467,7 @@ namespace MotherMod
             float bendDraw = Mathf.Lerp(lastBodyBend, bodyBend, timeStacker);
             float squashDraw = Mathf.Lerp(lastBodySquash, bodySquash, timeStacker);
             float squeezeDraw = fox.DrawSqueezeAmount;
-            float widthFac = BodyWidthFac(p, squashDraw, squeezeDraw);
+            float widthFac = BodyWidthFac(p, squashDraw, squeezeDraw) * HopBoingWidthFac(p, timeStacker);
 
             var bodyStrip = sLeaser.sprites[SpriteBodyMesh] as TriangleMesh;
             var chestStrip = sLeaser.sprites[SpriteChest] as TriangleMesh;
@@ -572,6 +571,7 @@ namespace MotherMod
             float breath = PartsBreath(p, timeStacker);
             float widthFac = partsBodyMeshActive
                 ? BodyWidthFac(p, Mathf.Lerp(lastBodySquash, bodySquash, timeStacker), fox.DrawSqueezeAmount)
+                  * HopBoingWidthFac(p, timeStacker)
                 : SqueezeDrawFac(p, fox.DrawSqueezeAmount);
 
             float bodyHalf = PartsBodyHalf(p, s, breath, widthFac);
@@ -635,6 +635,10 @@ namespace MotherMod
             public float phase, foldDistal, foldMid;
             public float metaDeg;
             public float reachLimit;
+            public bool reachClamped;
+            public float poleAmt;
+            public float poleFlip;
+            public float frameSign;
         }
 
         private const float POLE_BEND_BAND_PX = 2f;
@@ -710,6 +714,7 @@ namespace MotherMod
 
             q.reachLimit = PartsLegReachLimit(p, q.upperLen + q.lowerLen);
             float d = Vector2.Distance(root, q.distal);
+            q.reachClamped = d > q.reachLimit * 1.001f;
             if (d > q.reachLimit && d > 0.01f)
             {
                 Vector2 pull = (q.distal - root) * (q.reachLimit / d - 1f);
@@ -721,6 +726,7 @@ namespace MotherMod
 
             float bendKey = front ? p.PartsLegBendFront : p.PartsLegBendHind;
             float flip = bendKey * bendSmooth;
+            q.poleAmt = poleAmt;
             if (poleAmt > 0f)
             {
                 float frameSign = (up.y * fwd.x - up.x * fwd.y) >= 0f ? 1f : -1f;
@@ -728,6 +734,8 @@ namespace MotherMod
                 float poleKey = front ? p.PoleLegBendFront : p.PoleLegBendHind;
                 float poleFlip = poleKey * frameSign * Mathf.Clamp(sep / POLE_BEND_BAND_PX, -1f, 1f);
                 flip = Mathf.Lerp(flip, poleFlip, poleAmt);
+                q.poleFlip = poleFlip;
+                q.frameSign = frameSign;
             }
             q.mid = Custom.InverseKinematic(root, q.distal, q.upperLen, q.lowerLen, flip);
             if (stabilise) q.mid = StabiliseKnee(p, i, q.mid);
@@ -750,6 +758,8 @@ namespace MotherMod
 
             LegPose q = SolveLegPose(p, i, root, paw, fwd, up, swing,
                                      limbs[i].SwingPhase, bendSmooth, true, phaseLast, phaseLerp);
+            Vector2 pawFacing = fwd;
+            SpearLegPose(p, i, root, fwd, up, phaseLerp, bendSmooth, ref q, ref swing, ref pawFacing);
             Vector2 knee = q.mid;
             Vector2 hock = q.distal;
             Vector2 ankle = q.mcp;
@@ -810,7 +820,7 @@ namespace MotherMod
             PlaceCentred(sLeaser.sprites[b + LEG_JOINT2], hock, ankle - hock,
                          thick * jointW * 0.85f, thick * jointW * 0.85f, faceSign, camPos);
             FSprite pawSprite = sLeaser.sprites[b + LEG_PAW];
-            PlaceCentred(pawSprite, paw, fwd, thick * (front ? P_LEGA_PAW_W : P_LEGB_PAW_W), thick * pawH,
+            PlaceCentred(pawSprite, paw, pawFacing, thick * (front ? P_LEGA_PAW_W : P_LEGB_PAW_W), thick * pawH,
                          faceSign, camPos);
             CurlPaw(pawSprite, paw, ankle, p.PawCurlDeg * swing * faceSign, p.PawCurlPivotAnkle);
 
@@ -937,7 +947,8 @@ namespace MotherMod
             DrawNeckPos = neck;
             DrawHeadPos = neck;
             float rock = Mathf.Lerp(lastWavePitchDeg, wavePitchDeg, timeStacker);
-            Vector2 dir = Custom.DegToVec(AimDeg(DrawHeadDir) - rock * faceSign);
+            float nod = HopBoingNodDeg(p, timeStacker);
+            Vector2 dir = Custom.DegToVec(AimDeg(DrawHeadDir) - rock * faceSign + nod * faceSign);
             if (dir.sqrMagnitude > 0.0001f) DrawHeadDir = dir.normalized;
             DrawHeadUp = new Vector2(-DrawHeadDir.y, DrawHeadDir.x);
             if (DrawHeadUp.y < 0f) DrawHeadUp = -DrawHeadUp;
@@ -1110,8 +1121,8 @@ namespace MotherMod
                   p.PartsBodyFlexWave * waveAmp * Mathf.Sin(wavePh + p.PartsBodyFlexWavePhase)
                 + p.PartsBodyFlexAccel * accelSmooth
                 + p.PartsBodyFlexLand * landImpact
-                + p.PartsBodyFlexGather * Mathf.Clamp01(fox.PounceGather)
-                + p.PartsBodyFlexFlight * Mathf.Clamp01(fox.PounceFlight)
+                + p.PartsBodyFlexGather * Mathf.Clamp01(fox.DrawPounceGather)
+                + p.PartsBodyFlexFlight * Mathf.Clamp01(fox.DrawPounceFlight)
                 + p.PartsBodyFlexTurn * turnArc);
 
             float spineLen = Mathf.Max(1f, Vector2.Distance(front, rear) * TurnForeshorten(p, headDepth));
@@ -1140,8 +1151,8 @@ namespace MotherMod
             bodyLenRatio = Vector2.Distance(fox.bodyChunks[0].pos, fox.bodyChunks[2].pos)
                            / Mathf.Max(1f, artRestSpine);
             squashGeom = (bodyLenRatio - 1f) * p.PartsBodySquashLenGain
-                         + p.PartsBodySquashFlight * Mathf.Clamp01(fox.PounceFlight)
-                         - p.PartsBodySquashGather * Mathf.Clamp01(fox.PounceGather)
+                         + p.PartsBodySquashFlight * Mathf.Clamp01(fox.DrawPounceFlight)
+                         - p.PartsBodySquashGather * Mathf.Clamp01(fox.DrawPounceGather)
                          - p.PartsBodySquashLand * landImpact;
             squashMotion = p.PartsBodySquashSpeed * speedNorm
                            + p.PartsBodySquashAccel * accelSmooth
@@ -1215,7 +1226,7 @@ namespace MotherMod
                 for (int i = 0; i < drawPositions.GetLength(0); i++) drawPositions[i, 0] += up * h;
             }
 
-            float gather = Mathf.Clamp01(fox.PounceGather);
+            float gather = Mathf.Clamp01(fox.DrawPounceGather);
             if (gather > 0f && p.PounceBowPitch != 0f)
             {
                 float lever = Mathf.Tan(Mathf.Clamp(p.PounceBowPitch * gather, -60f, 60f) * Mathf.Deg2Rad)
@@ -1224,7 +1235,7 @@ namespace MotherMod
                 drawPositions[2, 0] += up * lever;
                 wavePitchDeg += p.PounceBowPitch * gather;
             }
-            float flight = Mathf.Clamp01(fox.PounceFlight);
+            float flight = Mathf.Clamp01(fox.DrawPounceFlight);
             if (flight > 0f && p.PouncePropelPitch != 0f)
             {
                 float lever = Mathf.Tan(Mathf.Clamp(p.PouncePropelPitch * flight, -60f, 60f) * Mathf.Deg2Rad)
@@ -1247,7 +1258,7 @@ namespace MotherMod
             float calm = 1f - amp;
             float sway = (p.IdleTailSwayTicks > 1f)
                 ? Mathf.Sin(swayTicks * (Mathf.PI * 2f / p.IdleTailSwayTicks)) : 0f;
-            float gather = Mathf.Clamp01(fox.PounceGather);
+            float gather = Mathf.Clamp01(fox.DrawPounceGather);
             float turnSweep = (p.TurnTailSwing != 0f)
                 ? p.TurnTailSwing * Mathf.Sin(Mathf.Clamp01(fox.TurnProgress) * Mathf.PI) : 0f;
 
@@ -1344,7 +1355,7 @@ namespace MotherMod
             bool pheromoneSniffNow = false;
 
             Creature chase = fox.chaseTarget;
-            bool eating = fox.HeldPrey != null || fox.EatPose > 0f;
+            bool carrying = fox.HeldPrey != null;
 
             if (chase != null && chase.room == fox.room && chase.mainBodyChunk != null)
             {
@@ -1353,7 +1364,7 @@ namespace MotherMod
                 headModeTicks = 0; headNoiseHold = 0;
                 if (ScentSniffOpen) CloseScentSniff(false, "target");
             }
-            else if (eating && TryMealPoint(out lookAt))
+            else if (carrying && TryMealPoint(out lookAt))
             {
                 want = HL_TARGET; headLookHasPos = true;
                 headLookWhat = "meal";
@@ -1497,6 +1508,7 @@ namespace MotherMod
 
             lastHeadPitchDeg = headPitchDeg;
             headPitchDeg = Mathf.Lerp(headPitchDeg, pitchTarget, Mathf.Clamp01(p.HeadPitchRate));
+            ApplySpearHead(p);
             headYaw = Mathf.Lerp(headYaw, yawTarget, yawRate);
             headMode = want;
             if (headLookHasPos) headLookPos = lookAt;
@@ -1574,11 +1586,6 @@ namespace MotherMod
                 at = fox.HeldPrey.mainBodyChunk.pos;
                 return true;
             }
-            if (fox.EatPose > 0f)
-            {
-                at = fox.EatAimPos;
-                return true;
-            }
             at = Vector2.zero;
             return false;
         }
@@ -1628,33 +1635,6 @@ namespace MotherMod
             if (glanceTicks <= 0) return target;
             Vector2 perp = new Vector2(-bodyAxis.y, bodyAxis.x);
             return target + perp * (glanceDir * p.IdleGlanceRange);
-        }
-
-        private void CheckTurnSwap(FoxBreedParams p)
-        {
-            if (fox.TurnSwapCount == lastTurnSwapCount) return;
-            lastTurnSwapCount = fox.TurnSwapCount;
-
-            for (int slot = 0; slot < 2; slot++)
-            {
-                Vector2 t = drawPositions[0, slot];
-                drawPositions[0, slot] = drawPositions[2, slot];
-                drawPositions[2, slot] = t;
-            }
-            Vector2 ride = RideVector(p);
-            Vector2 newRear = fox.bodyChunks[2].pos + ride;
-            for (int i = 0; i < tail.Length; i++) tail[i].Reset(newRear);
-
-            for (int i = 0; i < limbs.Length / 2; i++) limbs[i].SwapFootWith(limbs[i + 2]);
-            for (int i = 0; i < limbs.Length; i++) limbs[i].ReseedBend();
-            head.Reset(fox.bodyChunks[0].pos + ride);
-
-            headDepth = 0f;
-            lastHeadDepth = 0f;
-            artRotSeeded = false;
-            bodyBend = 0f;
-            lastBodyBend = 0f;
-            midLagSeeded = false;
         }
     }
 }

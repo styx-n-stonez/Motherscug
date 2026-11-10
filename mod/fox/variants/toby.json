@@ -8,7 +8,6 @@
   "through_surface_vision": 0.56,
   "movement_based_vision": 0.3,
   "off_screen_speed": 0.36,
-  "relationships_expected_skipped": 6,
   "relationships": {
     "Rat": {
       "type": "Eats",
@@ -370,7 +369,6 @@
   "climbs_walls": true,
   "climbs_poles": true,
   "pheromone_enabled": true,
-  "pheromone_style": 2,
   "cosmetics": [
     {
       "layer": "Ears",

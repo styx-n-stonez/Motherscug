@@ -1,13 +1,12 @@
 {
   "meat_points": 7,
   "dangerous_to_player": 0.8,
-  "toughness": 1.2,
+  "toughness": 1.5,
   "stun_toughness": 1.08,
   "visual_radius": 2300,
   "water_vision": 0.7,
   "through_surface_vision": 0.56,
   "movement_based_vision": 0.3,
-  "relationships_expected_skipped": 6,
   "relationships": {
     "Rat": {
       "type": "Eats",
@@ -438,5 +437,10 @@
   "color_leg_lower": "240A0A",
   "color_paws": "0A0000",
   "color_eye": "0A0A0A",
-  "icon_color": "E03018"
+  "icon_color": "E03018",
+  "carry_max_mass_ratio": 0.35,
+  "base_speed": 3.66,
+  "speed_corridor": 0.71,
+  "swim_speed": 1.9,
+  "pounce_route_goal_seed_radius_tiles": 7.0
 }

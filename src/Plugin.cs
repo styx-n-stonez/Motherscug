@@ -45,7 +45,7 @@ namespace MotherMod
 
             On.SandboxGameSession.SpawnEntity += SandboxGameSession_SpawnEntity;
 
-            FoxState.Register();
+            FoxStash.Register();
 
             FoxPathTieBreak.Install();
 
@@ -54,6 +54,8 @@ namespace MotherMod
             FoxWallAccess.Install();
 
             FoxSandboxIcon.Install();
+
+            FoxSpear.InstallHooks();
 
             On.Lizard.ctor += Lizard_ctor;
         }

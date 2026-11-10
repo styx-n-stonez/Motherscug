@@ -19,7 +19,6 @@ namespace MotherMod
             EscapeRain,
             ReturnToDen,
             ReturnPrey,
-            Eat,
             Stalk,
             Bait
         }
@@ -42,6 +41,11 @@ namespace MotherMod
 
         internal FoxPheromone pheromone;
 
+        internal FoxFlank flank;
+
+        internal FoxSpear spear;
+        internal FoxSpear Spear { get { return spear; } }
+
         private int scentCounter;
         private int scentSweep;
         private bool scentWasEnabled;
@@ -55,8 +59,6 @@ namespace MotherMod
         private const int ScentRefreshLogTicks = 200;
         private const int SniffStaleFactor = 20;
 
-        private int eatCounter;
-        private Creature eatTarget;
         private int denRestCounter;
         private string denReason = "none";
 
@@ -79,6 +81,8 @@ namespace MotherMod
         private AbstractCreature lastPreyTarget;
 
         private readonly FoxPounceRouter pounceRouter;
+        private readonly FoxHopPlanner hopPlanner;
+        internal FoxHopPlanner HopPlanner { get { return hopPlanner; } }
 
         private readonly FoxBait bait;
 
@@ -99,10 +103,10 @@ namespace MotherMod
             get { return pounceRouter != null ? pounceRouter.WalkedRoute : "none"; }
         }
 
-        internal FoxAscentPlan RequestAscent(Vector2 measuredLip, float runUpPx)
+        internal FoxAscentPlan RequestAscent(Vector2 measuredLip, float runUpPx, float standoffPx)
         {
             if (pounceRouter == null) return null;
-            return pounceRouter.RequestAscent(fox.P, measuredLip, runUpPx);
+            return pounceRouter.RequestAscent(fox.P, measuredLip, runUpPx, standoffPx);
         }
 
         private bool obstacleReporting;
@@ -150,6 +154,8 @@ namespace MotherMod
             AddModule(new UtilityComparer(this));
             pheromone = new FoxPheromone(this);
             AddModule(pheromone);
+            flank = new FoxFlank(this);
+            spear = new FoxSpear(this, fox);
             AddModule(new RelationshipTracker(this, tracker));
             AddModule(new StuckTracker(this, trackPastPositions: true, trackNotFollowingCurrentGoal: true));
 
@@ -184,6 +190,7 @@ namespace MotherMod
             noiseTracker.hearingSkill = p.HearingSkill;
 
             pounceRouter = new FoxPounceRouter(this, fox);
+            hopPlanner = new FoxHopPlanner(this, fox);
         }
 
         public override void Update()
@@ -197,9 +204,11 @@ namespace MotherMod
                 UpdateOmniSense(p);
                 if (bait != null) bait.Update(p);
                 DetermineBehavior();
+                flank.Tick(p, behavior, preyTracker.MostAttractivePrey);
                 ActOnBehavior();
 
                 if (pounceRouter != null) pounceRouter.Update(p);
+                if (hopPlanner != null) hopPlanner.Update(p);
 
                 FeedObstacleTracker(p);
             }
@@ -250,7 +259,7 @@ namespace MotherMod
                 huntLatchTicks--;
                 var stillTracked = preyTracker.MostAttractivePrey;
                 bool eligible = behavior != Behavior.Flee && behavior != Behavior.EscapeRain
-                                && behavior != Behavior.ReturnPrey && behavior != Behavior.Eat
+                                && behavior != Behavior.ReturnPrey
                                 && fox.HeldPrey == null
                                 && stillTracked != null
                                 && ReferenceEquals(stillTracked.representedCreature, huntLatchPrey);
@@ -308,26 +317,8 @@ namespace MotherMod
             if (behavior == Behavior.Hunt && p.StalkEnabled && !ambushHolds) behavior = StalkOrHunt(p, behavior, previous);
             else if (behavior != Behavior.Stalk) fox.StalkCrouch = 0f;
 
-            if (p.EatInPlaceEnabled
-                && (behavior == Behavior.Hunt || behavior == Behavior.Stalk || behavior == Behavior.Eat))
-            {
-                behavior = EatOrHunt(p, behavior);
-            }
-            else if (eatTarget != null)
-            {
-                ClearEat();
-            }
-            if (!p.EatInPlaceEnabled && behavior == Behavior.Eat)
-            {
-                behavior = Behavior.Hunt;
-            }
-
             if (fox.HeldPrey != null && behavior != Behavior.Flee)
             {
-                if (behavior != Behavior.ReturnPrey && eatTarget != null)
-                {
-                    ClearEat();
-                }
                 behavior = Behavior.ReturnPrey;
             }
             else if (behavior == Behavior.ReturnPrey)
@@ -583,6 +574,7 @@ namespace MotherMod
         private void ActOnBehavior()
         {
             FoxBreedParams p = fox.P;
+            spear.Tick(p, behavior);
 
             pathFinder.walkPastPointOfNoReturn =
                 stranded
@@ -624,11 +616,6 @@ namespace MotherMod
                     Hunt(p, allowPounce: false);
                     break;
 
-                case Behavior.Eat:
-                    fox.runSpeed = stuckBoost;
-                    UpdateEat(p);
-                    break;
-
                 case Behavior.ReturnPrey:
                     fox.runSpeed = Mathf.Max(p.RunSpeedHunt, stuckBoost);
                     fox.chaseTarget = null;
@@ -651,16 +638,7 @@ namespace MotherMod
                     break;
             }
 
-            UpdateEatPose(p);
-        }
-
-        private void UpdateEatPose(FoxBreedParams p)
-        {
-            float rate = Mathf.Max(0.001f, p.EatPoseRate);
-            bool feeding = behavior == Behavior.Eat && eatTarget != null
-                           && eatTarget.mainBodyChunk != null;
-            fox.EatPose = Mathf.Clamp01(fox.EatPose + (feeding ? rate : -rate));
-            if (feeding) fox.EatAimPos = eatTarget.mainBodyChunk.pos;
+            spear.AfterAct(p, behavior, stuckBoost);
         }
 
         private void Hunt(FoxBreedParams p, bool allowPounce = true)
@@ -679,7 +657,23 @@ namespace MotherMod
 
             WorldCoordinate guess = prey.BestGuessForPosition();
             bool blindPursuit = !prey.VisualContact;
-            if (p.HuntGhostPursue || prey.VisualContact)
+            WorldCoordinate flankGoal;
+            bool circling = flank.TryGetCircleGoal(out flankGoal);
+            if (circling)
+            {
+                creature.abstractAI.SetDestination(flankGoal);
+                float stuck = stuckTracker != null ? stuckTracker.Utility() : 0f;
+                if (flank.TeamHolding)
+                {
+                    fox.runSpeed = Mathf.Max(p.RunSpeedStalk, stuck);
+                    fox.StalkCrouch = Mathf.Clamp01(p.StalkCrouchFac);
+                }
+                else if (flank.TeamHerding)
+                {
+                    fox.runSpeed = Mathf.Max(p.RunSpeedHunt * Mathf.Max(0f, p.FlankHerdSpeedFac), stuck);
+                }
+            }
+            else if (p.HuntGhostPursue || prey.VisualContact)
             {
                 creature.abstractAI.SetDestination(guess);
             }
@@ -693,7 +687,9 @@ namespace MotherMod
             fox.chaseTarget = (realized != null && realized.room == fox.room
                                && (!realized.dead || corpsesCount)) ? realized : null;
 
-            if (allowPounce && fox.chaseTarget != null && !fox.chaseTarget.dead
+            spear.HuntTick(p);
+
+            if (allowPounce && !circling && fox.chaseTarget != null && !fox.chaseTarget.dead
                 && fox.pounce == Fox.PounceState.None && fox.charge == Fox.ChargeState.None)
             {
                 if (!fox.TryCharge(fox.chaseTarget.mainBodyChunk.pos))
@@ -715,6 +711,7 @@ namespace MotherMod
             internal bool Found;
             internal WorldCoordinate Coord;
             internal float Score, Threat;
+            internal int Radius;
             internal IntVector2 From;
         }
 
@@ -772,6 +769,7 @@ namespace MotherMod
             result.Coord = best;
             result.Score = bestScore;
             result.Threat = bestThreat;
+            result.Radius = radius;
             result.From = here;
 
             return result;
@@ -1420,7 +1418,7 @@ namespace MotherMod
         {
             var ut = utilityComparer?.GetUtilityTracker(preyTracker);
             if (ut == null) return;
-            ut.weight = p.WeightPrey * Mathf.Lerp(1f, p.StarveAggressionFac, Mathf.Clamp01(fox.Hunger));
+            ut.weight = p.WeightPrey;
         }
 
         private Behavior StalkOrHunt(FoxBreedParams p, Behavior current, Behavior previous)
@@ -1463,79 +1461,6 @@ namespace MotherMod
 
             fox.StalkCrouch = 0f;
             return current;
-        }
-
-        private Behavior EatOrHunt(FoxBreedParams p, Behavior current)
-        {
-            Creature target = eatTarget;
-            if (target == null)
-            {
-                var prey = preyTracker.MostAttractivePrey;
-                target = prey?.representedCreature.realizedCreature;
-            }
-
-            if (target == null || target.room != fox.room || !target.dead)
-            {
-                if (eatTarget != null) { ClearEat(); }
-                return current;
-            }
-            if (fox.CanCarry(target))
-            {
-                if (eatTarget != null) { ClearEat(); }
-                return current;
-            }
-            if (target.State != null && target.State.meatLeft <= 0)
-            {
-                if (eatTarget != null) { ClearEat(); }
-                preyTracker.ForgetPrey(target.abstractCreature);
-                return current;
-            }
-
-            float threat = threatTracker.Utility();
-            if (threat > p.EatSafeThreat)
-            {
-                if (eatTarget != null)
-                {
-                    ClearEat();
-                }
-                return current;
-            }
-
-            float dist = Vector2.Distance(fox.mainBodyChunk.pos, target.mainBodyChunk.pos);
-            if (dist > p.EatReach)
-            {
-                if (eatTarget != null)
-                {
-                    ClearEat();
-                }
-                return current;
-            }
-
-            if (eatTarget != target)
-            {
-                eatTarget = target;
-                eatCounter = 0;
-            }
-            return Behavior.Eat;
-        }
-
-        private void UpdateEat(FoxBreedParams p)
-        {
-            if (eatTarget == null) return;
-            fox.chaseTarget = null;
-
-            eatCounter++;
-            if (eatCounter < p.EatFrames) return;
-
-            fox.FinishMeal(eatTarget, p);
-            denRestCounter = p.DenRestFrames;
-            ClearEat();
-        }
-
-        private void ClearEat()
-        {
-            eatTarget = null;
-            eatCounter = 0;
         }
 
         public void Fed(int restFrames)
@@ -1582,6 +1507,8 @@ namespace MotherMod
                 cost += new PathCost(0f, PathCost.Legality.Unallowed);
             }
 
+            if (flank != null) cost = flank.ApplySpread(room, connection, cost, RouteQueryInFlight);
+
             return cost;
         }
 
@@ -1601,6 +1528,8 @@ namespace MotherMod
             AItile ai = room.aimap.getAItile(c.x, c.y);
             return ai != null && ai.acc == AItile.Accessibility.Climb;
         }
+
+        private bool RouteQueryInFlight { get { return rpStep == 0; } }
 
         private const int OBSTACLE_WARNING_CLAMP = 3;
 
@@ -1767,6 +1696,7 @@ namespace MotherMod
         {
             base.NewRoom(room);
             if (pounceRouter != null) pounceRouter.NewRoom();
+            if (hopPlanner != null) hopPlanner.NewRoom();
             if (bait != null) bait.NewRoom();
         }
 

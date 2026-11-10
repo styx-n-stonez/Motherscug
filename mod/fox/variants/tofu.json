@@ -1,1 +1,6 @@
-{}
+{
+  "base_speed": 4.9,
+  "speed_corridor": 0.57,
+  "swim_speed": 0.6,
+  "pounce_route_goal_seed_radius_tiles": 7.0
+}
