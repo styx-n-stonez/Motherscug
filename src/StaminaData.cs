@@ -339,6 +339,11 @@ namespace MotherMod
             return stored > earlyBirthCount ? stored : earlyBirthCount;
         }
 
+        public void LogEarlyBirthStatus(Player self)
+        {
+            ReadEarlyBirthCount(self);
+        }
+
         private void WriteEarlyBirthCount(Player self, int count)
         {
             earlyBirthCount = count;

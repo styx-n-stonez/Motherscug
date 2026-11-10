@@ -1,0 +1,94 @@
+{
+ "frames": {
+  "FoxToby_Frame1.png": {
+   "frame": {
+    "x": 2,
+    "y": 2,
+    "w": 22,
+    "h": 19
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 19
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 19
+   }
+  },
+  "FoxToby_Frame2.png": {
+   "frame": {
+    "x": 26,
+    "y": 2,
+    "w": 22,
+    "h": 19
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 19
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 19
+   }
+  },
+  "FoxToby_Frame3.png": {
+   "frame": {
+    "x": 50,
+    "y": 2,
+    "w": 22,
+    "h": 19
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 19
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 19
+   }
+  },
+  "FoxToby_Frame4.png": {
+   "frame": {
+    "x": 74,
+    "y": 2,
+    "w": 22,
+    "h": 19
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 19
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 19
+   }
+  }
+ },
+ "meta": {
+  "version": "1.0",
+  "image": "fox_toby.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 256,
+   "h": 23
+  },
+  "scale": "1"
+ }
+}

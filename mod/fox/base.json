@@ -1,0 +1,692 @@
+{
+  "_options": {
+    "hot_reload": true
+  },
+  "body_size": 1.6,
+  "meat_points": 6,
+  "dangerous_to_player": 0.45,
+  "scaryness": 1.2,
+  "toughness": 1.0,
+  "stun_toughness": 0.9,
+  "visual_radius": 900,
+  "water_vision": 0.3,
+  "through_surface_vision": 0.5,
+  "movement_based_vision": 0.4,
+  "off_screen_speed": 0.3,
+  "grasps": 1,
+  "can_swim": true,
+  "rel_route_attacks": "prey",
+  "rel_route_social_dependent": "prey",
+  "relationships": {
+    "Rat": {
+      "type": "Eats",
+      "intensity": 0.9
+    },
+    "LanternMouse": {
+      "type": "Eats",
+      "intensity": 0.9
+    },
+    "JetFish": {
+      "type": "Eats",
+      "intensity": 0.9
+    },
+    "Snail": {
+      "type": "Eats",
+      "intensity": 0.7
+    },
+    "EggBug": {
+      "type": "Eats",
+      "intensity": 0.7
+    },
+    "SmallNeedleWorm": {
+      "type": "Eats",
+      "intensity": 0.5
+    },
+    "SmallCentipede": {
+      "type": "Eats",
+      "intensity": 0.5
+    },
+    "SmallMoth": {
+      "type": "Eats",
+      "intensity": 0.5
+    },
+    "VultureGrub": {
+      "type": "Eats",
+      "intensity": 0.3
+    },
+    "SeafarerGrub": {
+      "type": "Eats",
+      "intensity": 0.3
+    },
+    "VagabondGosling": {
+      "type": "Attacks",
+      "intensity": 0.9
+    },
+    "Vagabond": {
+      "type": "Attacks",
+      "intensity": 0.9
+    },
+    "VagabondTinkerer": {
+      "type": "Attacks",
+      "intensity": 0.9
+    },
+    "VagabondCaretaker": {
+      "type": "Attacks",
+      "intensity": 0.9
+    },
+    "Yeek": {
+      "type": "Attacks",
+      "intensity": 0.9
+    },
+    "Centiwing": {
+      "type": "Attacks",
+      "intensity": 0.9
+    },
+    "ZoopLizard": {
+      "type": "Attacks",
+      "intensity": 0.7
+    },
+    "CicadaA": {
+      "type": "Attacks",
+      "intensity": 0.7
+    },
+    "CicadaB": {
+      "type": "Attacks",
+      "intensity": 0.7
+    },
+    "Frog": {
+      "type": "Attacks",
+      "intensity": 0.7
+    },
+    "BigNeedleWorm": {
+      "type": "Attacks",
+      "intensity": 0.7
+    },
+    "Centipede": {
+      "type": "Attacks",
+      "intensity": 0.7
+    },
+    "Millipede": {
+      "type": "Attacks",
+      "intensity": 0.5
+    },
+    "Barnacle": {
+      "type": "Attacks",
+      "intensity": 0.5
+    },
+    "ScavengerTemplar": {
+      "type": "Attacks",
+      "intensity": 0.5
+    },
+    "ScavengerDisciple": {
+      "type": "Attacks",
+      "intensity": 0.5
+    },
+    "DropBug": {
+      "type": "Attacks",
+      "intensity": 0.5
+    },
+    "BigSpider": {
+      "type": "Attacks",
+      "intensity": 0.5
+    },
+    "SpitterSpider": {
+      "type": "Attacks",
+      "intensity": 0.3
+    },
+    "SandGrub": {
+      "type": "Attacks",
+      "intensity": 0.3
+    },
+    "MothGrub": {
+      "type": "Attacks",
+      "intensity": 0.3
+    },
+    "FireSprite": {
+      "type": "Attacks",
+      "intensity": 0.3
+    },
+    "FireBug": {
+      "type": "Attacks",
+      "intensity": 0.3
+    },
+    "BlueLizard": {
+      "type": "Antagonizes",
+      "intensity": 0.9
+    },
+    "PeachLizard": {
+      "type": "Antagonizes",
+      "intensity": 0.5
+    },
+    "TempleGuard": {
+      "type": "Uncomfortable",
+      "intensity": 0.9
+    },
+    "DrillCrab": {
+      "type": "Uncomfortable",
+      "intensity": 0.9
+    },
+    "TowerCrab": {
+      "type": "Uncomfortable",
+      "intensity": 0.9
+    },
+    "BigMoth": {
+      "type": "Uncomfortable",
+      "intensity": 0.9
+    },
+    "MotherFoxCherry": {
+      "type": "Uncomfortable",
+      "intensity": 0.7
+    },
+    "Rattler": {
+      "type": "Uncomfortable",
+      "intensity": 0.7
+    },
+    "ScavengerKing": {
+      "type": "Uncomfortable",
+      "intensity": 0.7
+    },
+    "ScavengerElite": {
+      "type": "Uncomfortable",
+      "intensity": 0.5
+    },
+    "Scavenger": {
+      "type": "Uncomfortable",
+      "intensity": 0.5,
+      "reverse": {
+        "type": "Attacks",
+        "intensity": 0.4
+      }
+    },
+    "Leech": {
+      "type": "Uncomfortable",
+      "intensity": 0.5
+    },
+    "PinkLizard": {
+      "type": "Uncomfortable",
+      "intensity": 0.3
+    },
+    "Salamander": {
+      "type": "Uncomfortable",
+      "intensity": 0.3
+    },
+    "YellowLizard": {
+      "type": "Uncomfortable",
+      "intensity": 0.3
+    },
+    "Slugcat": {
+      "type": "SocialDependent",
+      "intensity": 0.85,
+      "reverse": {
+        "type": "Attacks",
+        "intensity": 0.4
+      }
+    },
+    "SlugNPC": {
+      "type": "SocialDependent",
+      "intensity": 0.85
+    },
+    "RotLoach": {
+      "type": "Afraid",
+      "intensity": 0.9
+    },
+    "HunterDaddy": {
+      "type": "Afraid",
+      "intensity": 0.9
+    },
+    "LizardLongLegs": {
+      "type": "Afraid",
+      "intensity": 0.9
+    },
+    "TerrorLongLegs": {
+      "type": "Afraid",
+      "intensity": 0.9
+    },
+    "DaddyLongLegs": {
+      "type": "Afraid",
+      "intensity": 0.9
+    },
+    "BrotherLongLegs": {
+      "type": "Afraid",
+      "intensity": 0.9
+    },
+    "Loach": {
+      "type": "Afraid",
+      "intensity": 0.9
+    },
+    "BigEel": {
+      "type": "Afraid",
+      "intensity": 0.9,
+      "reverse": {
+        "type": "Eats",
+        "intensity": 1.0
+      }
+    },
+    "TrainLizard": {
+      "type": "Afraid",
+      "intensity": 0.9
+    },
+    "RedLizard": {
+      "type": "Afraid",
+      "intensity": 0.9,
+      "reverse": {
+        "type": "Eats",
+        "intensity": 0.7
+      }
+    },
+    "BlizzardLizard": {
+      "type": "Afraid",
+      "intensity": 0.7
+    },
+    "MirosVulture": {
+      "type": "Afraid",
+      "intensity": 0.7
+    },
+    "RedCentipede": {
+      "type": "Afraid",
+      "intensity": 0.7
+    },
+    "AquaCenti": {
+      "type": "Afraid",
+      "intensity": 0.7
+    },
+    "Angler": {
+      "type": "Afraid",
+      "intensity": 0.7
+    },
+    "KingVulture": {
+      "type": "Afraid",
+      "intensity": 0.7,
+      "reverse": {
+        "type": "Eats",
+        "intensity": 0.7
+      }
+    },
+    "Vulture": {
+      "type": "Afraid",
+      "intensity": 0.7,
+      "reverse": {
+        "type": "Eats",
+        "intensity": 0.5
+      }
+    },
+    "MirosBird": {
+      "type": "Afraid",
+      "intensity": 0.7,
+      "reverse": {
+        "type": "Eats",
+        "intensity": 0.8
+      }
+    },
+    "ShelterSnake": {
+      "type": "Afraid",
+      "intensity": 0.7
+    },
+    "Antcupine": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "BigSandGrub": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "VagabondGuardian": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "MotherSpider": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "StowawayBug": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "BigJelly": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "BoxWorm": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "TentaclePlant": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "WhiteLizard": {
+      "type": "Afraid",
+      "intensity": 0.5
+    },
+    "BlackLizard": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "CyanLizard": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "GreenLizard": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "SpitLizard": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "EelLizard": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "BasiliskLizard": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "IndigoLizard": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "Spider": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "PoleMimic": {
+      "type": "Afraid",
+      "intensity": 0.3
+    },
+    "Overseer": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "GarbageWorm": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "TubeWorm": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "Deer": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "Fly": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "Inspector": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "SkyWhale": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "LocustWhale": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "Tardigrade": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "MotherFoxMilk": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "MotherFoxCorn": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "MotherFoxPopcorn": {
+      "type": "Ignores",
+      "intensity": 0.0
+    },
+    "MotherFoxTofu": {
+      "type": "Ignores",
+      "intensity": 0.0
+    }
+  },
+  "tiles": {
+    "floor": {
+      "resistance": 1.0,
+      "legality": "Allowed"
+    },
+    "curved_floor": {
+      "resistance": 1.0,
+      "legality": "inherit"
+    },
+    "corridor": {
+      "resistance": 1.5,
+      "legality": "Allowed"
+    },
+    "climb": {
+      "resistance": 4.0,
+      "legality": "Unallowed"
+    },
+    "wall": {
+      "resistance": 4.0,
+      "legality": "Unallowed"
+    },
+    "ceiling": {
+      "resistance": 4.0,
+      "legality": "Unallowed"
+    }
+  },
+  "connections": {
+    "standard": {
+      "resistance": 1.0,
+      "legality": "Allowed"
+    },
+    "open_diagonal": {
+      "resistance": 2.0,
+      "legality": "Allowed"
+    },
+    "reach_over_gap": {
+      "resistance": 2.5,
+      "legality": "Allowed"
+    },
+    "reach_up": {
+      "resistance": 2.0,
+      "legality": "Allowed"
+    },
+    "double_reach_up": {
+      "resistance": 3.0,
+      "legality": "Allowed"
+    },
+    "reach_down": {
+      "resistance": 2.0,
+      "legality": "Allowed"
+    },
+    "semi_diagonal_reach": {
+      "resistance": 2.0,
+      "legality": "Allowed"
+    },
+    "slope": {
+      "resistance": 1.5,
+      "legality": "Allowed"
+    },
+    "drop_to_floor": {
+      "resistance": 8.0,
+      "legality": "Allowed"
+    },
+    "drop_to_water": {
+      "resistance": 20.0,
+      "legality": "Allowed"
+    },
+    "drop_to_climb": {
+      "resistance": 30.0,
+      "legality": "Unallowed"
+    },
+    "lizard_turn": {
+      "resistance": 10.0,
+      "legality": "Allowed"
+    },
+    "short_cut": {
+      "resistance": 1.5,
+      "legality": "Allowed"
+    },
+    "npc_transportation": {
+      "resistance": 25.0,
+      "legality": "Allowed"
+    },
+    "between_rooms": {
+      "resistance": 10.0,
+      "legality": "Allowed"
+    },
+    "off_screen_movement": {
+      "resistance": 1.0,
+      "legality": "Allowed"
+    }
+  },
+  "body_mass": 3.2,
+  "body_size_fac": 0.9,
+  "body_rad_fac": 1.0,
+  "body_length_fac": 1.0,
+  "weight_threat": 1.0,
+  "weight_prey": 0.6,
+  "weight_rain": 0.9,
+  "prey_sure_to_get_distance": 3.0,
+  "prey_sure_to_lose_distance": 110.0,
+  "hearing_skill": 1.0,
+  "prey_give_up_unreachable": 900,
+  "prey_give_up_ghost_generation": 90,
+  "hunt_persist_frames": 400,
+  "swim_speed": 0.2,
+  "blind_enabled": true,
+  "blind_stun_enabled": true,
+  "death_throes_enabled": true,
+  "base_speed": 3.0,
+  "acceleration": 0.55,
+  "speed_floor": 1.0,
+  "speed_corridor": 0.85,
+  "speed_climb": 0.55,
+  "speed_wall": 0.6,
+  "run_speed_idle": 0.35,
+  "run_speed_hunt": 1.0,
+  "run_speed_flee": 1.0,
+  "ledge_pounce_enabled": true,
+  "ledge_pounce_max_rise": 95.0,
+  "ledge_pounce_max_drop": 120.0,
+  "mantle_enabled": true,
+  "reach_enabled": true,
+  "idle_wander_chance": 0.08,
+  "idle_stay_chance": 0.1,
+  "flee_max_distance": 30,
+  "vision_perfect_angle": 0.8,
+  "vision_peripheral_angle": -0.25,
+  "sense_radius": 500,
+  "scent_enabled": true,
+  "scent_radius_tiles": 75,
+  "bite_damage": 1.1,
+  "bite_stun_bonus": 45,
+  "bite_radius": 45,
+  "bite_cooldown": 60,
+  "pounce_enabled": true,
+  "pounce_distance": 170,
+  "pounce_min_distance": 40,
+  "pounce_cooldown": 110,
+  "pounce_recovery_stun": 18,
+  "pounce_chance": 0.6,
+  "pounce_attack_enabled": true,
+  "pounce_gather_frames": 22,
+  "pounce_launch_speed": 9.0,
+  "pounce_boost": 2.0,
+  "pounce_align_rate": 0.25,
+  "pounce_align_max_deg": 7.0,
+  "pounce_hind_release_ticks": 4,
+  "charge_enabled": false,
+  "charge_distance": 260.0,
+  "charge_min_distance": 70.0,
+  "charge_chance": 0.5,
+  "charge_windup_frames": 14,
+  "charge_windup_pull": 0.25,
+  "charge_thrust": 1.1,
+  "charge_thrust_frames": 26,
+  "charge_max_frames": 34,
+  "charge_max_speed": 14.0,
+  "charge_recovery_stun": 34,
+  "charge_cooldown": 150,
+  "roam_radius_tiles": 30,
+  "hunt_forget_frames": 900,
+  "den_health_threshold": 0.5,
+  "carry_max_mass_ratio": 0.3,
+  "grasp_dominance": 0.8,
+  "eats_carrion": true,
+  "roam_distance_weight": 0.35,
+  "stalk_enabled": true,
+  "stalk_distance": 400.0,
+  "run_speed_stalk": 0.3,
+  "stalk_break_distance": 180.0,
+  "rep_enabled": true,
+  "rep_personality_amount": 0.25,
+  "rep_hostile_threshold": -0.5,
+  "rep_friendly_threshold": 0.5,
+  "land_safe_speed": 12.0,
+  "land_damage_speed": 20.0,
+  "land_damage_per_speed": 0.06,
+  "land_soft_fac": 1.0,
+  "body_mesh_rad_fac": 1.15,
+  "body_profile_neck": 0.8,
+  "body_profile_chest": 1.3,
+  "body_profile_waist": 0.72,
+  "body_profile_haunch": 1.0,
+  "body_ride_height": 9.8,
+  "body_ride_corridor_fac": 0.4,
+  "head_size": 1.0,
+  "head_sprite_scale": 1.0,
+  "head_pitch_max": 32.0,
+  "limb_length_fac": 0.55,
+  "limb_upper_fac": 0.5,
+  "toby_frames_enabled": false,
+  "spear_enabled": false,
+  "spear_throw_dist_px": 160.0,
+  "spear_throw_speed": 35.0,
+  "spear_damage": 1.0,
+  "spear_throw_cooldown_ticks": 40,
+  "parts_prefix": "FoxTofu_",
+  "parts_scale_fac": 1.0,
+  "step_arc_lift": 2.5,
+  "limb_speed": 4.0,
+  "tail_length_fac": 1.0,
+  "tail_thickness_fac": 1.0,
+  "tail_length_vs_body": 1.0,
+  "stalk_crouch_drop": 5.0,
+  "climbs_walls": false,
+  "regain_footing_frames": 10,
+  "climbs_poles": false,
+  "pheromone_enabled": false,
+  "pheromone_share": "all",
+  "pheromone_range_tiles": 0.0,
+  "flank_enabled": false,
+  "flank_block_enabled": false,
+  "flank_herd_enabled": false,
+  "flank_sync_enabled": false,
+  "evasion_enabled": false,
+  "evasion_chance": 0.6,
+  "evasion_cooldown_ticks": 40,
+  "evasion_pad_px": 8.0,
+  "evasion_dodge_pop": 4.0,
+  "evasion_dodge_max_px": 60.0,
+  "cosmetics": [],
+  "color_tail": "979797",
+  "color_head": "979797",
+  "color_leg_lower": "545454",
+  "icon_color": "B4B0BC",
+  "pounce_route_enabled": true,
+  "pounce_route_goal_seed_radius_tiles": 6.0,
+  "hop_enabled": false,
+  "hop_when": "moving",
+  "hop_speed_fac": 1.0,
+  "hop_cooldown_ticks": 20,
+  "prey_persistence_bias": 2.0,
+  "camo_enabled": false,
+  "camo_visibility_bonus": 0.8,
+  "camo_blend_max": 0.85,
+  "bait_item_types": "Spear,DangleFruit,ScavengerBomb,DataPearl,FlareBomb,PuffBall,BubbleGrass,EggBugEgg,FirecrackerPlant,FlyLure,JellyFish,Lantern,Mushroom,SlimeMold,VultureMask,WaterNut",
+  "bait_wait_max_ticks": 2400,
+  "bait_cooldown_ticks": 400,
+  "bait_holds_against_hunt": false,
+  "bait_wait_holds_against_hunt": false,
+  "bait_enabled": false
+}

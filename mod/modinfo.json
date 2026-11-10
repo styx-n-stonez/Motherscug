@@ -12,7 +12,8 @@
     "magica.hookinglibrary",
     "rwremix",
     "reclaimingentropycontinued",
-    "customslugcatutils"
+    "customslugcatutils",
+    "fisobs"
   ],
   "requirements_names": [
     "SlugBase",
@@ -22,7 +23,8 @@
     "Hooking Library",
     "Rain World Remix",
     "Reclaiming Entropy: Continued - A Post-Saint Worldstate",
-    "Custom Slugcat Utils"
+    "Custom Slugcat Utils",
+    "Fisobs"
   ],
   "tags": [
     "Custom Slugcat",
