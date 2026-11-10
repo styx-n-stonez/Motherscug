@@ -49,7 +49,10 @@ namespace MotherMod
         private string sigLocoTag;
         private int sigCarryTier;
         private bool sigPup;
+        private bool sigSprint;
         private string cachedSig;
+
+        private bool sprintActive;
 
         public bool suppressWallJumpDrain;
 
@@ -76,6 +79,29 @@ namespace MotherMod
             : 1f;
 
         public float ThrowMult => (config.OverexertSlowThrow && OverexertSlowActive) ? SpeedMult : 1f;
+
+        public bool SprintActive => sprintActive;
+
+        private float OverexertMoveMult
+        {
+            get
+            {
+                float m = SpeedMult;
+                return m < 0.999f ? m : 1f;
+            }
+        }
+
+        public bool SpeedScaleActive => sprintActive || SpeedMult < 0.999f;
+
+        public float RunSpeedMult => OverexertMoveMult * (sprintActive ? config.SprintRunSpeedMult : 1f);
+
+        public float PoleSpeedMult => (config.OverexertSlowClimb ? OverexertMoveMult : 1f)
+                                      * (sprintActive ? config.SprintPoleSpeedMult : 1f);
+
+        public float CorridorSpeedMult => (config.OverexertSlowClimb ? OverexertMoveMult : 1f)
+                                          * (sprintActive ? config.SprintCorridorSpeedMult : 1f);
+
+        public float SwimSpeedMult => config.OverexertSlowSwim ? OverexertMoveMult : 1f;
 
         private const int VINE_GRACE_FRAMES = 10;
 
@@ -112,7 +138,7 @@ namespace MotherMod
             if (self.dead)
             {
                 StopContinuousLogs("death");
-
+                sprintActive = false;
                 if (emptyDeferReason != null)
                 {
                     emptyDeferReason = null;
@@ -145,6 +171,7 @@ namespace MotherMod
 
             if (forcedStun)
             {
+                sprintActive = false;
                 UpdateForcedStun(self);
                 return;
             }
@@ -179,6 +206,8 @@ namespace MotherMod
 
             if (dangerouslyExhausted)
             {
+                sprintActive = false;
+
                 for (int i = 0; i < self.bodyChunks.Length; i++)
                     self.bodyChunks[i].vel *= config.ExhaustionMovePenalty;
 
@@ -217,7 +246,9 @@ namespace MotherMod
                 return;
             }
 
+            UpdateSprint(self);
             UpdateContinuousDrains(self, suspended: zeroG || self.inShortcut);
+            SettleSprint(self);
 
             if (stamina <= 0f && !zeroG)
             {
@@ -390,6 +421,7 @@ namespace MotherMod
             string locoSig = null;
             int carryTier = 0;
             bool pupCarry = false;
+            bool sprintDrain = false;
             float rate = 0f;
 
             if (!suspended && self.room != null)
@@ -480,22 +512,63 @@ namespace MotherMod
                         rate += config.SlugpupCarryDrainPerSecond;
                     }
                 }
+
+                if (sprintActive && inputDir && config.SprintDrainPerSecond > 0f)
+                {
+                    sprintDrain = true;
+                    rate += config.SprintDrainPerSecond;
+                }
             }
 
             if (rate > 0f)
                 stamina = Mathf.Max(0f, stamina - PerFrame(rate));
 
-            LogDrainEdges(ComposeDrainSig(locoSig, carryTier, pupCarry), rate);
+            LogDrainEdges(ComposeDrainSig(locoSig, carryTier, pupCarry, sprintDrain), rate);
         }
 
-        private string ComposeDrainSig(string locoTag, int carryTier, bool pup)
+        private void UpdateSprint(Player self)
         {
-            if (locoTag != sigLocoTag || carryTier != sigCarryTier || pup != sigPup)
+            bool held = self.input[0].spec;
+
+            bool blocked = self.stun != 0 || stamina <= config.SprintMinStamina || !held;
+
+            if (!config.SprintEnabled)
+            {
+                return;
+            }
+
+            if (!blocked)
+            {
+                if (!sprintActive)
+                {
+                    sprintActive = true;
+                }
+            }
+            else if (sprintActive)
+            {
+                sprintActive = false;
+            }
+        }
+
+        private void SettleSprint(Player self)
+        {
+            if (!sprintActive) return;
+            if (stamina <= config.SprintMinStamina)
+            {
+                sprintActive = false;
+                return;
+            }
+        }
+
+        private string ComposeDrainSig(string locoTag, int carryTier, bool pup, bool sprint)
+        {
+            if (locoTag != sigLocoTag || carryTier != sigCarryTier || pup != sigPup || sprint != sigSprint)
             {
                 sigLocoTag = locoTag;
                 sigCarryTier = carryTier;
                 sigPup = pup;
-                if (locoTag == null && carryTier == 0 && !pup)
+                sigSprint = sprint;
+                if (locoTag == null && carryTier == 0 && !pup && !sprint)
                 {
                     cachedSig = null;
                 }
@@ -506,6 +579,8 @@ namespace MotherMod
                         s = (s.Length == 0 ? "" : s + "+") + (carryTier == 2 ? "carryHeavy" : "carryLight");
                     if (pup)
                         s = (s.Length == 0 ? "" : s + "+") + "pup";
+                    if (sprint)
+                        s = (s.Length == 0 ? "" : s + "+") + "sprint";
                     cachedSig = s;
                 }
             }

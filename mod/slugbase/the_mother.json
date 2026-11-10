@@ -94,6 +94,15 @@
 			"overexert_slow_climb": true,
 			"overexert_slow_swim": true,
 			"overexert_slow_throw": true,
+			
+			"_doc_zone": "sprint -- mult are based on rivs stats and spear_damage is gourmands.",
+			"sprint_enabled": true,
+			"sprint_run_speed_mult": 1.75,
+			"sprint_pole_speed_mult": 1.8,
+			"sprint_corridor_speed_mult": 1.6,
+			"sprint_drain_per_second": 38,
+			"sprint_min_stamina": 0,
+			"sprint_spear_damage": 3.0,
 
 			"_doc_hit": "TAKING DAMAGE -- hit_stamina_cost points are lost each time she is hit (bites, rocks, spears, explosions; falls are free). 0 = off (the designer's first answer); 25 was the offered 'mean' option. One charge per hit_cost_cooldown frames so an explosion doesn't charge every frame.",
 			"hit_stamina_cost": 0,
