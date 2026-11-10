@@ -26,7 +26,7 @@ namespace MotherMod
 
         private bool ResolveTobyFrames(FoxBreedParams p)
         {
-            if (p.TobyDraw != 3) return false;
+            if (!p.TobyFramesEnabled) return false;
             var els = new FAtlasElement[TOBY_FRAME_COUNT];
             for (int i = 0; i < TOBY_FRAME_COUNT; i++)
             {

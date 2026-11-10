@@ -48,7 +48,7 @@ namespace MotherMod
         internal WorldCoordinate FilterPoleDestination(WorldCoordinate d)
         {
             FoxBreedParams p = P;
-            if (p == null || !p.ClimbsPoles || p.PoleHorizontalAllowed || !p.PoleDestFilter) return d;
+            if (p == null || !p.ClimbsPoles || p.PoleHorizontalAllowed) return d;
             string why;
             if (!PoleDestinationRefusedCore(d, out why)) return d;
             WorldCoordinate sub;
@@ -62,7 +62,7 @@ namespace MotherMod
         internal bool PoleDestinationRefused(WorldCoordinate d)
         {
             FoxBreedParams p = P;
-            if (p == null || !p.ClimbsPoles || p.PoleHorizontalAllowed || !p.PoleDestFilter) return false;
+            if (p == null || !p.ClimbsPoles || p.PoleHorizontalAllowed) return false;
             string why;
             if (!PoleDestinationRefusedCore(d, out why)) return false;
             return true;

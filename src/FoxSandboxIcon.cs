@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using CreatureType = CreatureTemplate.Type;
 
@@ -16,40 +15,12 @@ namespace MotherMod
 
             try
             {
-                On.ArenaBehaviors.SandboxEditor.CreatureOrItemIcon.GlowColor += GlowColor;
-            }
-            catch (System.Exception e)
-            {
-                FoxFault.Warn($"sandbox_glow_hook_failed target=CreatureOrItemIcon.GlowColor " +
-                              $"err={e.GetType().Name} msg=\"{e.Message}\" action=vanilla_white_glow_kept");
-            }
-
-            try
-            {
-                On.ArenaBehaviors.SandboxEditor.CreatureOrItemIcon.GlowAlpha += GlowAlpha;
-            }
-            catch (System.Exception e)
-            {
-                FoxFault.Warn($"sandbox_glow_hook_failed target=CreatureOrItemIcon.GlowAlpha " +
-                              $"err={e.GetType().Name} msg=\"{e.Message}\" action=vanilla_glow_alpha_kept");
-            }
-
-            try
-            {
                 On.ArenaBehaviors.SandboxEditor.CreatureOrItemIcon.DrawSprites += DrawSpritesProbe;
             }
             catch (System.Exception e)
             {
                 FoxFault.Warn($"sandbox_glow_hook_failed target=CreatureOrItemIcon.DrawSprites " +
-                              $"err={e.GetType().Name} msg=\"{e.Message}\" action=art_copy_not_suppressed");
-            }
-            try
-            {
-            }
-            catch (System.Exception e)
-            {
-                FoxFault.Warn($"sandbox_glow_hook_failed target=CreatureOrItemIcon.GlowAlpha " +
-                              $"err={e.GetType().Name} msg=\"{e.Message}\" action=vanilla_glow_alpha_kept");
+                              $"err={e.GetType().Name} msg=\"{e.Message}\"");
             }
         }
 
@@ -59,33 +30,6 @@ namespace MotherMod
             CreatureType type = self.iconData.critType;
             if (!FoxCritob.IsFoxType(type)) return null;
             return FoxCritob.VariantIdFor(type);
-        }
-
-        private static Color GlowColor(
-            On.ArenaBehaviors.SandboxEditor.CreatureOrItemIcon.orig_GlowColor orig,
-            ArenaBehaviors.SandboxEditor.CreatureOrItemIcon self, float timeStacker)
-        {
-            string variant = VariantOf(self);
-            if (variant == null) return orig(self, timeStacker);
-
-            FoxBreedParams p = FoxParams.For(variant);
-            if (!p.SandboxGlowEnabled) return orig(self, timeStacker);
-
-            Color c = p.SandboxGlowColor;
-            return new Color(c.r, c.g, c.b, Mathf.Clamp01(p.SandboxGlowAlpha));
-        }
-
-        private static float GlowAlpha(
-            On.ArenaBehaviors.SandboxEditor.CreatureOrItemIcon.orig_GlowAlpha orig,
-            ArenaBehaviors.SandboxEditor.CreatureOrItemIcon self, float timeStacker)
-        {
-            string variant = VariantOf(self);
-            if (variant == null) return orig(self, timeStacker);
-
-            FoxBreedParams p = FoxParams.For(variant);
-            if (!p.SandboxGlowEnabled) return orig(self, timeStacker);
-
-            return p.SandboxGlowAlpha;
         }
 
         private static readonly Dictionary<string, int> ProbeFrames = new Dictionary<string, int>();
@@ -101,13 +45,6 @@ namespace MotherMod
 
             string variant = VariantOf(self);
             if (variant == null) return;
-
-            FoxBreedParams pp = FoxParams.For(variant);
-            if (pp.SandboxHideArtCopy && sLeaser?.sprites != null && sLeaser.sprites.Length > 2
-                && sLeaser.sprites[2] != null)
-            {
-                sLeaser.sprites[2].isVisible = false;
-            }
 
             return;
 #pragma warning disable 0162

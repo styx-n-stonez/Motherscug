@@ -73,7 +73,7 @@ namespace MotherMod
             target = fox.RoomRef.MiddleOfTile(s.Conn.DestTile);
             lastLogTick = fox.MoveTick;
 
-            if (p.ReachGravityOff && !gravitySuspended)
+            if (!gravitySuspended)
             {
                 gravitySuspended = true;
                 fox.SetWeightApplied(p, false, "reach_begin");
@@ -443,7 +443,7 @@ namespace MotherMod
             IntVector2 foot = room.GetTilePosition(new Vector2(c[0].pos.x, m.FootY + 1f));
             int scan = Math.Max(1, p.LedgePounceLipScanEffective);
             int band = Math.Max(1, Mathf.CeilToInt(Mathf.Max(20f, p.LedgePounceMaxRise) / 20f));
-            int downRows = Math.Max(0, p.LedgePounceDescendRows);
+            int downRows = p.LedgePounceDescendRows;
 
             int mask = p.LedgePounceLipSurfaceMask;
             m.SkipReason = "none";
@@ -519,7 +519,7 @@ namespace MotherMod
                 }
             }
 
-            if (faceRow == int.MinValue && downRows > 0)
+            if (faceRow == int.MinValue)
             {
                 for (int r = footRow - 1; r >= footRow - downRows; r--)
                 {
@@ -583,12 +583,10 @@ namespace MotherMod
 
             if (kind == "level")
             {
-                if (!p.LedgePounceAllowLevel) return "below_leap_band";
                 if (gapPx < Mathf.Max(0f, p.LedgePounceMinGapPx)) return "gap_too_small";
                 return null;
             }
 
-            if (!p.LedgePounceAllowDescend) return "below_leap_band";
             if (-rise > Mathf.Max(0f, p.LedgePounceMaxDrop)) return "drop_too_far";
             if (gapPx < Mathf.Max(0f, p.LedgePounceMinGapPx)) return "gap_too_small";
             return null;
@@ -660,7 +658,7 @@ namespace MotherMod
 
             if (so.Refuse == null)
             {
-                bool fliesPlan = so.FromPlan && p.PounceRouteFlyLaunchVel && plan != null;
+                bool fliesPlan = so.FromPlan && plan != null;
                 so.Reach = fliesPlan
                            ? fox.CanReachLeap(p, so.Aim, GatherSlackPx(p), plan.LaunchVel)
                            : fox.CanReachLeap(p, so.Aim, GatherSlackPx(p));
@@ -1002,7 +1000,7 @@ namespace MotherMod
             }
 
             routeVerdict = ConsultRoutePrice(p);
-            if (routeVerdict == ROUTE_NOT_CHEAPER && p.MantleRouteVeto)
+            if (routeVerdict == ROUTE_NOT_CHEAPER)
             {
                 string mRoute = null;
                 return FoxMoveBid.No("route_not_cheaper", mRoute);
@@ -1023,8 +1021,6 @@ namespace MotherMod
         {
             routeHereRes = float.NaN;
             routeLandRes = float.NaN;
-
-            if (!p.MantleRouteEnabled) return "route_off";
 
             Room room = fox.RoomRef;
             if (room == null) return "no_room";
@@ -1052,15 +1048,12 @@ namespace MotherMod
                 new WorldCoordinate(room.abstractRoom.index, probeCol, landRow, -1));
             if (hereCell == null || landCell == null) return "no_cell";
 
-            if (hereCell.generation != gen)
-                return p.MantleRouteVetoOnSilence ? ROUTE_NOT_CHEAPER : "here_unflooded";
-            if (landCell.generation != gen)
-                return p.MantleRouteVetoOnSilence ? ROUTE_NOT_CHEAPER : "land_unflooded";
+            if (hereCell.generation != gen) return "here_unflooded";
+            if (landCell.generation != gen) return "land_unflooded";
 
             PathCost.Legality ceiling = RouteCeiling(p);
 
-            if (landCell.costToGoal.legality > ceiling)
-                return p.MantleRouteVetoOnIllegalLanding ? ROUTE_NOT_CHEAPER : "land_illegal";
+            if (landCell.costToGoal.legality > ceiling) return "land_illegal";
 
             float penalty = Mathf.Max(0f, p.MantleRoutePenalty);
             routeLandRes = landCell.costToGoal.resistance;
@@ -1259,13 +1252,11 @@ namespace MotherMod
             float climbFootY = Mathf.Min(c[0].pos.y - c[0].rad, c[2].pos.y - c[2].rad);
             float bodyFootY = float.MaxValue;
             for (int i = 0; i < c.Length; i++) bodyFootY = Mathf.Min(bodyFootY, c[i].pos.y - c[i].rad);
-            float footY = p.MantleRiseFromClimbEnds ? climbFootY : bodyFootY;
+            float footY = climbFootY;
 
             int footRow = room.GetTilePosition(new Vector2(fox.mainBodyChunk.pos.x, footY + 1f)).y;
 
-            int faceMask = p.MantleFacePlatforms
-                ? (FoxLandingSurface.Rock | FoxLandingSurface.Platform)
-                : FoxLandingSurface.Rock;
+            int faceMask = FoxLandingSurface.Rock | FoxLandingSurface.Platform;
             float faceTopY;
             string faceKind;
             if (!FoxLandingSurface.At(room, col, footRow, sign, faceMask, out faceTopY, out faceKind))
@@ -1332,7 +1323,6 @@ namespace MotherMod
 
         internal enum ShortcutVerdict
         {
-            off,
             never,
             stale,
             delay_gone,
@@ -1374,7 +1364,6 @@ namespace MotherMod
                 return Refuse(p, "no_body", null);
             }
 
-            if (!p.EnterEnabled) { sc = ShortcutVerdict.off; return Refuse(p, "enter_disabled", null); }
             if (Cooldown > 0)
             {
                 sc = ShortcutOf(p, room);
@@ -1408,7 +1397,7 @@ namespace MotherMod
 
             bool viaPipe = how == "shortcut_exit";
 
-            if (!fox.Grounded && (!viaPipe || p.EnterShortcutNeedsGround))
+            if (!fox.Grounded && !viaPipe)
             {
                 string d = null;
                 return Refuse(p, "airborne", d);
@@ -1474,7 +1463,6 @@ namespace MotherMod
             scMouth = new IntVector2(0, 0);
             scSlot = new IntVector2(0, 0);
 
-            if (!p.EnterShortcutEnabled) return ShortcutVerdict.off;
             if (room == null || fox.Chunks == null || fox.Chunks.Length < 1) return ShortcutVerdict.never;
 
             int age = fox.MoveTick - fox.LastShortcutExitTick;
@@ -1569,7 +1557,7 @@ namespace MotherMod
                 int frames = Math.Max(1, p.EnterGatherFrames);
                 fox.EnterGather = Mathf.Clamp01((float)(Ticks - 1) / Math.Max(1, frames - 1));
                 spinePullWanted = false;
-                UpdateThroughFloors(p, room, false);
+                UpdateThroughFloors(room, false);
                 if (Ticks >= p.EnterGatherFrames)
                 {
                     phase = Phase.Insert;
@@ -1579,16 +1567,15 @@ namespace MotherMod
             }
 
             fox.EnterGather = 1f;
-            spinePullWanted = p.EnterSpinePull;
-            UpdateThroughFloors(p, room, true);
+            spinePullWanted = true;
+            UpdateThroughFloors(room, true);
             Fox.PullChunk(c[0], aim, p.EnterPull * (1f + Mathf.Max(0f, p.EnterHeadLead)));
             Fox.PullChunk(c[2], room.MiddleOfTile(fromTile), p.EnterPull * (1f - Mathf.Clamp01(p.EnterRearLag)));
         }
 
-        private void UpdateThroughFloors(FoxBreedParams p, Room room, bool inserting)
+        private void UpdateThroughFloors(Room room, bool inserting)
         {
             bool want = inserting
-                        && p.EnterThroughFloors
                         && fox.TileIsPlatform(destTile)
                         && room != null && fox.Chunks != null && fox.Chunks.Length > 0
                         && room.GetTilePosition(fox.Chunks[0].pos).y >= destTile.y;
@@ -1631,7 +1618,6 @@ namespace MotherMod
             if (spinePullWanted)
             {
                 spinePullWanted = false;
-                if (!p.SqueezeSpinePull) fox.AssertAsBuiltBodyNow();
                 restored = true;
             }
 

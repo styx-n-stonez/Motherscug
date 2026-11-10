@@ -158,7 +158,7 @@ namespace MotherMod
 
             UpdateFloorStepOffBlock(p);
             UpdateSurfaceState(p, why);
-            CheckPoleTileIsNotCorridorLike(p);
+            CheckPoleTileIsNotCorridorLike();
         }
 
         private bool PoleGeometryWantsHold(FoxBreedParams p, out string why)
@@ -283,7 +283,7 @@ namespace MotherMod
             surface = now;
         }
 
-        private void CheckPoleTileIsNotCorridorLike(FoxBreedParams p)
+        private void CheckPoleTileIsNotCorridorLike()
         {
             if (!poleProbe.AnyOn || poleProbe.Anchor < 0) return;
             IntVector2 t = poleProbe.Tile;
@@ -303,8 +303,8 @@ namespace MotherMod
 
             int stepDir = PoleStepDir();
             float bodyDy = bodyChunks[0].pos.y - bodyChunks[2].pos.y;
-            float orient = PoleAlignOrient(p, stepDir, bodyDy);
-            bool ascentHeadFirst = p.PoleAscentHeadFirst && stepDir > 0;
+            float orient = PoleAlignOrient(stepDir, bodyDy);
+            bool ascentHeadFirst = stepDir > 0;
             for (int i = 0; i < 3; i++) { alignW[i] = 0f; alignBehind[i] = 0f; alignMode[i] = leaving ? "leaving" : "near"; }
             if (!leaving)
             {
@@ -320,7 +320,7 @@ namespace MotherMod
                         float half = Mathf.Max(1f, 0.5f * PoleLinkRest(i - 1));
                         float behind = (bodyChunks[i - 1].pos.y - c.pos.y) * orient;
                         alignBehind[i] = behind;
-                        if (p.PoleAlignOrder) w = Mathf.Clamp01(behind / half);
+                        w = Mathf.Clamp01(behind / half);
 
                         if (ascentHeadFirst && p.PoleAlignSwingPx > 0f && behind < -POLE_ALIGN_SWING_BAND)
                         {
@@ -387,9 +387,9 @@ namespace MotherMod
             return dy > 0 ? 1 : -1;
         }
 
-        private float PoleAlignOrient(FoxBreedParams p, int stepDir, float bodyDy)
+        private float PoleAlignOrient(int stepDir, float bodyDy)
         {
-            if (stepDir > 0 && p.PoleAscentHeadFirst) return 1f;
+            if (stepDir > 0) return 1f;
             if (Mathf.Abs(bodyDy) > POLE_HEAD_SIGN_BAND) return bodyDy < 0f ? -1f : 1f;
             if (stepDir < 0) return -1f;
             return poleHeadSign < 0f ? -1f : 1f;
@@ -489,11 +489,11 @@ namespace MotherMod
             return 1f + Mathf.Clamp(p.PolePullPulseFac, 0f, 0.9f) * Mathf.Sin(polePhase * Mathf.PI * 2f);
         }
 
-        private bool PoleBacking(FoxBreedParams p, Vector2 desired)
+        private bool PoleBacking(Vector2 desired)
         {
-            if (!poleHeld || !p.PoleBackDown) return false;
+            if (!poleHeld) return false;
             if (Mathf.Abs(desired.y) <= Mathf.Abs(desired.x)) return false;
-            if (p.PoleAscentHeadFirst && desired.y > 0f) return false;
+            if (desired.y > 0f) return false;
             float dy = bodyChunks[0].pos.y - bodyChunks[2].pos.y;
             if (Mathf.Abs(dy) <= POLE_HEAD_SIGN_BAND) return false;
             return desired.y * dy < 0f;

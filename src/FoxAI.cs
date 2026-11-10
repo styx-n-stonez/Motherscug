@@ -59,7 +59,6 @@ namespace MotherMod
         private const int ScentRefreshLogTicks = 200;
         private const int SniffStaleFactor = 20;
 
-        private int denRestCounter;
         private string denReason = "none";
 
         private bool denWatchOn;
@@ -159,18 +158,12 @@ namespace MotherMod
             AddModule(new RelationshipTracker(this, tracker));
             AddModule(new StuckTracker(this, trackPastPositions: true, trackNotFollowingCurrentGoal: true));
 
-            if (p.DiscomfortEnabled)
-            {
-                AddModule(new DiscomfortTracker(this, tracker, 0f));
-            }
+            AddModule(new DiscomfortTracker(this, tracker, 0f));
 
-            if (p.RouteObstacleEnabled)
-            {
-                AddModule(new ObstacleTracker(this, trackObjects: false, trackTiles: true,
-                                              mapDecayPerReport: 2,
-                                              objectsReportsToNoticeCreatures: 3,
-                                              objectsMaxTrackedCreatures: 5));
-            }
+            AddModule(new ObstacleTracker(this, trackObjects: false, trackTiles: true,
+                                          mapDecayPerReport: 2,
+                                          objectsReportsToNoticeCreatures: 3,
+                                          objectsMaxTrackedCreatures: 5));
 
             if (p.BaitEnabled)
             {
@@ -293,7 +286,6 @@ namespace MotherMod
                 bool injured = creature.state is HealthState && health < p.DenHealthThreshold;
                 if (denGaveUp) UpdateDenGiveUpWound(health, injured);
                 if (injured && !denGaveUp) reason = "injury";
-                else if (p.DenFedEnabled && denRestCounter > 0 && utility < p.DenFedPriority) reason = "fed";
 
                 if (reason != null)
                 {
@@ -629,7 +621,6 @@ namespace MotherMod
                     fox.chaseTarget = null;
                     var den = denFinder.GetDenPosition();
                     if (den.HasValue) creature.abstractAI.SetDestination(den.Value);
-                    if (denRestCounter > 0) denRestCounter--;
                     break;
 
                 case Behavior.Bait:
@@ -673,7 +664,7 @@ namespace MotherMod
                     fox.runSpeed = Mathf.Max(p.RunSpeedHunt * Mathf.Max(0f, p.FlankHerdSpeedFac), stuck);
                 }
             }
-            else if (p.HuntGhostPursue || prey.VisualContact)
+            else
             {
                 creature.abstractAI.SetDestination(guess);
             }
@@ -728,9 +719,9 @@ namespace MotherMod
             float bestThreat = 0f, bestNoise = 0f, bestDist = 0f, bestSpacing = 0f;
             int examined = 0;
 
-            int candidates = Math.Max(1, p.RoamCandidates);
+            int candidates = p.RoamCandidates;
             int attempts = 0;
-            int maxAttempts = candidates * Math.Max(1, p.RoamAttemptsPerCandidate);
+            int maxAttempts = candidates * p.RoamAttemptsPerCandidate;
             int radius = Math.Max(1, p.RoamRadiusTiles);
             while (examined < candidates && attempts < maxAttempts)
             {
@@ -1012,12 +1003,6 @@ namespace MotherMod
                 Vector2 to = realized.mainBodyChunk.pos;
                 bool los = fox.room.VisualContact(from, to);
 
-                if (!los && !p.SenseThroughWalls)
-                {
-                    LoseOmni(other, "no_line_of_sight");
-                    continue;
-                }
-
                 float radius = los ? p.SenseRadius : p.SenseRadius * p.SenseWallRadiusFac;
                 float cap = los ? p.SenseMaxScore : p.SenseMaxScore * p.SenseWallScoreFac;
 
@@ -1041,18 +1026,7 @@ namespace MotherMod
                 string channel = los ? "omni" : "omni_wall";
                 float score = rep.EstimatedChanceOfFinding;
 
-                if (score <= cap)
-                {
-                    if (los && p.SenseOmniInLosFull)
-                    {
-                        tracker.SeeCreature(other);
-                        channel = "omni_full";
-                    }
-                    else
-                    {
-                        rep.HeardThisCreature();
-                    }
-                }
+                if (score <= cap) rep.HeardThisCreature();
 
                 MarkOmni(rep, other, channel, rep.EstimatedChanceOfFinding, dist, cap);
             }
@@ -1297,7 +1271,6 @@ namespace MotherMod
             {
                 CreatureTemplate.Relationship sr = StaticRelationship(other);
                 bool nearWould = !(sr.type == DoesntTrack || sr.type == Ignores || sr.intensity <= 0f)
-                                 && (los || p.SenseThroughWalls)
                                  && dist <= (los ? p.SenseRadius : p.SenseRadius * p.SenseWallRadiusFac) * blindFac;
                 if (nearWould) held = los ? "omni_pending" : "omni_wall_pending";
             }
@@ -1463,11 +1436,6 @@ namespace MotherMod
             return current;
         }
 
-        public void Fed(int restFrames)
-        {
-            denRestCounter = restFrames;
-        }
-
         public override PathCost TravelPreference(MovementConnection connection, PathCost cost)
         {
             cost = base.TravelPreference(connection, cost);
@@ -1477,7 +1445,7 @@ namespace MotherMod
 
             FoxBreedParams p = fox.P;
 
-            if (p.RouteObstacleEnabled && obstacleTracker != null)
+            if (obstacleTracker != null)
             {
                 int warnings = obstacleTracker.ObstacleWarning(connection);
                 if (warnings > 0)
@@ -1490,7 +1458,7 @@ namespace MotherMod
             }
 
             string holeKind;
-            if (p.RouteHoleAvoid && IsCrossedFloorHole(room, p, connection, out holeKind))
+            if (IsCrossedFloorHole(room, p, connection, out holeKind))
             {
                 bool throughCorridor = string.Equals(holeKind, "slot_drop", StringComparison.Ordinal)
                                        || string.Equals(holeKind, "slot_through", StringComparison.Ordinal);
@@ -1578,7 +1546,7 @@ namespace MotherMod
                 }
                 lastHoleOpenRow = dy - depth;
                 bool leadsSideways = false;
-                if (bottom && p.RouteCorridorDetectSideways)
+                if (bottom)
                 {
                     int openRow = lastHoleOpenRow;
                     leadsSideways = !room.GetTile(dx - 1, openRow).Solid
@@ -1642,7 +1610,7 @@ namespace MotherMod
 
         private void FeedObstacleTracker(FoxBreedParams p)
         {
-            if (!p.RouteObstacleEnabled || obstacleTracker == null || stuckTracker == null) return;
+            if (obstacleTracker == null || stuckTracker == null) return;
 
             bool stuck = stuckTracker.Utility() > 0f;
             if (!stuck)
@@ -1654,24 +1622,21 @@ namespace MotherMod
                 return;
             }
 
-            if (p.RouteObstacleSkipWhenWedged || p.RouteObstacleEscapeMuteTicks > 0)
+            bool wedged = fox.WedgeActive;
+            int sinceEscape = GameTick - fox.WedgeEscapeTick;
+            bool muted = p.RouteObstacleEscapeMuteTicks > 0
+                         && sinceEscape >= 0 && sinceEscape < p.RouteObstacleEscapeMuteTicks;
+            if (wedged || muted)
             {
-                bool wedged = p.RouteObstacleSkipWhenWedged && fox.WedgeActive;
-                int sinceEscape = GameTick - fox.WedgeEscapeTick;
-                bool muted = p.RouteObstacleEscapeMuteTicks > 0
-                             && sinceEscape >= 0 && sinceEscape < p.RouteObstacleEscapeMuteTicks;
-                if (wedged || muted)
+                if (!obstacleMuted)
                 {
-                    if (!obstacleMuted)
-                    {
-                        obstacleMuted = true;
-                    }
-                    return;
+                    obstacleMuted = true;
                 }
-                if (obstacleMuted)
-                {
-                    obstacleMuted = false;
-                }
+                return;
+            }
+            if (obstacleMuted)
+            {
+                obstacleMuted = false;
             }
 
             if (GameTick % OBSTACLE_REPORT_EVERY_TICKS != 0) return;
@@ -1753,7 +1718,7 @@ namespace MotherMod
             }
             if (type == Uncomfortable)
             {
-                return (p == null || p.DiscomfortEnabled) ? RelRoute.Discomfort : RelRoute.Inert;
+                return RelRoute.Discomfort;
             }
             return RelRoute.Inert;
         }

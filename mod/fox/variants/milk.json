@@ -474,55 +474,18 @@
   "body_profile_chest": 1.24,
   "body_profile_waist": 0.7,
   "body_profile_haunch": 0.96,
-  "body_front_cap": 3.6,
   "body_ride_height": 16.6,
   "body_ride_corridor_fac": 0.21,
   "head_size": 0.95,
-  "head_look_fac": 0.6,
   "head_pitch_max": 34.0,
-  "head_muzzle_length": 10.5,
-  "head_muzzle_width": 0.58,
-  "head_muzzle_tip": 0.22,
-  "eye_thickness": 1.5,
   "limb_length_fac": 0.61,
-  "limb_thickness": 2.6,
   "limb_upper_fac": 0.48,
-  "limb_paw_length": 3.2,
   "parts_prefix": "FoxMilk_",
   "step_arc_lift": 3.6,
   "limb_speed": 4.3,
   "tail_length_vs_body": 1.05,
   "stalk_crouch_drop": 7.25,
   "cosmetics": [
-    {
-      "layer": "Ears",
-      "size": 1.0,
-      "length": 11.5,
-      "width": 4.5,
-      "spread": 0.8,
-      "tilt": 26.0,
-      "flatten": 35.0,
-      "color": "A79C88"
-    },
-    {
-      "layer": "Snout",
-      "length": 10.5,
-      "width": 5.0,
-      "tip_width": 2.2,
-      "droop": 0.12,
-      "color": "A79C88",
-      "nose_size": 2.2,
-      "nose_color": "6B6152"
-    },
-    {
-      "layer": "BrushTail",
-      "tufts": 8,
-      "tuft_size": 1.9,
-      "tuft_spread": 0.85,
-      "tuft_droop": 0.3,
-      "tuft_follow_profile": 1.0,
-      "color": "A79C88"
-    },
     {
       "layer": "Spines",
       "count": 5,
@@ -548,14 +511,9 @@
       "max_stretch": 1.0
     }
   ],
-  "color_body": "E4DFD2",
   "color_tail": "A79C88",
-  "color_tail_root": "6B6152",
   "color_head": "A79C88",
-  "color_legs": "8A7F6C",
   "color_leg_lower": "7A7060",
-  "color_paws": "6B6152",
-  "color_eye": "2A251E",
   "icon_color": "E4DFD2",
   "prey_persistence_bias": 3.2
 }

@@ -42,6 +42,15 @@ namespace MotherMod
         internal bool OwnsAttitude { get { return latched && phase == Phase.Flight && fox.pounce == Fox.PounceState.Propel; } }
         internal bool LooksAtGoal { get { return latched && (phase == Phase.Charge || phase == Phase.Flight); } }
         internal Vector2 Goal { get { return aim; } }
+
+        internal static bool PlansSnap(FoxBreedParams p)
+        {
+            return p != null && p.HopLookCyan >= 1 && p.HopLookSnap >= 1;
+        }
+
+        internal bool SnapsLaunch(FoxBreedParams p) { return latched && p.HopLookSnap >= 1; }
+
+        internal Vector2 SnapPoint(Vector2 v) { return start + v; }
         internal Phase CurrentPhase { get { return phase; } }
 
         internal float FlickerNum { get { return flickerNum; } }
@@ -254,7 +263,7 @@ namespace MotherMod
                     return;
                 }
             }
-            int cap = Math.Max(1, p.AttackStateCeilingTicks) + 8 * Math.Max(2, p.HopLookLandTicks) + 200;
+            int cap = p.AttackStateCeilingTicks + 8 * Math.Max(2, p.HopLookLandTicks) + 200;
             if (now - beganTick > cap) End(p, "watchdog");
         }
 

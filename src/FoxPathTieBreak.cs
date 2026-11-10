@@ -41,7 +41,6 @@ namespace MotherMod
             if (fox == null) return chosen;
 
             FoxBreedParams p = fox.P;
-            if (!p.PathBodyTieBreak) return chosen;
 
             Room room = self.realizedRoom;
             if (room == null || room.aimap == null) return chosen;
@@ -92,7 +91,7 @@ namespace MotherMod
                     }
 
                     bool allowed = held != default(MovementConnection)
-                                   && StepCost(room, self.creature.creatureTemplate, fox, p, held, following).Allowed;
+                                   && StepCost(room, self.creature.creatureTemplate, fox, held, following).Allowed;
 
                     if (allowed)
                     {
@@ -127,7 +126,7 @@ namespace MotherMod
             if (chosenCell == null) return NoSwap(fox, following, chosen);
 
             MovementConnection priced = chosen;
-            if (isTurn && p.PathTiebreakNormaliseTurn)
+            if (isTurn)
             {
                 for (int i = 0; i < MAX_CONNECTIONS; i++)
                 {
@@ -140,7 +139,7 @@ namespace MotherMod
                 }
             }
 
-            PathCost chosenConn = StepCost(room, tmpl, fox, p, priced, following);
+            PathCost chosenConn = StepCost(room, tmpl, fox, priced, following);
             PathCost chosenTotal = chosenCell.costToGoal + chosenConn;
 
             MovementConnection best = default(MovementConnection);
@@ -155,7 +154,7 @@ namespace MotherMod
                 if (!c.destinationCoord.TileDefined) continue;
                 if (Custom.IntVectorsOpposite(StepOf(c), bodyDir)) continue;
 
-                PathCost connCost = StepCost(room, tmpl, fox, p, c, following);
+                PathCost connCost = StepCost(room, tmpl, fox, c, following);
                 if (!connCost.Allowed) continue;
 
                 PathFinder.PathingCell cell = self.PathingCellAtWorldCoordinate(c.destinationCoord);
@@ -204,11 +203,10 @@ namespace MotherMod
             return chosen;
         }
 
-        private static PathCost StepCost(Room room, CreatureTemplate tmpl, Fox fox, FoxBreedParams p,
+        private static PathCost StepCost(Room room, CreatureTemplate tmpl, Fox fox,
                                          MovementConnection c, bool following)
         {
             PathCost engine = room.aimap.ConnectionCostForCreature(c, tmpl);
-            if (!p.PathTiebreakTravelPreference) return engine;
             FoxAI ai = fox.AI;
             if (ai == null) return engine;
             PathCost folded = ai.TravelPreferenceForQuery(c, engine);

@@ -286,7 +286,7 @@ namespace MotherMod
             }
 
             UpdateSurfaceState(p, why);
-            CheckWallTileIsNotCorridorLike(p);
+            CheckWallTileIsNotCorridorLike();
         }
 
         private bool WallGeometryWantsHold(FoxBreedParams p, bool poleBefore, FoxSurface surfaceBefore,
@@ -429,7 +429,7 @@ namespace MotherMod
             ReleaseWallHold(p, "corridor_wins", false);
         }
 
-        private void CheckWallTileIsNotCorridorLike(FoxBreedParams p)
+        private void CheckWallTileIsNotCorridorLike()
         {
             if (!wallHeld) return;
             IntVector2 t = wallTile;

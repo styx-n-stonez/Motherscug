@@ -456,44 +456,9 @@
   "stalk_crouch_drop": 2.75,
   "climbs_walls": true,
   "climbs_poles": true,
-  "cosmetics": [
-    {
-      "layer": "Ears",
-      "size": 1.35,
-      "length": 18.0,
-      "width": 7.5,
-      "spread": 0.9,
-      "tilt": 14.0,
-      "flatten": 35.0,
-      "color": "EAE5D7"
-    },
-    {
-      "layer": "Snout",
-      "length": 8.5,
-      "width": 5.2,
-      "tip_width": 2.4,
-      "droop": 0.12,
-      "color": "EAE5D7",
-      "nose_size": 2.2,
-      "nose_color": "1A1A1A"
-    },
-    {
-      "layer": "BrushTail",
-      "tufts": 10,
-      "tuft_size": 2.4,
-      "tuft_spread": 0.85,
-      "tuft_droop": 0.3,
-      "tuft_follow_profile": 1.0,
-      "color": "E9E4D6"
-    }
-  ],
-  "color_body": "8C562E",
   "color_tail": "E9E4D6",
-  "color_tail_root": "8C562E",
   "color_head": "EAE5D7",
-  "color_legs": "8C562E",
   "color_leg_lower": "9E653A",
-  "color_paws": "5E3A1E",
   "icon_color": "F0D8B4",
   "base_speed": 2.34,
   "speed_corridor": 0.71,

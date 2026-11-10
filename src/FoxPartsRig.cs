@@ -27,9 +27,7 @@ namespace MotherMod
         private const int HEAD_SIDE = 0, HEAD_TQ = 1, HEAD_AWAY = 2;
         private static readonly string[] HEAD_PART_NAMES = { "HeadSide", "HeadThreeQuarter", "HeadAway" };
 
-        internal bool partsRigActive;
-
-        private int LimbSpriteCount { get { return partsRigActive ? PARTS_LEG_SPRITES : 1; } }
+        private bool drawNothing;
 
         private float partsScale = 1f;
 
@@ -55,12 +53,12 @@ namespace MotherMod
 
         public float GaitSpeed
         {
-            get { return partsRigActive ? speedSmooth : fox.bodyChunks[1].vel.magnitude; }
+            get { return speedSmooth; }
         }
 
         public Vector2 GaitVelocity
         {
-            get { return partsRigActive ? travelVel : fox.bodyChunks[1].vel; }
+            get { return travelVel; }
         }
         private Vector2 travelVel;
 
@@ -76,8 +74,6 @@ namespace MotherMod
         private float wavePitchDeg, lastWavePitchDeg;
         private float pairBlend;
         private bool gaitPaired;
-        private int glanceTicks;
-        private float glanceDir;
         private uint glanceRng;
 
         private const int HL_NEUTRAL = 0, HL_SNIFF = 1, HL_SCAN = 2, HL_NOISE = 3, HL_TARGET = 4, HL_TURN = 5,
@@ -120,34 +116,30 @@ namespace MotherMod
         private float flexGeom, flexMotion, squashGeom, squashMotion;
         private float accelSmooth;
 
+        private static readonly string[] REQUIRED_PARTS =
+        {
+            "HeadSide", "HeadThreeQuarter", "HeadAway", "Chest", "Body", "Tail",
+            "LegA_Upper", "LegA_Joint", "LegA_Lower", "LegA_Paw",
+            "LegB_Haunch", "LegB_Upper", "LegB_Joint", "LegB_Lower", "LegB_Paw",
+        };
+
         private bool ResolvePartsRig(FoxBreedParams p)
         {
-            if (!p.PartsRig) return false;
-            bool ok = true;
-            for (int i = 0; i < 3; i++) ok &= PartsRequire(p, HEAD_PART_NAMES[i]);
-            ok &= PartsRequire(p, "Chest") & PartsRequire(p, "Body") & PartsRequire(p, "Tail");
-            ok &= PartsRequire(p, "LegA_Upper") & PartsRequire(p, "LegA_Joint")
-                  & PartsRequire(p, "LegA_Lower") & PartsRequire(p, "LegA_Paw");
-            ok &= PartsRequire(p, "LegB_Haunch") & PartsRequire(p, "LegB_Upper") & PartsRequire(p, "LegB_Joint")
-                  & PartsRequire(p, "LegB_Lower") & PartsRequire(p, "LegB_Paw");
-            return ok;
-        }
-
-        private bool PartsRequire(FoxBreedParams p, string part)
-        {
-            string el = PartsEl(p, part);
-            if (FoxAtlas.Has(el)) return true;
+            List<string> missing = null;
+            for (int i = 0; i < REQUIRED_PARTS.Length; i++)
+            {
+                string el = PartsEl(p, REQUIRED_PARTS[i]);
+                if (FoxAtlas.Has(el)) continue;
+                if (missing == null) missing = new List<string>();
+                missing.Add(el);
+            }
+            if (missing == null) return true;
             return false;
         }
 
         private static string PartsEl(FoxBreedParams p, string part)
         {
-            return p.PartsPrefix + part + (p.PartsMask ? "Mask" : "");
-        }
-
-        private static Color PartsTint(FoxBreedParams p, Color variantColor)
-        {
-            return p.PartsMask ? variantColor : Color.white;
+            return p.PartsPrefix + part;
         }
 
         private void BuildPartsRig(FoxBreedParams p)
@@ -251,7 +243,7 @@ namespace MotherMod
 
         public float LegGroundReach(int i)
         {
-            if (!partsRigActive || fox == null || limbs == null || i < 0 || i >= limbs.Length) return 0f;
+            if (fox == null || limbs == null || i < 0 || i >= limbs.Length) return 0f;
             return LegRootHeight(fox.P, i);
         }
 
@@ -265,11 +257,11 @@ namespace MotherMod
 
         private const float POLE_REACH_MARGIN_PX = 0.5f;
 
-        private void PublishPoleFrame(Vector2 fwd, Vector2 up, bool valid)
+        private void PublishPoleFrame(Vector2 fwd, Vector2 up)
         {
             poleFrameFwd = fwd;
             poleFrameUp = up;
-            poleFrameOk = valid;
+            poleFrameOk = true;
             if (fox == null || !fox.PoleHeld) return;
             float x = BodyUp.x;
             if (Mathf.Abs(x) >= POLE_SIDE_BAND) poleBodySide = (x < 0f) ? -1f : 1f;
@@ -280,7 +272,7 @@ namespace MotherMod
         {
             lo = 0f;
             hi = 0f;
-            if (!partsRigActive || !poleFrameOk || fox == null || limbs == null
+            if (!poleFrameOk || fox == null || limbs == null
                 || i < 0 || i >= limbs.Length) return false;
             FoxBreedParams p = fox.P;
             if (p == null) return false;
@@ -443,7 +435,6 @@ namespace MotherMod
             float fore = TurnForeshorten(p, depth);
             Vector2 rearDraw = midChunk + (rearChunk - midChunk) * fore;
             chest = midChunk + (chest - midChunk) * fore;
-            Color bodyTint = PartsTint(p, p.ColorBody);
 
             float breath = PartsBreath(p, timeStacker);
             float lean = Mathf.Lerp(lastLeanDeg, leanDeg, timeStacker) * faceSign;
@@ -480,14 +471,14 @@ namespace MotherMod
                 float bodyHalf = PartsBodyHalf(p, s, breath, widthFac);
                 WriteStrip(bodyStrip, rearDraw, ctrl, bEnd, 0f, tEnd, Vector2.zero,
                            bodyHalf, faceSign, camPos);
-                bodyStrip.color = bodyTint;
+                bodyStrip.color = Color.white;
 
                 float h = (P_CHEST_W * s * 0.5f) / chordLen;
                 Vector2 chestOffset = chestDraw - Bezier(rearDraw, ctrl, bEnd, 1f);
                 float chestHalf = PartsChestHalf(p, s, breath, widthFac);
                 WriteStrip(chestStrip, rearDraw, ctrl, bEnd, 1f - h, 1f + h, chestOffset,
                            chestHalf, faceSign, camPos);
-                chestStrip.color = bodyTint;
+                chestStrip.color = Color.white;
             }
             else
             {
@@ -499,7 +490,7 @@ namespace MotherMod
                 body.rotation = AimDeg(fwd) - 90f * faceSign + lean;
                 body.scaleX = (drawnLen / P_BODY_W) * faceSign;
                 body.scaleY = s * (1f + p.IdleBreathAmp * breath * 0.6f) * SqueezeDrawFac(p, squeezeDraw);
-                body.color = bodyTint;
+                body.color = Color.white;
 
                 FSprite chestSprite = sLeaser.sprites[SpriteChest];
                 chestSprite.x = chestDraw.x - camPos.x;
@@ -509,7 +500,7 @@ namespace MotherMod
                 chestSprite.rotation = AimDeg(fwd) - 90f * faceSign + lean;
                 chestSprite.scaleX = s * faceSign;
                 chestSprite.scaleY = s * (1f + p.IdleBreathAmp * breath) * SqueezeDrawFac(p, squeezeDraw);
-                chestSprite.color = bodyTint;
+                chestSprite.color = Color.white;
             }
 
             for (int i = 0; i < limbs.Length; i++)
@@ -519,11 +510,6 @@ namespace MotherMod
                 float swing = Mathf.Clamp01(Mathf.Lerp(limbs[i].lastSwing, limbs[i].swing, timeStacker));
                 float bendSmooth = Mathf.Lerp(limbs[i].lastBend, limbs[i].bend, timeStacker);
                 Vector2 root = PartsLegRootFrom(p, i, rearDraw, chest, fwd, up);
-                if (p.PartsLegRootFollowBend && bendDraw != 0f)
-                {
-                    float tRoot = Mathf.Clamp01((i < 2) ? p.PartsLegRootFront : p.PartsLegRootHind);
-                    root += nLean * (4f * bendDraw * tRoot * (1f - tRoot));
-                }
                 bool foldInterp = fox.PoleAmount <= 0f && !limbs[i].OnPole;
                 float phaseLast = foldInterp ? limbs[i].LastSwingPhase : limbs[i].SwingPhase;
                 DrawPartsLeg(sLeaser, p, i, root, paw, fwd, up, faceSign, swing, bendSmooth, camPos,
@@ -752,10 +738,6 @@ namespace MotherMod
             int b = LimbSprite(i);
             float s = partsScale;
             float thick = s * Mathf.Max(0.05f, p.PartsLegThicknessFac);
-            Color tint = PartsTint(p, p.ColorLegs);
-            Color pawTint = PartsTint(p, p.ColorPaws);
-            Color lowerTint = PartsTint(p, p.ColorLegLower);
-
             LegPose q = SolveLegPose(p, i, root, paw, fwd, up, swing,
                                      limbs[i].SwingPhase, bendSmooth, true, phaseLast, phaseLerp);
             Vector2 pawFacing = fwd;
@@ -764,30 +746,6 @@ namespace MotherMod
             Vector2 hock = q.distal;
             Vector2 ankle = q.mcp;
             paw = q.paw;
-
-            if (p.PartsLegSingleSprite)
-            {
-                sLeaser.sprites[b + LEG_HAUNCH].scaleX = 0f;
-                sLeaser.sprites[b + LEG_HAUNCH].scaleY = 0f;
-                sLeaser.sprites[b + LEG_JOINT].scaleX = 0f;
-                sLeaser.sprites[b + LEG_JOINT].scaleY = 0f;
-                sLeaser.sprites[b + LEG_LOWER].scaleX = 0f;
-                sLeaser.sprites[b + LEG_LOWER].scaleY = 0f;
-                sLeaser.sprites[b + LEG_JOINT2].scaleX = 0f;
-                sLeaser.sprites[b + LEG_JOINT2].scaleY = 0f;
-                sLeaser.sprites[b + LEG_META].scaleX = 0f;
-                sLeaser.sprites[b + LEG_META].scaleY = 0f;
-                PlaceSegment(sLeaser.sprites[b + LEG_UPPER], root, ankle,
-                             front ? P_LEGA_UPPER_W : P_LEGB_UPPER_W,
-                             thick * (front ? P_LEGA_UPPER_H : P_LEGB_UPPER_H), faceSign, camPos);
-                FSprite singlePaw = sLeaser.sprites[b + LEG_PAW];
-                PlaceCentred(singlePaw, paw, fwd, thick * (front ? P_LEGA_PAW_W : P_LEGB_PAW_W),
-                             thick * (front ? P_LEGA_PAW_H : P_LEGB_PAW_H), faceSign, camPos);
-                CurlPaw(singlePaw, paw, ankle, p.PawCurlDeg * swing * faceSign, p.PawCurlPivotAnkle);
-                for (int k = 0; k < PARTS_LEG_SPRITES; k++) sLeaser.sprites[b + k].color = tint;
-                singlePaw.color = pawTint;
-                return;
-            }
 
             if (!front)
             {
@@ -824,12 +782,7 @@ namespace MotherMod
                          faceSign, camPos);
             CurlPaw(pawSprite, paw, ankle, p.PawCurlDeg * swing * faceSign, p.PawCurlPivotAnkle);
 
-            for (int k = 0; k < PARTS_LEG_SPRITES; k++) sLeaser.sprites[b + k].color = tint;
-            sLeaser.sprites[b + LEG_LOWER].color = lowerTint;
-            sLeaser.sprites[b + LEG_META].color = lowerTint;
-            sLeaser.sprites[b + LEG_JOINT].color = lowerTint;
-            sLeaser.sprites[b + LEG_JOINT2].color = lowerTint;
-            pawSprite.color = pawTint;
+            for (int k = 0; k < PARTS_LEG_SPRITES; k++) sLeaser.sprites[b + k].color = Color.white;
         }
 
         private Vector2 StabiliseKnee(FoxBreedParams p, int i, Vector2 raw)
@@ -944,14 +897,11 @@ namespace MotherMod
             if (wantEye != null && eye.element != wantEye) eye.element = wantEye;
 
             Vector2 neck = PartsNeck(p, chest, fwd);
-            DrawNeckPos = neck;
             DrawHeadPos = neck;
             float rock = Mathf.Lerp(lastWavePitchDeg, wavePitchDeg, timeStacker);
             float nod = HopBoingNodDeg(p, timeStacker);
             Vector2 dir = Custom.DegToVec(AimDeg(DrawHeadDir) - rock * faceSign + nod * faceSign);
             if (dir.sqrMagnitude > 0.0001f) DrawHeadDir = dir.normalized;
-            DrawHeadUp = new Vector2(-DrawHeadDir.y, DrawHeadDir.x);
-            if (DrawHeadUp.y < 0f) DrawHeadUp = -DrawHeadUp;
             DrawNosePos = DrawHeadPos + DrawHeadDir * (P_HEAD_W * 0.7f * partsScale);
 
             float scale = Mathf.Max(0.01f, p.HeadSpriteScale * p.HeadSize * partsScale);
@@ -962,7 +912,7 @@ namespace MotherMod
             s.rotation = AimDeg(DrawHeadDir) - 90f * faceSign;
             s.scaleX = scale * faceSign * fore;
             s.scaleY = scale;
-            s.color = PartsTint(p, p.ColorHead);
+            s.color = Color.white;
 
             eye.x = s.x;
             eye.y = s.y;
@@ -978,7 +928,7 @@ namespace MotherMod
             {
                 eye.scaleX = s.scaleX;
                 eye.scaleY = s.scaleY;
-                eye.color = InkEyeTint(p, PartsTint(p, EyeColor(p)));
+                eye.color = InkEyeTint(p, Color.white);
             }
         }
 
@@ -1057,9 +1007,9 @@ namespace MotherMod
 
             float gate = Mathf.Max(0.1f, p.GaitPairSpeed);
             pairBlend = Mathf.Clamp01((speedSmooth - gate) / (gate * 0.5f));
-            bool paired = p.GaitDiagonal && pairBlend >= 0.5f;
+            bool paired = pairBlend >= 0.5f;
 
-            bool walk4 = p.GaitWalkEnabled && p.GaitDiagonal && !paired
+            bool walk4 = !paired
                          && speedSmooth < p.GaitWalkTrotSpeed * (gaitWalk4 ? GAIT_WALK_HYSTERESIS : 1f);
             if (paired != gaitPaired || walk4 != gaitWalk4)
             {
@@ -1173,11 +1123,6 @@ namespace MotherMod
                 limbs[i].gaitGapFrac = 0f;
                 limbs[i].ClearGaitHold();
             }
-            if (!p.GaitDiagonal)
-            {
-                for (int i = 0; i < limbs.Length; i++) limbs[i].gaitPartner = limbs[i].otherLimbInPair;
-                return;
-            }
             if (gaitWalk4 && !gaitPaired && limbs.Length == 4)
             {
                 float shortGap = Mathf.Max(0f, p.StepGaitGapShort);
@@ -1197,7 +1142,6 @@ namespace MotherMod
             {
                 limbs[1].gaitPartner = limbs[0];
                 limbs[3].gaitPartner = limbs[1];
-                if (p.PartsGaitChainAll) limbs[2].gaitPartner = limbs[3];
             }
         }
 
@@ -1308,11 +1252,6 @@ namespace MotherMod
 
         private void UpdateHeadLook(FoxBreedParams p)
         {
-            if (!partsRigActive)
-            {
-                ServiceScentSniffWithoutParts(p);
-                return;
-            }
             if (!headPitchSeeded)
             {
                 headPitchDeg = lastHeadPitchDeg = p.HeadRestPitchDeg;
@@ -1373,7 +1312,7 @@ namespace MotherMod
             }
             else
             {
-                if (p.HeadNoiseEnabled && fox.AI != null)
+                if (fox.AI != null)
                 {
                     Vector2 np; int nage;
                     float selfRad = fox.bodyChunks[0].rad * 5f;
@@ -1396,7 +1335,7 @@ namespace MotherMod
                 }
                 else if (ScentSniffOpen)
                 {
-                    StartOrContinueScentSniff(p, "parts");
+                    StartOrContinueScentSniff(p);
                     want = HL_SCENT; headLookWhat = "scent";
                     headModeTicks = 0;
                 }
@@ -1429,7 +1368,7 @@ namespace MotherMod
                         want = HL_NEUTRAL;
                         headLookCooldown = JitterTicks(p.HeadLookCooldownTicks);
                     }
-                    else if (p.HeadIdleEnabled && idle && headLookCooldown <= 0)
+                    else if (idle && headLookCooldown <= 0)
                     {
                         float r = NextGlanceRandom();
                         if (r < p.HeadSniffChance)
@@ -1537,7 +1476,7 @@ namespace MotherMod
             get { return fox.ScentSniff.Open; }
         }
 
-        private void StartOrContinueScentSniff(FoxBreedParams p, string rig)
+        private void StartOrContinueScentSniff(FoxBreedParams p)
         {
             Fox.ScentSniffSeam s = fox.ScentSniff;
             if (scentSniffServing == s.RequestSerial) return;
@@ -1564,19 +1503,6 @@ namespace MotherMod
 
             scentSniffServing = 0;
             scentSniffLeft = 0;
-        }
-
-        private void ServiceScentSniffWithoutParts(FoxBreedParams p)
-        {
-            if (!ScentSniffOpen) return;
-            if (fox.dead)
-            {
-                CloseScentSniff(false, "dead");
-                return;
-            }
-            StartOrContinueScentSniff(p, "fallback");
-            scentSniffLeft--;
-            if (scentSniffLeft <= 0) CloseScentSniff(true, "no_parts_rig");
         }
 
         private bool TryMealPoint(out Vector2 at)
@@ -1612,29 +1538,7 @@ namespace MotherMod
 
         private Vector2 ApplyHeadLook(FoxBreedParams p, Vector2 target)
         {
-            if (!partsRigActive) return ApplyIdleGlance(p, target);
             return headLookHasPos ? headLookPos : target;
-        }
-
-        private Vector2 ApplyIdleGlance(FoxBreedParams p, Vector2 target)
-        {
-            if (p.IdleGlanceChance <= 0f || fox.chaseTarget != null)
-            {
-                glanceTicks = 0;
-                return target;
-            }
-            if (glanceTicks > 0)
-            {
-                glanceTicks--;
-            }
-            else if (NextGlanceRandom() < p.IdleGlanceChance)
-            {
-                glanceTicks = Mathf.Max(1, p.IdleGlanceTicks);
-                glanceDir = (NextGlanceRandom() < 0.5f) ? -1f : 1f;
-            }
-            if (glanceTicks <= 0) return target;
-            Vector2 perp = new Vector2(-bodyAxis.y, bodyAxis.x);
-            return target + perp * (glanceDir * p.IdleGlanceRange);
         }
     }
 }

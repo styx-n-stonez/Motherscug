@@ -59,9 +59,7 @@ namespace MotherMod
             if (c != null && c != pather.fallbackPathingCell) hereCell = c;
 
             PathCost.Legality ceiling = FoxPounceRouter.Ceiling(p);
-            float g, airFric;
-            fox.FlightArcInputs(p, out g, out airFric);
-            FoxArcModel arc = FoxArcModel.Of(p, g, airFric);
+            FoxArcModel arc = fox.HopArc(p);
 
             TickFinders(p, pather, room, arc, ceiling);
             bool onPath = PeekAhead(p, pather);
@@ -83,7 +81,7 @@ namespace MotherMod
                                  PathCost.Legality ceiling)
         {
             if (finders.Count == 0) return;
-            int iters = Math.Max(1, Math.Max(1, p.HopItersPerTick) / finders.Count);
+            int iters = Math.Max(1, p.HopItersPerTick / finders.Count);
             WorldCoordinate dest = pather.GetDestination;
             bool destHere = dest.TileDefined && dest.room == fox.abstractCreature.pos.room;
 
@@ -110,7 +108,7 @@ namespace MotherMod
             futurePath.Clear();
             bool onPath = false;
             WorldCoordinate walk = fox.abstractCreature.pos;
-            int steps = Math.Max(0, p.HopPeekSteps);
+            int steps = p.HopPeekSteps;
             for (int i = 0; i < steps; i++)
             {
                 MovementConnection step = pather.FollowPath(walk, false);
@@ -128,7 +126,7 @@ namespace MotherMod
         private void Seed(FoxBreedParams p, StandardPather pather, Room room, PathCost.Legality ceiling,
                           bool onPath)
         {
-            int cap = onPath ? 1 : Math.Max(0, p.HopMaxFinders);
+            int cap = onPath ? 1 : p.HopMaxFinders;
             if (finders.Count >= cap || futurePath.Count <= 1) return;
 
             WorldCoordinate here = fox.abstractCreature.pos;
@@ -144,7 +142,7 @@ namespace MotherMod
                 }
             }
             if (refuse == null && fox.TileIsCorridorLike(cand.Tile)) refuse = "corridor";
-            if (refuse == null && p.HopBlockNarrow && room.aimap.getAItile(cand.x, cand.y).narrowSpace) refuse = "narrow";
+            if (refuse == null && room.aimap.getAItile(cand.x, cand.y).narrowSpace) refuse = "narrow";
             PathFinder.PathingCell cell = null;
             if (refuse == null)
             {
@@ -263,9 +261,9 @@ namespace MotherMod
             internal float BestPower;
 
             private Vector2 pos, lastPos, vel, trialVel;
-            private float trialPower;
+            private float trialPower, trialPeak;
             private int trialTick;
-            private bool ventured;
+            private bool ventured, trialSnap;
 
             internal HopFinder(Fox fox, Room room, IntVector2 startTile, PathFinder.PathingCell startCell)
             {
@@ -289,8 +287,8 @@ namespace MotherMod
                 trialsSinceTaken++;
                 float power = UnityEngine.Random.value * Mathf.Sqrt(Mathf.Clamp01(fox.runSpeed));
                 if (room.aimap.getTerrainProximity(StartTile.x, StartTile.y) > 1) power *= 0.5f;
-                float speed = Mathf.Lerp(Mathf.Clamp01(p.HopMinSpeedFrac), 1f, power)
-                              * fox.EffectiveLaunchSpeed(p) * Mathf.Max(0f, p.HopSpeedFac);
+                float speed = Mathf.Lerp(p.HopLaunchSpeedMin, p.HopLaunchSpeedMax, power)
+                              * Mathf.Max(0f, p.HopSpeedFac);
                 if (fox.grasps != null && fox.grasps.Length > 0 && fox.grasps[0] != null)
                     speed *= Mathf.Max(0f, p.HopCarrySpeedFac);
                 HealthState hs = fox.abstractCreature != null ? fox.abstractCreature.state as HealthState : null;
@@ -302,12 +300,14 @@ namespace MotherMod
                 float rad = deg * Mathf.Deg2Rad;
                 Vector2 dir = new Vector2(Mathf.Sin(rad), Mathf.Cos(rad));
 
-                trialVel = Fox.LaunchVelocity(p, dir, speed);
+                trialVel = dir * speed;
                 trialPower = power;
                 pos = room.MiddleOfTile(StartTile.x, StartTile.y);
                 lastPos = pos;
                 vel = trialVel;
                 trialTick = 0;
+                trialPeak = 0f;
+                trialSnap = FoxHopLook.PlansSnap(p);
                 ventured = false;
             }
 
@@ -317,7 +317,10 @@ namespace MotherMod
                 bool improved = false;
                 lastPos = pos;
                 trialTick++;
-                arc.Step(ref vel, ref pos.x, ref pos.y, trialTick);
+                if (trialTick == 1 && trialSnap) pos += vel;
+                else arc.Step(ref vel, ref pos.x, ref pos.y, trialTick);
+                float rise = pos.y - room.MiddleOfTile(StartTile.x, StartTile.y).y;
+                if (rise > trialPeak) trialPeak = rise;
 
                 int n;
                 for (n = SharedPhysics.RayTracedTilesArray(lastPos, pos, trace);
@@ -336,9 +339,10 @@ namespace MotherMod
                 {
                     int tx = trace[i].x, ty = trace[i].y;
                     if (ty < 0 || room.GetTile(tx, ty).Solid || ty < room.defaultWaterLevel) { NewTrial(p, room); return improved; }
+                    if (tx < 0 || tx >= room.TileWidth) { NewTrial(p, room); return improved; }
                     int prevTy = i > 0 ? trace[i - 1].y : room.GetTilePosition(lastPos).y;
                     if (ty < prevTy && room.GetTile(tx, ty).Terrain == Room.Tile.TerrainType.Floor) { NewTrial(p, room); return improved; }
-                    if (p.HopBlockNarrow && room.aimap.getAItile(tx, ty).narrowSpace) { NewTrial(p, room); return improved; }
+                    if (room.aimap.getAItile(tx, ty).narrowSpace) { NewTrial(p, room); return improved; }
 
                     bool beam = room.GetTile(tx, ty).verticalBeam || room.GetTile(tx, ty).horizontalBeam;
                     int prox = room.aimap.getTerrainProximity(tx, ty);
@@ -348,7 +352,8 @@ namespace MotherMod
                         && room.aimap.TileAccessibleToCreature(tx, ty, fox.Template)
                         && !fox.ClimbTileBarsLeap(tx, ty)
                         && StartTile.FloatDist(trace[i]) > minOrigin
-                        && (!destHere || dest.Tile.FloatDist(trace[i]) > p.HopMinTilesDest))
+                        && (!destHere || dest.Tile.FloatDist(trace[i]) > p.HopMinTilesDest)
+                        && fox.LandingXInRoom(p, room.MiddleOfTile(tx, ty).x))
                     {
                         PathFinder.PathingCell cell = pather.PathingCellAtWorldCoordinate(room.GetWorldCoordinate(trace[i]));
                         if (cell != null && cell.costToGoal.legality <= ceiling
@@ -371,7 +376,7 @@ namespace MotherMod
                     }
                 }
 
-                if (trialTick > p.PounceFlightMaxFrames) NewTrial(p, room);
+                if (trialTick > p.HopFlightMaxFrames) NewTrial(p, room);
                 return improved;
             }
 
@@ -490,7 +495,7 @@ namespace MotherMod
 
         internal void NoteEnded(FoxBreedParams p, string reason, string stage, bool handover, bool touched,
                                 string outcome, Vector2 touchPos, int touchFrames, float aimErr,
-                                string launchRefusal, int ran)
+                                float apexPx, string launchRefusal, int ran)
         {
             Cooldown = Math.Max(Cooldown, Math.Max(0, p.HopCooldownTicks));
             FoxHopPlanner planner = fox.AI != null ? fox.AI.HopPlanner : null;

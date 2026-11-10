@@ -438,45 +438,9 @@
   "step_arc_lift": 3.5,
   "tail_length_vs_body": 1.95,
   "stalk_crouch_drop": 7.0,
-  "cosmetics": [
-    {
-      "layer": "Ears",
-      "size": 1.0,
-      "length": 11.5,
-      "width": 5.5,
-      "spread": 0.8,
-      "tilt": 20.0,
-      "flatten": 35.0,
-      "color": "FFFFFF"
-    },
-    {
-      "layer": "Snout",
-      "length": 8.0,
-      "width": 6.0,
-      "tip_width": 3.0,
-      "droop": 0.12,
-      "color": "FFFFFF",
-      "nose_size": 2.2,
-      "nose_color": "141414"
-    },
-    {
-      "layer": "BrushTail",
-      "tufts": 12,
-      "tuft_size": 3.0,
-      "tuft_spread": 0.85,
-      "tuft_droop": 0.3,
-      "tuft_follow_profile": 1.0,
-      "color": "FF1400"
-    }
-  ],
-  "color_body": "E7E7E7",
   "color_tail": "FF1400",
-  "color_tail_root": "FFFFFF",
   "color_head": "FFFFFF",
-  "color_legs": "DCDCDC",
   "color_leg_lower": "E7E7E7",
-  "color_paws": "C4C4C4",
-  "color_eye": "141414",
   "icon_color": "D8D8D8",
   "camo_enabled": true,
   "camo_blend_max": 1.0,

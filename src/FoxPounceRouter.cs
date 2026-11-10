@@ -30,8 +30,6 @@ namespace MotherMod
 
         private bool disabledLogged;
 
-        private bool clamberDisabledLogged;
-
         internal FoxPounceRouter(FoxAI ai, Fox fox)
         {
             this.ai = ai;
@@ -79,14 +77,7 @@ namespace MotherMod
                 disabledLogged = false;
             }
 
-            if (leapRouting && !p.PounceRouteWhilePatrolling
-                && ai.CurrentBehavior != FoxAI.Behavior.Hunt
-                && ai.CurrentBehavior != FoxAI.Behavior.Stalk)
-            {
-                leapRouting = false;
-            }
-
-            if (!leapRouting) ClearLeapSearch(p.PounceRouteEnabled ? "not_hunting" : "disabled");
+            if (!leapRouting) ClearLeapSearch("disabled");
 
             int now = fox.MoveTick;
 
@@ -115,7 +106,7 @@ namespace MotherMod
         {
             futurePath.Clear();
             WorldCoordinate walk = here;
-            int steps = Math.Max(1, p.PounceRoutePeekSteps);
+            int steps = p.PounceRoutePeekSteps;
             for (int i = 0; i < steps; i++)
             {
                 MovementConnection step = pather.FollowPath(walk, false);
@@ -135,7 +126,7 @@ namespace MotherMod
         {
             if (finders.Count == 0) return;
 
-            int iters = Math.Max(1, Math.Max(1, p.PounceRouteItersPerTick) / finders.Count);
+            int iters = Math.Max(1, p.PounceRouteItersPerTick / finders.Count);
 
             bool destReachable = pather.CoordinateReachable(pather.GetDestination);
 
@@ -159,7 +150,7 @@ namespace MotherMod
         private void SeedFinder(FoxBreedParams p, StandardPather pather, Room room,
                                 WorldCoordinate here, PathFinder.PathingCell hereCell)
         {
-            if (finders.Count >= Math.Max(1, p.PounceRouteMaxFinders)) return;
+            if (finders.Count >= p.PounceRouteMaxFinders) return;
 
             if (SeedFromWalkedPath(p, pather, room, here, hereCell)) return;
             SeedTowardGoal(p, pather, room, here, hereCell);
@@ -173,15 +164,12 @@ namespace MotherMod
                 return false;
             }
 
-            int attempts = 0, narrowHits = 0;
             WorldCoordinate pick = default(WorldCoordinate);
             PathFinder.PathingCell cell = null;
             bool have = false;
-            int lastNarrowX = -1, lastNarrowY = -1;
 
-            for (int a = 0; a < Math.Max(1, p.PounceRouteSeedAttemptsPerTick) && !have; a++)
+            for (int a = 0; a < p.PounceRouteSeedAttemptsPerTick && !have; a++)
             {
-                attempts++;
                 WorldCoordinate cand = futurePath[UnityEngine.Random.Range(0, futurePath.Count)];
                 if (!cand.TileDefined || cand.room != here.room) continue;
                 if (cand.Tile.FloatDist(here.Tile) <= 2f) continue;
@@ -192,22 +180,12 @@ namespace MotherMod
                 }
                 if (dup) continue;
 
-                if (p.PounceRouteBlockNarrow && room.aimap.getAItile(cand.x, cand.y).narrowSpace)
-                {
-                    narrowHits++;
-                    lastNarrowX = cand.x; lastNarrowY = cand.y;
-                    continue;
-                }
-
                 pick = cand;
                 cell = pather.PathingCellAtWorldCoordinate(cand);
                 have = true;
             }
 
-            if (!have)
-            {
-                return false;
-            }
+            if (!have) return false;
 
             string seedWhy;
             if (!Compare(hereCell, cell, Ceiling(p), out seedWhy))
@@ -224,10 +202,8 @@ namespace MotherMod
         private string GoalSeedMode(FoxBreedParams p, StandardPather pather, WorldCoordinate here,
                                     out WorldCoordinate dest, out bool destReachable)
         {
-            string status = WalkedRouteStatusOf(p, pather, here, futurePath.Count,
-                                                out dest, out destReachable);
-            if (!p.PounceRouteGoalSeedEnabled) return "off";
-            return status;
+            return WalkedRouteStatusOf(p, pather, here, futurePath.Count,
+                                       out dest, out destReachable);
         }
 
         private string WalkedRouteStatusOf(FoxBreedParams p, StandardPather pather, WorldCoordinate here,
@@ -271,7 +247,7 @@ namespace MotherMod
             PathFinder.PathingCell cell = null;
             bool have = false;
 
-            for (int a = 0; a < Math.Max(1, p.PounceRouteSeedAttemptsPerTick) && !have; a++)
+            for (int a = 0; a < p.PounceRouteSeedAttemptsPerTick && !have; a++)
             {
                 float along = Mathf.Lerp(2f, p.PounceRouteGoalSeedRadiusTiles, UnityEngine.Random.value);
                 float lat = (UnityEngine.Random.value * 2f - 1f) * p.PounceRouteGoalSeedLateralTiles;
@@ -329,11 +305,6 @@ namespace MotherMod
                     if (finders[i].StartTile == cand) { dup = true; break; }
                 }
                 if (dup) { continue; }
-
-                if (p.PounceRouteBlockNarrow && room.aimap.getAItile(cand.x, cand.y).narrowSpace)
-                {
-                    continue;
-                }
 
                 PathFinder.PathingCell candCell = pather.PathingCellAtWorldCoordinate(candCoord);
                 string why;
@@ -502,10 +473,6 @@ namespace MotherMod
             {
                 why = fox.PoleTileBarsLeap(t.x, t.y) ? "landing_is_pole" : "landing_is_wall"; return false;
             }
-            if (p.PounceRouteBlockNarrow && room.aimap.getAItile(t.x, t.y).narrowSpace)
-            {
-                why = "landing_narrow"; return false;
-            }
 
             if (plan.Kind == FoxAscentKind.Mantle)
             {
@@ -617,15 +584,6 @@ namespace MotherMod
         private void ClamberUpdate(FoxBreedParams p, StandardPather pather, Room room,
                                    WorldCoordinate here, PathFinder.PathingCell hereCell, int now)
         {
-            if (!p.MantleRouteEnabled)
-            {
-                if (!clamberDisabledLogged)
-                {
-                    clamberDisabledLogged = true;
-                }
-                return;
-            }
-            clamberDisabledLogged = false;
 
             string skip = ClamberSkipReason(p);
             if (skip != null)
@@ -703,10 +661,6 @@ namespace MotherMod
 
             if (!room.aimap.TileAccessibleToCreature(col, landRow, fox.Template)
                 || fox.ClimbTileBarsLeap(col, landRow))
-            {
-                return false;
-            }
-            if (p.PounceRouteBlockNarrow && room.aimap.getAItile(col, landRow).narrowSpace)
             {
                 return false;
             }
@@ -938,11 +892,6 @@ namespace MotherMod
                     int tx = trace[i].x, ty = trace[i].y;
 
                     if (ty < 0 || room.GetTile(tx, ty).Solid || ty < room.defaultWaterLevel)
-                    {
-                        NewTrial(p, room);
-                        return;
-                    }
-                    if (p.PounceRouteBlockNarrow && room.aimap.getAItile(tx, ty).narrowSpace)
                     {
                         NewTrial(p, room);
                         return;

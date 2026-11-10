@@ -80,7 +80,7 @@ namespace MotherMod
 
         public int ContactTicks(FoxBreedParams p)
         {
-            if (OnPole || OnWall || p == null || !p.StepTrueStance) return gripCounter;
+            if (OnPole || OnWall || p == null) return gripCounter;
             return trueStanceTicks;
         }
 
@@ -89,11 +89,11 @@ namespace MotherMod
         private const float PLANT_LEVEL_TOL_PX = 3f;
         private const float PLANT_CHORD_MARGIN_PX = 0.5f;
 
-        internal const int AHEAD_KEY_OFF = 2, AHEAD_NO_GEOMETRY = 3,
-                           AHEAD_ACTION = 4, AHEAD_TURN_STEP = 5, AHEAD_POSE = 6, AHEAD_AIRBORNE = 7,
-                           AHEAD_CORRIDOR = 8, AHEAD_CLIMBER = 9, AHEAD_WATER = 10, AHEAD_SLOW = 11,
-                           AHEAD_NOT_PLAIN = 12, AHEAD_NO_GROUND_ROOT = 13, AHEAD_NO_GROUND_AHEAD = 14,
-                           AHEAD_STEP = 15, AHEAD_BLOCKED = 16, AHEAD_OUT_OF_REACH = 17
+        internal const int AHEAD_NO_GEOMETRY = 2,
+                           AHEAD_ACTION = 3, AHEAD_TURN_STEP = 4, AHEAD_POSE = 5, AHEAD_AIRBORNE = 6,
+                           AHEAD_CORRIDOR = 7, AHEAD_CLIMBER = 8, AHEAD_WATER = 9, AHEAD_SLOW = 10,
+                           AHEAD_NOT_PLAIN = 11, AHEAD_NO_GROUND_ROOT = 12, AHEAD_NO_GROUND_AHEAD = 13,
+                           AHEAD_STEP = 14, AHEAD_BLOCKED = 15, AHEAD_OUT_OF_REACH = 16
                            ;
 
         private int pendingReleaseWhy;
@@ -205,7 +205,7 @@ namespace MotherMod
             jointDist = 25f * ((p.BodySizeFac + 1f) / 2f) * Mathf.Max(0.05f, p.LimbLengthFac)
                         * crouchFac * squeezeFac * layFac;
 
-            float floorFold = p.StepReachFloorFollowsFold ? (squeezeFac * layFac) : 1f;
+            float floorFold = squeezeFac * layFac;
             float clampFac = Mathf.Clamp(p.StepReachClampFac, 0.1f, 2f);
             groundReach = (gfx != null) ? gfx.LegGroundReach(limbNumber) * crouchFac * floorFold : 0f;
             if (groundReach > 0f)
@@ -281,7 +281,7 @@ namespace MotherMod
             {
                 turnStepArmed = false;
             }
-            else if (p.PartsTurnStep && !turnStepArmed && turnProg >= TurnStepAt(p))
+            else if (!turnStepArmed && turnProg >= TurnStepAt(p))
             {
                 turnStepArmed = true;
                 turnStepping = true;
@@ -304,7 +304,6 @@ namespace MotherMod
             }
 
             Vector2 axis = gfx.BodyAxis;
-            if (connection.index == 2 && p.StepHindAxisFlip) axis *= -1f;
             axis = Vector2.Lerp(axis, Fox.Dir(attachPos, gfx.LimbsAimFor), 0.4f).normalized;
 
             float behind = DistanceToPerpendicular(pos, attachPos, axis);
@@ -322,7 +321,7 @@ namespace MotherMod
                 reachingForTerrain = true;
                 swingTicks = 0;
                 swingPhase = 0f;
-                if (p.StepPlantWorldLock) absoluteHuntPos = plantTarget;
+                absoluteHuntPos = plantTarget;
                 huntSpeed = PawSpeed(p, 1f);
                 plantedTicks++;
                 commitTicks = 0;
@@ -486,7 +485,7 @@ namespace MotherMod
                 {
                     EnterSwing();
                 }
-                else if (reachedSnapPosition || PlantedNow(p)
+                else if (reachedSnapPosition || PlantedNow()
                          || commitTicks >= Mathf.Max(1, p.StepPlantCommitTicks))
                 {
                     stepStance = true;
@@ -882,7 +881,6 @@ namespace MotherMod
             plant = attachPos;
             Fox fox = gfx.fox;
 
-            if (!p.StepPlantAhead) return RefuseAhead(AHEAD_KEY_OFF);
             if (groundReach <= 0f || standDrop <= 1f) return RefuseAhead(AHEAD_NO_GEOMETRY);
             if (fox.Move != null && fox.Move.AnyRunning) return RefuseAhead(AHEAD_ACTION);
             if (turnStepping || fox.TurnProgress > 0f) return RefuseAhead(AHEAD_TURN_STEP);
@@ -1025,10 +1023,10 @@ namespace MotherMod
             swingPhase = 0f;
         }
 
-        private bool PlantedNow(FoxBreedParams p)
+        private bool PlantedNow()
         {
             if (OverLappingHuntPos) return true;
-            return p.StepPlantWorldLock && plantCommitted && gripCounter > 0
+            return plantCommitted && gripCounter > 0
                    && Custom.DistLess(plantTarget, attachPos, jointDist - 1f);
         }
 
@@ -1036,7 +1034,6 @@ namespace MotherMod
         {
             Vector2 rel = target - attachPos;
             lastTargetAbove = Vector2.Dot(rel, gfx.BodyUp);
-            if (!p.StepTargetClamp) return target;
 
             bool climber = gfx.fox.IsWallClimber;
 

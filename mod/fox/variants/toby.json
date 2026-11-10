@@ -364,49 +364,12 @@
   "bite_stun_bonus": 90,
   "bite_cooldown": 32,
   "charge_enabled": true,
-  "toby_draw": 3,
-  "parts_mask": true,
+  "toby_frames_enabled": true,
   "climbs_walls": true,
   "climbs_poles": true,
   "pheromone_enabled": true,
-  "cosmetics": [
-    {
-      "layer": "Ears",
-      "size": 1.0,
-      "length": 11.0,
-      "width": 4.5,
-      "spread": 0.8,
-      "tilt": 22.0,
-      "flatten": 35.0,
-      "color": "FFFFFF"
-    },
-    {
-      "layer": "Snout",
-      "length": 9.0,
-      "width": 5.5,
-      "tip_width": 2.6,
-      "droop": 0.12,
-      "color": "FFFFFF",
-      "nose_size": 2.4,
-      "nose_color": "0A0A0A"
-    },
-    {
-      "layer": "BrushTail",
-      "tufts": 9,
-      "tuft_size": 2.2,
-      "tuft_spread": 0.85,
-      "tuft_droop": 0.3,
-      "tuft_follow_profile": 1.0,
-      "color": "E7E7E7"
-    }
-  ],
-  "color_body": "E7E7E7",
   "color_tail": "E7E7E7",
-  "color_tail_root": "FFFFFF",
   "color_head": "FFFFFF",
-  "color_legs": "DCDCDC",
   "color_leg_lower": "E7E7E7",
-  "color_paws": "C4C4C4",
-  "color_eye": "0A0A0A",
   "icon_color": "D8D8D8"
 }

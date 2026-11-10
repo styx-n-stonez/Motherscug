@@ -15,19 +15,29 @@ namespace MotherMod
             internal Creature Thrower;
             internal Vector2 ThrownPos;
             internal int State;
-            internal int DecideTick;
+            internal int FirstTick;
             internal int LastSeenTick;
+            internal int Gate = -1;
+            internal string GateDetail;
+            internal readonly int[] GateTicks = new int[EVADE_GATE_NAMES.Length];
             internal int ImpactTicks;
             internal int DodgeTick;
             internal string Move;
+            internal bool Rolled;
             internal float Roll;
             internal string SkipReason;
-            internal float MissPx;
         }
 
         private const int EVADE_DONE = 0;
-        private const int EVADE_ARMED = 1;
+        private const int EVADE_OPEN = 1;
         private const int EVADE_DODGED = 2;
+
+        private const int EVADE_GATE_OFF_PATH = 0;
+        private const int EVADE_GATE_BUSY = 1;
+        private const int EVADE_GATE_COOLDOWN = 2;
+        private const int EVADE_GATE_UNSEEN = 3;
+        private const int EVADE_GATE_NO_MOVE = 4;
+        private static readonly string[] EVADE_GATE_NAMES = { "off_path", "busy", "cooldown", "unseen", "no_move" };
 
         private const int EVADE_MAX_RECS = 16;
 
@@ -35,10 +45,23 @@ namespace MotherMod
 
         private const int EVADE_MAX_TRACE_TICKS = 40;
 
+        private const int EVADE_LIFT_TRIES = 3;
+
+        private const float EVADE_LIFT_MARGIN = 1f;
+
+        private const int EVADE_LAND_GRACE_TICKS = 4;
+
+        private const int EVADE_FLOOR_SCAN_ROWS = 12;
+
         private List<EvadeRec> evadeRecs;
 
         private int evadeStaggerUntil = int.MinValue / 2;
         private int evadeCooldownUntil = int.MinValue / 2;
+
+        private bool evadeDodgeOpen;
+        private int evadeDodgeTick;
+        private int evadeLandBy;
+        private bool evadeResumePending;
 
         private Vector2[] evadeBodyPos;
         private float[] evadeRise;
@@ -70,11 +93,13 @@ namespace MotherMod
 
         internal bool EvadeStaggering { get { return GameTick < evadeStaggerUntil; } }
 
+        internal bool EvadeLandingOwned { get { return evadeDodgeOpen && GameTick <= evadeLandBy; } }
+
         private struct EvadeTrace
         {
             internal int HitTick;
             internal float MinClear;
-            internal int MinClearTick;
+            internal float AimDy;
             internal int StopTick;
         }
 
@@ -104,154 +129,120 @@ namespace MotherMod
             if (rec != null)
             {
                 rec.LastSeenTick = now;
-                if (rec.State == EVADE_ARMED) EvadeArmedTick(p, rec);
-                return;
+                if (rec.State != EVADE_OPEN) return;
             }
 
             int horizon = Math.Max(1, p.EvasionReactionMaxTicks);
-            PrepareEvadeBody(false, 0f, 0f);
-            EvadeTrace t = TraceSpear(weapon, 0, horizon);
-            float clearNow = SpearClearNow(weapon);
-            bool hits = t.HitTick > 0;
-            bool passes = !hits && t.MinClear < clearNow && (t.MinClearTick < horizon || t.StopTick >= 0);
-            if (!hits && !passes) return;
+            int min = p.EvasionReactionMinTicks;
+            float pad = Mathf.Max(0f, p.EvasionPadPx);
+            bool air = !Grounded;
+            PrepareEvadeBody(0f, air, air ? bodyChunks[0].vel.y : 0f, Mathf.Max(0.05f, gravity));
+            EvadeTrace t = TraceSpear(weapon, 0, horizon, pad);
+            bool threat = t.HitTick > 0;
 
-            if (passes && t.StopTick >= 0 && t.MinClearTick == t.StopTick)
+            if (rec == null)
             {
+                if (!threat) return;
+                rec = new EvadeRec
+                {
+                    Spear = weapon,
+                    Thrower = weapon.thrownBy,
+                    ThrownPos = weapon.thrownPos,
+                    State = EVADE_OPEN,
+                    FirstTick = now,
+                    LastSeenTick = now,
+                    ImpactTicks = t.HitTick,
+                    Move = "none",
+                    SkipReason = "none",
+                };
+                if (evadeRecs.Count >= EVADE_MAX_RECS) DropOldestEvadeRec();
+                evadeRecs.Add(rec);
+            }
+            if (threat) rec.ImpactTicks = t.HitTick;
+
+            int gate = -1;
+            string detail = null;
+            if (!threat) gate = EVADE_GATE_OFF_PATH;
+            else if ((detail = EvadeBusy()) != null) gate = EVADE_GATE_BUSY;
+            else if (now < evadeCooldownUntil) gate = EVADE_GATE_COOLDOWN;
+            else if (AI == null || !AI.VisualContact(weapon.firstChunk)) gate = EVADE_GATE_UNSEEN;
+
+            bool closed = threat && t.HitTick < min;
+
+            if (gate >= 0)
+            {
+                EvadeGate(rec, gate, detail);
+                if (closed) EvadeClose(rec, "window_closed");
+                return;
+            }
+            if (closed)
+            {
+                EvadeClose(rec, rec.Gate < 0 ? "inside_min" : "window_closed");
                 return;
             }
 
-            rec = new EvadeRec
+            if (!rec.Rolled)
             {
-                Spear = weapon,
-                Thrower = weapon.thrownBy,
-                ThrownPos = weapon.thrownPos,
-                State = EVADE_DONE,
-                DecideTick = now,
-                LastSeenTick = now,
-                ImpactTicks = t.HitTick,
-                Move = "none",
-                SkipReason = "none",
-                MissPx = t.MinClear,
-            };
-            if (evadeRecs.Count >= EVADE_MAX_RECS) DropOldestEvadeRec();
-            evadeRecs.Add(rec);
+                rec.Rolled = true;
+                rec.Roll = UnityEngine.Random.value;
+                if (p.EvasionChance < 1f && rec.Roll >= p.EvasionChance)
+                {
+                    rec.State = EVADE_DONE;
+                    rec.SkipReason = "roll";
+                    return;
+                }
+            }
 
-            string busy = EvadeBusy();
-            if (busy != null)
-            {
-                rec.SkipReason = "busy";
-                return;
-            }
-            if (now < evadeCooldownUntil)
-            {
-                rec.SkipReason = "cooldown";
-                return;
-            }
-            if (AI == null || !AI.VisualContact(weapon.firstChunk))
-            {
-                rec.SkipReason = "unseen";
-                return;
-            }
-            if (!hits)
-            {
-                rec.SkipReason = "off_path";
-                return;
-            }
-            if (t.HitTick < p.EvasionReactionMinTicks)
-            {
-                rec.SkipReason = "point_blank";
-                return;
-            }
-            float roll = UnityEngine.Random.value;
-            rec.Roll = roll;
-            if (p.EvasionChance < 1f && roll >= p.EvasionChance)
-            {
-                rec.SkipReason = "roll";
-                return;
-            }
-            rec.State = EVADE_ARMED;
-            EvadeArmedTick(p, rec);
+            EvadeTryMove(p, rec, t, pad);
         }
 
-        private void EvadeArmedTick(FoxBreedParams p, EvadeRec rec)
+        private static bool EvadeGate(EvadeRec rec, int gate, string detail)
+        {
+            rec.GateTicks[gate]++;
+            bool changed = rec.Gate != gate || rec.GateDetail != detail;
+            rec.Gate = gate;
+            rec.GateDetail = detail;
+            return changed;
+        }
+
+        private void EvadeClose(EvadeRec rec, string why)
+        {
+            rec.State = EVADE_DONE;
+            rec.SkipReason = rec.Gate < 0 ? "point_blank" : EVADE_GATE_NAMES[rec.Gate];
+        }
+
+        private void EvadeTryMove(FoxBreedParams p, EvadeRec rec, EvadeTrace t, float pad)
         {
             int now = GameTick;
             Weapon w = rec.Spear;
             int horizon = Math.Max(1, p.EvasionReactionMaxTicks);
-            int min = p.EvasionReactionMinTicks;
-
-            PrepareEvadeBody(false, 0f, 0f);
-            EvadeTrace t = TraceSpear(w, 0, horizon);
-            if (t.HitTick <= 0)
-            {
-                if (t.StopTick >= 0 && t.MinClearTick == t.StopTick) return;
-                rec.State = EVADE_DONE;
-                rec.SkipReason = "off_path";
-                rec.MissPx = t.MinClear;
-                return;
-            }
-            string busy = EvadeBusy();
-            if (busy != null)
-            {
-                rec.State = EVADE_DONE;
-                rec.SkipReason = "busy";
-                return;
-            }
-            if (now < evadeCooldownUntil)
-            {
-                rec.State = EVADE_DONE;
-                rec.SkipReason = "cooldown";
-                return;
-            }
-            if (t.HitTick < min)
-            {
-                rec.State = EVADE_DONE;
-                rec.SkipReason = "no_move";
-                return;
-            }
-
             int traceTicks = Math.Min(EVADE_MAX_TRACE_TICKS, t.HitTick + horizon);
-            string duckWhy, hopWhy;
-            float duckClear = 0f, hopClear = 0f, dropPx = 0f, impulse = 0f;
+            float g = Mathf.Max(0.05f, gravity);
+            float pop = Mathf.Max(0f, p.EvasionDodgePop);
+            float maxLift = Mathf.Max(0f, p.EvasionDodgeMaxPx);
+
+            bool duckFirst = t.AimDy > 0f;
+            string upWhy = "not_tried", duckWhy = "not_tried";
+            float lift = 0f, upClear = 0f, dropPx = 0f, duckClear = 0f;
+            int landTicks = 0;
             string chosen = null;
-
-            if (!Grounded)
+            for (int pass = 0; pass < 2 && chosen == null; pass++)
             {
-                duckWhy = hopWhy = Swimming ? "swimming" : "airborne";
-            }
-            else
-            {
-                dropPx = PrepareDuckBody();
-                if (dropPx < 0.5f) duckWhy = "no_drop";
-                else
+                if ((pass == 0) == duckFirst)
                 {
-                    EvadeTrace d = TraceSpear(w, 0, traceTicks);
-                    duckClear = d.MinClear;
-                    duckWhy = d.HitTick > 0 ? "still_hit" : "clears";
-                    if (d.HitTick <= 0) chosen = "duck";
+                    duckWhy = EvadeTryDuck(w, traceTicks, pad, out dropPx, out duckClear);
+                    if (duckWhy == "clears") chosen = "duck";
                 }
-
-                float g = Mathf.Max(0.05f, gravity);
-                impulse = FoxStepUpAction.HopImpulse(p, g);
-                if (chosen != null) hopWhy = "not_tried";
-                else if (!HopHeadroom(impulse, g)) hopWhy = "ceiling";
                 else
                 {
-                    float vy0 = Mathf.Max(MaxChunkVelY(), impulse);
-                    PrepareEvadeBody(true, vy0, g);
-                    EvadeTrace h = TraceSpear(w, 1, traceTicks);
-                    hopClear = h.MinClear;
-                    hopWhy = h.HitTick > 0 ? "still_hit" : "clears";
-                    if (h.HitTick <= 0) chosen = "hop";
+                    upWhy = EvadeTryUp(w, traceTicks, pad, pop, maxLift, g, out lift, out upClear, out landTicks);
+                    if (upWhy == "clears") chosen = "up";
                 }
             }
 
             if (chosen == null)
             {
-                if (t.HitTick - 1 >= min) return;
-                rec.State = EVADE_DONE;
-                rec.SkipReason = "no_move";
+                EvadeGate(rec, EVADE_GATE_NO_MOVE, "up_" + upWhy + "+duck_" + duckWhy);
                 return;
             }
 
@@ -263,6 +254,11 @@ namespace MotherMod
             {
                 move.Pounce.End(p, "evaded");
             }
+            if (move != null && move.Turn.Running)
+            {
+                move.Turn.End(p, "evaded");
+            }
+
             if (chosen == "duck")
             {
                 for (int i = 0; i < bodyChunks.Length; i++)
@@ -274,22 +270,62 @@ namespace MotherMod
             else
             {
                 for (int i = 0; i < bodyChunks.Length; i++)
-                    bodyChunks[i].vel.y = Mathf.Max(bodyChunks[i].vel.y, impulse);
+                {
+                    bodyChunks[i].pos.y += lift;
+                    bodyChunks[i].vel.y = Mathf.Max(bodyChunks[i].vel.y, pop);
+                }
             }
             int stagger = Math.Max(0, p.EvasionStaggerTicks);
             int cooldown = Math.Max(0, p.EvasionCooldownTicks);
             evadeStaggerUntil = now + stagger;
             evadeCooldownUntil = now + cooldown;
+            evadeDodgeOpen = true;
+            evadeDodgeTick = now;
+            evadeLandBy = now + landTicks + EVADE_LAND_GRACE_TICKS;
+            evadeResumePending = true;
             rec.State = EVADE_DODGED;
             rec.DodgeTick = now;
             rec.ImpactTicks = t.HitTick;
             rec.Move = chosen;
             rec.SkipReason = "dodged";
-            rec.MissPx = chosen == "duck" ? duckClear : hopClear;
+        }
+
+        private string EvadeTryUp(Weapon w, int traceTicks, float pad, float pop, float maxLift,
+                                  float g, out float lift, out float clear, out int landTicks)
+        {
+            lift = 0f;
+            clear = 0f;
+            landTicks = 0;
+            for (int i = 0; ; i++)
+            {
+                PrepareEvadeBody(lift, false, 0f, g);
+                EvadeTrace held = TraceSpear(w, 1, traceTicks, pad);
+                if (held.HitTick <= 0) break;
+                if (i >= EVADE_LIFT_TRIES) return "still_hit";
+                lift += -held.MinClear + EVADE_LIFT_MARGIN;
+                if (lift > maxLift) return "too_far";
+                if (!EvadeHeadroom(lift, pop, g)) return "ceiling";
+            }
+            if (lift <= 0f) return "no_overlap";
+            landTicks = PrepareEvadeBody(lift, true, Mathf.Max(MaxChunkVelY(), pop), g);
+            EvadeTrace arc = TraceSpear(w, 1, traceTicks, pad);
+            clear = arc.MinClear;
+            return arc.HitTick > 0 ? "falls_back" : "clears";
+        }
+
+        private string EvadeTryDuck(Weapon w, int traceTicks, float pad, out float dropPx, out float clear)
+        {
+            clear = 0f;
+            dropPx = PrepareDuckBody();
+            if (dropPx < 0.5f) return "no_drop";
+            EvadeTrace d = TraceSpear(w, 0, traceTicks, pad);
+            clear = d.MinClear;
+            return d.HitTick > 0 ? "still_hit" : "clears";
         }
 
         private void TickEvasion()
         {
+            if (evadeDodgeOpen || evadeResumePending) TickEvadeBody();
             if (evadeRecs == null || evadeRecs.Count == 0) return;
             int now = GameTick;
             int window = Math.Max(1, P.EvasionReactionMaxTicks);
@@ -306,12 +342,35 @@ namespace MotherMod
                     }
                     continue;
                 }
-                if (r.State == EVADE_ARMED && (!flying || now - r.LastSeenTick > 2))
+                if (r.State == EVADE_OPEN && (!flying || now - r.LastSeenTick > 2))
                 {
+                    EvadeClose(r, flying ? "lost_spear" : "stopped_flying");
                     evadeRecs.RemoveAt(i);
                     continue;
                 }
                 if (r.State == EVADE_DONE && !flying) evadeRecs.RemoveAt(i);
+            }
+        }
+
+        private void TickEvadeBody()
+        {
+            int now = GameTick;
+            if (evadeDodgeOpen && now >= evadeDodgeTick + 2)
+            {
+                string how = null;
+                if (dead || disabled || room == null || bodyChunks == null) how = "ended";
+                else if (inShortcut || EngineOwnsBody) how = "shortcut";
+                else if (PoleHeld || WallHeld) how = "surface";
+                else if (Submersion > 0f) how = "water";
+                else if (Grounded) how = "ground";
+                if (how != null)
+                {
+                    evadeDodgeOpen = false;
+                }
+            }
+            if (evadeResumePending && !evadeDodgeOpen && !EvadeStaggering)
+            {
+                evadeResumePending = false;
             }
         }
 
@@ -328,9 +387,10 @@ namespace MotherMod
             {
                 r.SkipReason = "hit_after_dodge";
             }
-            else if (r.State == EVADE_ARMED)
+            else
             {
-                r.SkipReason = "hit_before_move";
+                bool open = r.State == EVADE_OPEN;
+                if (open) r.SkipReason = r.Gate < 0 ? "none" : EVADE_GATE_NAMES[r.Gate];
             }
             r.State = EVADE_DONE;
         }
@@ -343,6 +403,10 @@ namespace MotherMod
                 EvadeRec r = evadeRecs[i];
                 if (!ReferenceEquals(r.Spear, w)) continue;
                 if (ReferenceEquals(r.Thrower, w.thrownBy) && r.ThrownPos == w.thrownPos) return r;
+                if (r.State == EVADE_DODGED)
+                {
+                }
+                else if (r.State == EVADE_OPEN) EvadeClose(r, "rethrown");
                 evadeRecs.RemoveAt(i);
                 return null;
             }
@@ -375,12 +439,15 @@ namespace MotherMod
             if (WallHeld || WallOwnsGravity) return "wall";
             if (ClimbOwnsGravity) return "climb";
             if (EngineOwnsBody || inShortcut) return "shortcut";
-            string action = move != null ? move.RunningActionNameExcept(move.Charge, move.Pounce) : null;
+            if (evadeDodgeOpen) return "dodging";
+            if (Swimming) return "swimming";
+            if (!Grounded) return "airborne";
+            string action = move != null ? move.RunningActionNameExcept(move.Charge, move.Pounce, move.Turn) : null;
             if (action != null) return "action_" + action;
             return null;
         }
 
-        private void PrepareEvadeBody(bool ballistic, float vy0, float g)
+        private int PrepareEvadeBody(float lift, bool arc, float vy0, float g)
         {
             int n = bodyChunks.Length;
             if (evadeBodyPos == null || evadeBodyPos.Length != n) evadeBodyPos = new Vector2[n];
@@ -388,29 +455,68 @@ namespace MotherMod
             if (evadeRise == null || evadeRise.Length < EVADE_MAX_TRACE_TICKS + 1)
                 evadeRise = new float[EVADE_MAX_TRACE_TICKS + 1];
 
-            if (!ballistic && !Grounded)
+            evadeRise[0] = lift;
+            if (!arc)
             {
-                ballistic = true;
-                vy0 = bodyChunks[0].vel.y;
-                g = Mathf.Max(0.05f, gravity);
+                for (int k = 1; k <= EVADE_MAX_TRACE_TICKS; k++) evadeRise[k] = lift;
+                return 0;
             }
-            evadeRise[0] = 0f;
-            float vy = vy0, y = 0f;
+            float ground = -EvadeFloorGap();
+            float vy = vy0, y = lift;
+            int land = -1;
             for (int k = 1; k <= EVADE_MAX_TRACE_TICKS; k++)
             {
-                if (ballistic)
+                if (land < 0)
                 {
                     vy -= g;
                     vy *= airFriction;
                     y += vy;
+                    if (y <= ground)
+                    {
+                        y = ground;
+                        land = k;
+                    }
                 }
                 evadeRise[k] = y;
             }
+            return land < 0 ? EVADE_MAX_TRACE_TICKS : land;
+        }
+
+        private float EvadeFloorGap()
+        {
+            float best = float.MaxValue;
+            for (int i = 0; i < bodyChunks.Length; i++)
+            {
+                BodyChunk c = bodyChunks[i];
+                int col = room.GetTilePosition(c.pos).x;
+                int bottomRow = room.GetTilePosition(new Vector2(c.pos.x, c.pos.y - c.rad)).y;
+                for (int supportRow = bottomRow; supportRow >= bottomRow - EVADE_FLOOR_SCAN_ROWS; supportRow--)
+                {
+                    IntVector2 tile = new IntVector2(col, supportRow);
+                    Room.Tile.TerrainType tt = room.GetTile(tile).Terrain;
+                    float restY;
+                    if (tt == Room.Tile.TerrainType.Solid || tt == Room.Tile.TerrainType.Floor)
+                    {
+                        restY = (supportRow + 1) * 20f + c.rad;
+                    }
+                    else if (tt == Room.Tile.TerrainType.Slope)
+                    {
+                        Room.SlopeDirection sd = room.IdentifySlope(tile);
+                        if (sd != Room.SlopeDirection.UpLeft && sd != Room.SlopeDirection.UpRight) continue;
+                        float u = Mathf.Clamp(c.pos.x - col * 20f, 0f, 20f);
+                        restY = supportRow * 20f + (sd == Room.SlopeDirection.UpLeft ? u : 20f - u) + 2f * c.rad;
+                    }
+                    else continue;
+                    best = Mathf.Min(best, Mathf.Max(0f, c.pos.y - restY));
+                    break;
+                }
+            }
+            return best;
         }
 
         private float PrepareDuckBody()
         {
-            PrepareEvadeBody(false, 0f, 0f);
+            PrepareEvadeBody(0f, false, 0f, 0f);
             float maxDrop = 0f;
             for (int i = 0; i < bodyChunks.Length; i++)
             {
@@ -434,16 +540,15 @@ namespace MotherMod
                 evadeBodyPos[i].y = c.pos.y - drop;
                 if (drop > maxDrop) maxDrop = drop;
             }
-            for (int k = 0; k < evadeRise.Length; k++) evadeRise[k] = 0f;
             return maxDrop;
         }
 
-        private EvadeTrace TraceSpear(Weapon w, int lag, int ticks)
+        private EvadeTrace TraceSpear(Weapon w, int lag, int ticks, float pad)
         {
             EvadeTrace t;
             t.HitTick = -1;
             t.MinClear = float.MaxValue;
-            t.MinClearTick = -1;
+            t.AimDy = 0f;
             t.StopTick = -1;
 
             BodyChunk sc = w.firstChunk;
@@ -452,7 +557,7 @@ namespace MotherMod
             float g = w.gravity;
             float lift = (w is Spear) ? SPEAR_THROWN_LIFT : 0f;
             float af = w.airFriction;
-            float projRad = SpearHitRad(w);
+            float projRad = SpearHitRad(w) + pad;
             ticks = Math.Min(ticks, EVADE_MAX_TRACE_TICKS);
 
             IntVector2 dir = ThrowDirOf(w);
@@ -510,13 +615,16 @@ namespace MotherMod
                     {
                         Vector2 c = new Vector2(evadeBodyPos[i].x + bodyChunks[i].vel.x * kb,
                                                 evadeBodyPos[i].y + evadeRise[kb]);
-                        float clear = Vector2.Distance(Custom.ClosestPointOnLineSegment(prev, s, c), c)
-                                      - (bodyChunks[i].rad + projRad);
-                        if (clear < t.MinClear) { t.MinClear = clear; t.MinClearTick = k; }
+                        Vector2 near = Custom.ClosestPointOnLineSegment(prev, s, c);
+                        float clear = Vector2.Distance(near, c) - (bodyChunks[i].rad + projRad);
+                        if (clear < t.MinClear)
+                        {
+                            t.MinClear = clear;
+                            t.AimDy = near.y - c.y;
+                        }
                         if (clear < 0f && t.HitTick < 0) t.HitTick = k;
                     }
                 }
-                if (t.HitTick > 0) return t;
 
                 if (contact == dir)
                 {
@@ -680,17 +788,6 @@ namespace MotherMod
             return true;
         }
 
-        private float SpearClearNow(Weapon w)
-        {
-            float best = float.MaxValue;
-            for (int i = 0; i < bodyChunks.Length; i++)
-            {
-                float clear = Vector2.Distance(w.firstChunk.pos, bodyChunks[i].pos) - (bodyChunks[i].rad + SpearHitRad(w));
-                if (clear < best) best = clear;
-            }
-            return best;
-        }
-
         private static float SpearHitRad(Weapon w)
         {
             return w.firstChunk.rad + ((w.thrownBy != null && w.thrownBy is Player) ? 5f : 0f);
@@ -703,20 +800,40 @@ namespace MotherMod
             return m;
         }
 
-        private bool HopHeadroom(float impulse, float g)
+        private bool EvadeHeadroom(float lift, float pop, float g)
         {
-            float apex = impulse * impulse / (2f * g);
+            float reach = lift + pop * pop / (2f * g);
             for (int i = 0; i < bodyChunks.Length; i++)
             {
                 BodyChunk c = bodyChunks[i];
-                for (float dy = c.rad; dy <= apex + c.rad; dy += 10f)
+                float top = reach + c.rad;
+                float side = Mathf.Max(0f, c.rad - 1f);
+                for (float dy = c.rad; ; dy += 10f)
                 {
-                    Room.Tile.TerrainType tt = room.GetTile(c.pos + new Vector2(0f, dy)).Terrain;
-                    if (tt == Room.Tile.TerrainType.Solid || tt == Room.Tile.TerrainType.Slope) return false;
+                    if (dy > top) dy = top;
+                    for (int sx = -1; sx <= 1; sx++)
+                    {
+                        if (EvadePointInTerrain(c.pos + new Vector2(sx * side, dy))) return false;
+                    }
+                    if (dy >= top) break;
                 }
-                Room.Tile.TerrainType top = room.GetTile(c.pos + new Vector2(0f, apex + c.rad)).Terrain;
-                if (top == Room.Tile.TerrainType.Solid || top == Room.Tile.TerrainType.Slope) return false;
             }
+            return true;
+        }
+
+        private bool EvadePointInTerrain(Vector2 pt)
+        {
+            IntVector2 tile = room.GetTilePosition(pt);
+            Room.Tile.TerrainType tt = room.GetTile(tile).Terrain;
+            if (tt == Room.Tile.TerrainType.Solid) return true;
+            if (tt != Room.Tile.TerrainType.Slope) return false;
+            float u = Mathf.Clamp(pt.x - tile.x * 20f, 0f, 20f);
+            float bottom = tile.y * 20f;
+            Room.SlopeDirection sd = room.IdentifySlope(tile);
+            if (sd == Room.SlopeDirection.UpLeft) return pt.y < bottom + u;
+            if (sd == Room.SlopeDirection.UpRight) return pt.y < bottom + 20f - u;
+            if (sd == Room.SlopeDirection.DownLeft) return pt.y > bottom + 20f - u;
+            if (sd == Room.SlopeDirection.DownRight) return pt.y > bottom + u;
             return true;
         }
     }

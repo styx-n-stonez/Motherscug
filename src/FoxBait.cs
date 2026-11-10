@@ -106,25 +106,22 @@ namespace MotherMod
                 Vector2 v = LaunchVelocity(p, dir, EffectiveLaunchSpeed(p) * frac);
 
                 Vector2 predicted;
-                if (p.PounceRoomClamp && !PredictedLandingInRoomFrom(p, from, v, out predicted))
+                if (!PredictedLandingInRoomFrom(p, from, v, out predicted))
                 {
                     why = "leaves_room";
                     aimName = a == 0 ? "bait" : (a == 1 ? "far" : "upper");
                     landAt = predicted;
                     return false;
                 }
-                if (p.PounceRequireLanding)
+                IntVector2 landTile;
+                string landWhy, landEntry;
+                Vector2 at;
+                if (!PredictedLeapLandingSurvivableFrom(p, from, v, out at, out landTile, out landWhy, out landEntry))
                 {
-                    IntVector2 landTile;
-                    string landWhy, landEntry;
-                    Vector2 at;
-                    if (!PredictedLeapLandingSurvivableFrom(p, from, v, out at, out landTile, out landWhy, out landEntry))
-                    {
-                        why = landWhy;
-                        aimName = a == 0 ? "bait" : (a == 1 ? "far" : "upper");
-                        landAt = at;
-                        return false;
-                    }
+                    why = landWhy;
+                    aimName = a == 0 ? "bait" : (a == 1 ? "far" : "upper");
+                    landAt = at;
+                    return false;
                 }
             }
             return true;

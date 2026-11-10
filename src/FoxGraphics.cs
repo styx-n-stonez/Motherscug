@@ -6,21 +6,6 @@ namespace MotherMod
 {
     public partial class FoxGraphics : GraphicsModule
     {
-        private const float REFERENCE_TAIL_LENGTH = 39f;
-
-        private const float REFERENCE_TAIL_PEAK_RAD = 7.5f;
-
-        private const float ART_BODY_W = 43f;
-        private const float ART_BODY_H = 17f;
-        private const float ART_SPINE_Y = 6.5f;
-        private const float ART_TAIL_X = 2f;
-        private const float ART_NECK_X = 36.44f;
-        private const float ART_SPINE_LEN = ART_NECK_X - ART_TAIL_X;
-        private static readonly float[] ART_LEG_X = { 31f, 37.5f, 12.5f, 17.5f };
-        private const float ART_TAIL_LEN = 32f;
-        private const float ART_TAIL_H = 15f;
-        private const float ART_BODY_GREY = 0x2B / 255f;
-
         public readonly Fox fox;
 
         public FoxLimb[] limbs;
@@ -31,33 +16,11 @@ namespace MotherMod
 
         private readonly List<FoxCosmetic> cosmetics = new List<FoxCosmetic>();
         private int extraSprites;
-        private int bodyCircleCount;
         private int tailSegmentCount;
-
-        private float[] bodyCircleRad;
-
-        private float[] bodyCircleU;
-
-        private Vector2[] spinePos;
-        private float[] spineRad;
-        private int bodyMeshPoints;
-
-        private bool headSpriteActive;
-
-        private bool headEyeActive;
-
-        private bool legSpritesActive;
-
-        private bool bodySpriteActive;
-
-        private bool tailSpriteActive;
-
-        private float artScale = 1f;
 
         private float artRestSpine = 1f;
 
-        private Vector2 artOrigin, artFwd, artUp;
-        private float artSx, artSy;
+        private Vector2 artFwd, artUp;
 
         private float lastArtRot;
         private bool artRotSeeded;
@@ -138,23 +101,11 @@ namespace MotherMod
         private bool builtLogged;
 
         public int SpriteBodyMesh { get { return 0; } }
-        public int SpriteBodyFillStart { get { return 1; } }
-        public int SpriteBodyFillEnd { get { return SpriteBodyFillStart + bodyCircleCount; } }
-        public int SpriteLimbsStart { get { return SpriteBodyFillEnd; } }
-        public int SpriteLimbsEnd { get { return SpriteLimbsStart + limbs.Length * LimbSpriteCount; } }
+        public int SpriteLimbsStart { get { return 1; } }
+        public int SpriteLimbsEnd { get { return SpriteLimbsStart + limbs.Length * PARTS_LEG_SPRITES; } }
         public int SpriteTail { get { return SpriteLimbsEnd; } }
         public int SpriteHead { get { return SpriteTail + 1; } }
         public int SpriteEye { get { return SpriteHead + 1; } }
-
-        public Color EyeColor(FoxBreedParams p)
-        {
-            if (p.BlindEnabled && p.BlindEyeFlicker && fox != null && fox.Blinded)
-            {
-                return Custom.HSL2RGB(UnityEngine.Random.value, 1f,
-                                      0.5f + 0.5f * UnityEngine.Random.value);
-            }
-            return p.ColorEye;
-        }
 
         internal const float EYE_INK_TINT_MIN = 0.15f;
 
@@ -164,29 +115,14 @@ namespace MotherMod
             return new Color(Mathf.Max(tint.r, f), Mathf.Max(tint.g, f), Mathf.Max(tint.b, f), tint.a);
         }
 
-        internal static Color NoHole(FoxBreedParams p, Color c)
-        {
-            if (!IsHoleValue(c)) return c;
-            Color floor = p != null ? p.EyeHoleFloor : default(Color);
-            if (IsHoleValue(floor)) floor = new Color(0x0A / 255f, 0x0A / 255f, 0x0A / 255f);
-            return new Color(floor.r, floor.g, floor.b, c.a);
-        }
-
-        internal static bool IsHoleValue(Color c)
-        {
-            return Mathf.RoundToInt(Mathf.Clamp01(c.r) * 255f) == 0
-                && Mathf.RoundToInt(Mathf.Clamp01(c.g) * 255f) == 0
-                && Mathf.RoundToInt(Mathf.Clamp01(c.b) * 255f) == 0;
-        }
-
         private Color EyeAfterCamo(FoxBreedParams p, Color blended)
         {
-            Color guarded = (partsRigActive || headEyeActive) ? InkEyeTint(p, blended) : NoHole(p, blended);
+            Color guarded = InkEyeTint(p, blended);
             return guarded;
         }
 
         public int SpriteChest { get { return SpriteEye + 1; } }
-        public int StartOfExtraSprites { get { return SpriteEye + 1 + (partsRigActive ? 1 : 0); } }
+        public int StartOfExtraSprites { get { return SpriteChest + 1; } }
         public int TotalSprites { get { return StartOfExtraSprites + extraSprites + (tobyFramesActive ? 1 : 0); } }
 
         public FoxGraphics(Fox fox) : base(fox, true)
@@ -221,36 +157,24 @@ namespace MotherMod
             }
 
             artRestSpine = Mathf.Max(1f, 2f * 17f * p.BodyLengthFac * ((p.BodySizeFac + 1f) / 2f));
-            artScale = (artRestSpine / ART_SPINE_LEN) * Mathf.Max(0.05f, p.BodySpriteScaleFac);
 
             FoxAtlas.EnsureLoaded();
-            partsRigActive = ResolvePartsRig(p);
-            if (partsRigActive) BuildPartsRig(p);
-            tobyFramesActive = ResolveTobyFrames(p);
-
-            bodySpriteActive = !partsRigActive && p.BodySprite && FoxAtlas.Has(p.BodySpriteElement);
-            tailSpriteActive = partsRigActive || (bodySpriteActive && FoxAtlas.Has(p.TailSpriteElement));
+            drawNothing = !ResolvePartsRig(p);
+            BuildPartsRig(p);
+            tobyFramesActive = !drawNothing && ResolveTobyFrames(p);
 
             tailSegmentCount = Mathf.Clamp(p.TailSegments, 1, 32);
             tail = new TailSegment[tailSegmentCount];
             tailRad = new float[tailSegmentCount];
-            float artTail = partsRigActive
-                ? ((p.TailLengthVsBody > 0f) ? (P_BODY_W * partsScale * p.TailLengthVsBody)
-                                             : (P_TAIL_W * partsScale))
-                : (ART_TAIL_LEN * artScale);
-            float segLen = ((bodySpriteActive || partsRigActive) ? artTail : REFERENCE_TAIL_LENGTH)
-                           * Mathf.Max(0.01f, p.TailLengthFac) / tailSegmentCount;
+            float artTail = (p.TailLengthVsBody > 0f) ? (P_BODY_W * partsScale * p.TailLengthVsBody)
+                                                      : (P_TAIL_W * partsScale);
+            float segLen = artTail * Mathf.Max(0.01f, p.TailLengthFac) / tailSegmentCount;
             for (int i = 0; i < tailSegmentCount; i++)
             {
-                tailRad[i] = partsRigActive
-                    ? (((p.TailHeightVsBody > 0f) ? (P_BODY_H * p.TailHeightVsBody) : P_TAIL_H)
-                       * 0.5f * partsScale * Mathf.Max(0.01f, p.TailThicknessFac)
-                       * Mathf.Lerp(1f, Mathf.Clamp(p.TailTipTaper, 0.05f, 1f),
-                                    tailSegmentCount == 1 ? 0f : (float)i / (tailSegmentCount - 1)))
-                    : bodySpriteActive
-                    ? (ART_TAIL_H * 0.5f * artScale * Mathf.Max(0.01f, p.TailThicknessFac))
-                    : BrushProfile(p, tailSegmentCount == 1 ? 0.5f : (float)i / (tailSegmentCount - 1))
-                      * REFERENCE_TAIL_PEAK_RAD * Mathf.Max(0.01f, p.TailThicknessFac);
+                tailRad[i] = ((p.TailHeightVsBody > 0f) ? (P_BODY_H * p.TailHeightVsBody) : P_TAIL_H)
+                             * 0.5f * partsScale * Mathf.Max(0.01f, p.TailThicknessFac)
+                             * Mathf.Lerp(1f, Mathf.Clamp(p.TailTipTaper, 0.05f, 1f),
+                                          tailSegmentCount == 1 ? 0f : (float)i / (tailSegmentCount - 1));
                 tail[i] = new TailSegment(this, tailRad[i], segLen, (i > 0) ? tail[i - 1] : null,
                                           0.85f, 0.95f, 0.5f, pullInPreviousPosition: true);
                 parts.Add(tail[i]);
@@ -261,42 +185,12 @@ namespace MotherMod
 
             bodyParts = parts.ToArray();
 
-            bodyMeshPoints = Mathf.Clamp(p.BodyMeshPoints, 3, 32);
-            spinePos = new Vector2[bodyMeshPoints];
-            spineRad = new float[bodyMeshPoints];
-
-            bodyCircleCount = (bodySpriteActive || partsRigActive) ? 0 : Mathf.Clamp(p.BodyCircles, 1, 64);
-            bodyCircleRad = new float[bodyCircleCount];
-            bodyCircleU = new float[bodyCircleCount];
-            for (int i = 0; i < bodyCircleCount; i++)
-            {
-                float u = (i + 0.5f) / bodyCircleCount;
-                bodyCircleU[i] = u;
-                bodyCircleRad[i] = SpineHalfWidth(p, u);
-            }
-
-            headSpriteActive = !partsRigActive && p.HeadSprite && FoxAtlas.Has(p.HeadSpriteElement);
-            headEyeActive = headSpriteActive
-                            && !string.IsNullOrEmpty(p.HeadEyeElement)
-                            && FoxAtlas.Has(p.HeadEyeElement);
-            legSpritesActive = !partsRigActive && p.LegSprites
-                               && FoxAtlas.Has(p.LegSpriteFront) && FoxAtlas.Has(p.LegSpriteFrontFar)
-                               && FoxAtlas.Has(p.LegSpriteHind) && FoxAtlas.Has(p.LegSpriteHindFar);
-
             int cursor = StartOfExtraSprites;
-            for (int i = 0; i < p.Cosmetics.Count; i++)
+            for (int i = 0; i < p.Cosmetics.Count && !drawNothing; i++)
             {
                 FoxCosmeticSpec spec = p.Cosmetics[i];
                 FoxCosmetic layer = FoxCosmetics.Create(spec, this, cursor);
                 if (layer == null)
-                {
-                    continue;
-                }
-                if ((headSpriteActive || partsRigActive) && layer.BakedIntoHeadSprite)
-                {
-                    continue;
-                }
-                if (tailSpriteActive && layer.BakedIntoTailSprite)
                 {
                     continue;
                 }
@@ -312,13 +206,6 @@ namespace MotherMod
             spriteIndex += cosmetic.numberOfSprites;
             extraSprites += cosmetic.numberOfSprites;
             return spriteIndex;
-        }
-
-        private static float BrushProfile(FoxBreedParams p, float t)
-        {
-            float swell = Mathf.Clamp(p.TailSwellPos, 0.01f, 0.99f);
-            if (t <= swell) return Mathf.Lerp(p.TailRootThickness, 1f, t / swell);
-            return Mathf.Lerp(1f, p.TailTipThickness, (t - swell) / (1f - swell));
         }
 
         private float SpineRadius(float t)
@@ -352,38 +239,14 @@ namespace MotherMod
             return Mathf.Lerp(1f, Mathf.Clamp(p.SqueezeTailFac, 0.05f, 1f), fox.DrawSqueezeAmount);
         }
 
-        private void BuildArtFrame(FoxBreedParams p, Vector2 rear, Vector2 front, float depth,
-                                   out Vector2 origin, out Vector2 fwd, out Vector2 up,
-                                   out float sx, out float sy)
+        private static void BuildArtFrame(Vector2 rear, Vector2 front, float depth,
+                                          out Vector2 fwd, out Vector2 up)
         {
             Vector2 span = front - rear;
             float len = span.magnitude;
             fwd = (len > 0.01f) ? span / len : new Vector2(1f, 0f);
             float sign = (depth >= 0f) ? 1f : -1f;
             up = new Vector2(-fwd.y, fwd.x) * sign;
-            sy = artScale;
-            float stretch = Mathf.Clamp01(p.BodySpriteStretch);
-            sx = artScale * Mathf.Clamp(len / artRestSpine, 1f - stretch, 1f + stretch);
-            origin = rear;
-        }
-
-        private static Vector2 ArtPoint(Vector2 origin, Vector2 fwd, Vector2 up,
-                                        float sx, float sy, float ax, float ay)
-        {
-            return origin + fwd * (sx * (ax - ART_TAIL_X)) + up * (sy * (ay - ART_SPINE_Y));
-        }
-
-        private Vector2 ArtPointTick(float ax, float ay)
-        {
-            return ArtPoint(artOrigin, artFwd, artUp, artSx, artSy, ax, ay);
-        }
-
-        private static Color BodyArtTint(FoxBreedParams p, bool mask)
-        {
-            if (mask) return p.ColorBody;
-            return new Color(Mathf.Clamp01(p.ColorBody.r / ART_BODY_GREY),
-                             Mathf.Clamp01(p.ColorBody.g / ART_BODY_GREY),
-                             Mathf.Clamp01(p.ColorBody.b / ART_BODY_GREY));
         }
 
         public Vector2 BodyAxis { get { return bodyAxis; } }
@@ -434,14 +297,10 @@ namespace MotherMod
 
         public Vector2 LimbsAimFor { get; private set; }
 
-        public float HeadRad { get { return head.rad; } }
-
         public float TailRad(int i)
         {
             return (tailRad != null && i >= 0 && i < tailRad.Length) ? tailRad[i] : 1f;
         }
-
-        public int TailSegmentCount { get { return tailSegmentCount; } }
 
         public Vector2 BackPoint(float u, float timeStacker, out Vector2 outward)
         {
@@ -472,13 +331,11 @@ namespace MotherMod
                                      Vector2 headChunk, Vector2 rearChunk, out bool onChest)
         {
             onChest = false;
-            if (!partsRigActive || !p.CosmeticAnchorDrawnBody) return SpineHalfWidth(p, u);
+            if (!p.CosmeticAnchorDrawnBody) return SpineHalfWidth(p, u);
             return PartsDrawnHalfExtent(p, u, timeStacker, headChunk, rearChunk, out onChest);
         }
 
-        public float PartsArtScale { get { return partsRigActive ? partsScale : 1f; } }
-
-        public Color ArtTint(Color variantColor) { return PartsTint(fox.P, variantColor); }
+        public float PartsArtScale { get { return partsScale; } }
 
         public bool EveryLimbGrippedAtLeast(FoxLimb me, int minGrip)
         {
@@ -504,18 +361,14 @@ namespace MotherMod
 
             UpdateAim(p);
             UpdateDrawPositions(p);
-            if (partsRigActive)
-            {
-                UpdatePartsMotion(p);
-                ApplyPartsPose(p);
-            }
-            BuildArtFrame(p, drawPositions[2, 0], drawPositions[0, 0], headDepth,
-                          out artOrigin, out artFwd, out artUp, out artSx, out artSy);
+            UpdatePartsMotion(p);
+            ApplyPartsPose(p);
+            BuildArtFrame(drawPositions[2, 0], drawPositions[0, 0], headDepth, out artFwd, out artUp);
             UpdateLimbs(p);
             UpdateSpearLayer(p);
             UpdateTail(p);
             UpdateHead(p);
-            if (partsRigActive) UpdatePartsHeadFrame(p);
+            UpdatePartsHeadFrame(p);
             TickTobyFrames(p);
 
             MeasureDrawMotion();
@@ -688,30 +541,15 @@ namespace MotherMod
             hindLegsDown = 0;
             int gripping = 0;
 
-            Vector2 pChest = Vector2.zero, pFwd = Vector2.zero, pUp = Vector2.zero;
-            float pSign = 1f;
-            if (partsRigActive) PartsFrameTick(p, out pChest, out pFwd, out pUp, out pSign);
-            PublishPoleFrame(pFwd, pUp, partsRigActive);
+            Vector2 pChest, pFwd, pUp;
+            float pSign;
+            PartsFrameTick(p, out pChest, out pFwd, out pUp, out pSign);
+            PublishPoleFrame(pFwd, pUp);
 
             for (int i = 0; i < limbs.Length; i++)
             {
                 bool front = i < 2;
-                if (partsRigActive)
-                {
-                    limbs[i].attachPos = PartsLegRoot(p, i, pChest, pFwd, pUp);
-                }
-                else if (bodySpriteActive)
-                {
-                    limbs[i].attachPos = ArtPointTick(ART_LEG_X[i], 0f) - artUp * p.LimbAttachDrop;
-                }
-                else
-                {
-                    Vector2 from = drawPositions[front ? 0 : 2, 0];
-                    Vector2 toward = drawPositions[1, 0];
-                    float along = front ? p.LimbAttachFront : p.LimbAttachRear;
-                    limbs[i].attachPos = Vector2.Lerp(from, toward, Mathf.Clamp01(along))
-                                         - BodyUp * p.LimbAttachDrop;
-                }
+                limbs[i].attachPos = PartsLegRoot(p, i, pChest, pFwd, pUp);
 
                 limbs[i].Update();
 
@@ -729,14 +567,10 @@ namespace MotherMod
 
         private void UpdateTail(FoxBreedParams p)
         {
-            Vector2 partsChest = Vector2.zero, partsFwd = Vector2.zero, partsUp = Vector2.zero;
-            float partsSign = 1f;
-            if (partsRigActive) PartsFrameTick(p, out partsChest, out partsFwd, out partsUp, out partsSign);
-            Vector2 tailRoot = partsRigActive
-                ? PartsTailRoot(p, drawPositions[2, 0], partsFwd) - partsUp * p.TailRootDrop
-                : bodySpriteActive
-                ? ArtPointTick(ART_TAIL_X, ART_SPINE_Y) - artUp * p.TailRootDrop
-                : drawPositions[2, 0] - BodyUp * p.TailRootDrop;
+            Vector2 partsChest, partsFwd, partsUp;
+            float partsSign;
+            PartsFrameTick(p, out partsChest, out partsFwd, out partsUp, out partsSign);
+            Vector2 tailRoot = PartsTailRoot(p, drawPositions[2, 0], partsFwd) - partsUp * p.TailRootDrop;
             tail[0].connectedPoint = tailRoot;
 
             if (lastPounceState == Fox.PounceState.Crouch && fox.pounce == Fox.PounceState.Propel
@@ -787,11 +621,8 @@ namespace MotherMod
                 }
             }
 
-            if (partsRigActive)
-            {
-                ApplyTailLife(p, tailRoot, -partsFwd, partsUp);
-                ApplySpearTail(p, partsUp);
-            }
+            ApplyTailLife(p, tailRoot, -partsFwd, partsUp);
+            ApplySpearTail(p, partsUp);
         }
 
         private void UpdateHead(FoxBreedParams p)
@@ -808,9 +639,9 @@ namespace MotherMod
                 Vector2 spine = Fox.Dir(drawPositions[1, 0], drawPositions[0, 0]);
                 float behind = Mathf.Clamp(-Vector2.Dot(dir, spine), 0f, 1f);
                 float pull = 1f - Mathf.Pow(1f - behind, 3f);
-                pull *= 1f - Mathf.Clamp01(p.NeckStiffness);
+                pull *= 1f - p.NeckStiffness;
                 if (pull > 0f) dir = Vector3.Slerp(dir, spine, pull);
-                head.vel += dir * Mathf.Lerp(6f, 2f, Mathf.Clamp01(p.NeckStiffness));
+                head.vel += dir * Mathf.Lerp(6f, 2f, p.NeckStiffness);
             }
 
             if (fox.HeldPrey == null || fox.HeldPrey.mainBodyChunk == null)
@@ -818,24 +649,11 @@ namespace MotherMod
                 head.vel.y -= fox.Consious ? p.HeadGravity : Mathf.Max(0f, p.DeathHeadGravity);
             }
 
-            float lead = partsRigActive ? P_CHEST_W * partsScale * Mathf.Max(0.05f, p.PartsNeckFac)
-                       : bodySpriteActive ? (ART_NECK_X - ART_TAIL_X) * artScale * 0.35f
-                                          : 12f * p.HeadSize;
-            Vector2 partsNeck = Vector2.zero;
-            if (partsRigActive)
-            {
-                Vector2 hChest, hFwd, hUp; float hSign;
-                PartsFrameTick(p, out hChest, out hFwd, out hUp, out hSign);
-                partsNeck = PartsNeck(p, hChest, hFwd) - hUp * (p.HeadDrop - p.HeadCarryPx);
-            }
-            Vector2 neck = partsRigActive
-                ? partsNeck
-                : bodySpriteActive
-                ? ArtPointTick(ART_NECK_X, ART_SPINE_Y) - artUp * p.HeadDrop
-                : drawPositions[0, 0]
-                  + Fox.Dir(drawPositions[1, 0], drawPositions[0, 0]) * lead
-                  - BodyUp * p.HeadDrop;
-            head.ConnectToPoint(neck, lead * Mathf.Max(0.05f, p.HeadNeckSlack),
+            float lead = P_CHEST_W * partsScale * Mathf.Max(0.05f, p.PartsNeckFac);
+            Vector2 hChest, hFwd, hUp; float hSign;
+            PartsFrameTick(p, out hChest, out hFwd, out hUp, out hSign);
+            Vector2 neck = PartsNeck(p, hChest, hFwd) - hUp * (p.HeadDrop - p.HeadCarryPx);
+            head.ConnectToPoint(neck, lead * p.HeadNeckSlack,
                                 push: false, 0.2f, fox.bodyChunks[0].vel, 0.5f, 0.1f);
 
             lastHeadDepth = headDepth;
@@ -852,7 +670,7 @@ namespace MotherMod
                 if (Mathf.Abs(bodyAxis.y) >= WALL_SIGN_BAND)
                     depthSideSign = (bodyAxis.y * fox.WallFaceSide < 0f) ? -1f : 1f;
             }
-            if ((p.DepthVerticalHold || poleHold || wallHold) && depthBand > 0f && !fox.TurnActive
+            if (depthBand > 0f && !fox.TurnActive
                 && Mathf.Abs(bodyAxis.x) < depthBand && depthSideSign != 0f)
             {
                 float t = Mathf.Clamp01(Mathf.Abs(bodyAxis.x) / depthBand);
@@ -892,8 +710,7 @@ namespace MotherMod
             camoSampleSeeded = false;
             for (int i = 0; i < cosmetics.Count; i++) cosmetics[i].Reset();
 
-            BuildArtFrame(fox.P, drawPositions[2, 0], drawPositions[0, 0], headDepth,
-                          out artOrigin, out artFwd, out artUp, out artSx, out artSy);
+            BuildArtFrame(drawPositions[2, 0], drawPositions[0, 0], headDepth, out artFwd, out artUp);
 
             lookPos = fox.bodyChunks[0].pos + bodyAxis * 60f;
             lookInitialized = true;
@@ -911,7 +728,6 @@ namespace MotherMod
             leanDeg = 0f;
             lastVelAlong = Vector2.Dot(fox.bodyChunks[1].vel, bodyAxis);
             lastHeadDepthForTrend = headDepth;
-            glanceTicks = 0;
 
             bodyBend = 0f;
             lastBodyBend = 0f;
@@ -952,21 +768,10 @@ namespace MotherMod
             speedSmooth = 0f;
         }
 
-        private static string LegElement(FoxBreedParams p, int i)
-        {
-            switch (i)
-            {
-                case 0: return p.LegSpriteFrontFar;
-                case 1: return p.LegSpriteFront;
-                case 2: return p.LegSpriteHindFar;
-                default: return p.LegSpriteHind;
-            }
-        }
-
         private void BindTailArt(TriangleMesh mesh, FoxBreedParams p)
         {
             if (mesh == null || mesh.UVvertices == null) return;
-            FAtlasElement el = FoxAtlas.Element(partsRigActive ? PartsEl(p, "Tail") : p.TailSpriteElement);
+            FAtlasElement el = FoxAtlas.Element(PartsEl(p, "Tail"));
             if (el == null) return;
             mesh.element = el;
             MapTailUV(mesh, el, 1f);
@@ -993,105 +798,23 @@ namespace MotherMod
 
         public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
+            if (drawNothing)
+            {
+                sLeaser.sprites = new FSprite[1] { new FSprite("Futile_White") };
+                sLeaser.containers = new FContainer[1] { new FContainer() };
+                AddToContainer(sLeaser, rCam, null);
+                base.InitiateSprites(sLeaser, rCam);
+                return;
+            }
+
             sLeaser.sprites = new FSprite[TotalSprites];
             FoxBreedParams bp = fox.P;
 
-            var bodyTris = new TriangleMesh.Triangle[bodyMeshPoints * 2];
-            for (int q = 0; q < bodyMeshPoints; q++)
-            {
-                int b = q * 4;
-                bodyTris[q * 2] = new TriangleMesh.Triangle(b, b + 1, b + 2);
-                bodyTris[q * 2 + 1] = new TriangleMesh.Triangle(b + 1, b + 2, b + 3);
-            }
-            if (partsRigActive)
-            {
-                InitiatePartsSprites(sLeaser, bp);
-            }
-            else if (bodySpriteActive)
-            {
-                var bodyArt = new FSprite(bp.BodySpriteElement);
-                bodyArt.anchorX = ART_TAIL_X / ART_BODY_W;
-                bodyArt.anchorY = ART_SPINE_Y / ART_BODY_H;
-                sLeaser.sprites[SpriteBodyMesh] = bodyArt;
-            }
-            else
-            {
-                sLeaser.sprites[SpriteBodyMesh] = new TriangleMesh("Futile_White", bodyTris, customColor: false);
-            }
-
-            for (int i = SpriteBodyFillStart; i < SpriteBodyFillEnd; i++)
-            {
-                sLeaser.sprites[i] = new FSprite("Circle20");
-            }
-
-            for (int i = 0; i < limbs.Length && !partsRigActive; i++)
-            {
-                if (legSpritesActive)
-                {
-                    sLeaser.sprites[LimbSprite(i)] = new FSprite(LegElement(bp, i));
-                    continue;
-                }
-
-                var tris = new TriangleMesh.Triangle[10]
-                {
-                    new TriangleMesh.Triangle(0, 1, 2),
-                    new TriangleMesh.Triangle(1, 2, 3),
-                    new TriangleMesh.Triangle(3, 4, 2),
-                    new TriangleMesh.Triangle(4, 2, 5),
-                    new TriangleMesh.Triangle(2, 5, 6),
-                    new TriangleMesh.Triangle(5, 6, 7),
-                    new TriangleMesh.Triangle(5, 7, 8),
-                    new TriangleMesh.Triangle(8, 7, 9),
-                    new TriangleMesh.Triangle(8, 9, 10),
-                    new TriangleMesh.Triangle(8, 9, 11),
-                };
-                sLeaser.sprites[LimbSprite(i)] = new TriangleMesh("Futile_White", tris, customColor: false);
-            }
+            InitiatePartsSprites(sLeaser, bp);
 
             sLeaser.sprites[SpriteTail] =
                 TriangleMesh.MakeLongMesh(tail.Length, pointyTip: true, customColor: true);
-            if (tailSpriteActive) BindTailArt(sLeaser.sprites[SpriteTail] as TriangleMesh, bp);
-
-            if (partsRigActive)
-            {
-            }
-            else if (headSpriteActive)
-            {
-                var headSprite = new FSprite(bp.HeadSpriteElement);
-                headSprite.anchorX = bp.HeadSpriteAnchorX;
-                headSprite.anchorY = bp.HeadSpriteAnchorY;
-                sLeaser.sprites[SpriteHead] = headSprite;
-                if (headEyeActive)
-                {
-                    var eyeSprite = new FSprite(bp.HeadEyeElement);
-                    eyeSprite.anchorX = bp.HeadSpriteAnchorX;
-                    eyeSprite.anchorY = bp.HeadSpriteAnchorY;
-                    sLeaser.sprites[SpriteEye] = eyeSprite;
-                }
-                else
-                {
-                    sLeaser.sprites[SpriteEye] = new FSprite("Futile_White");
-                    sLeaser.sprites[SpriteEye].isVisible = false;
-                }
-            }
-            else
-            {
-                var headTris = new TriangleMesh.Triangle[HEAD_QUADS * 2];
-                for (int q = 0; q < HEAD_QUADS; q++)
-                {
-                    int b = q * 4;
-                    headTris[q * 2] = new TriangleMesh.Triangle(b, b + 1, b + 2);
-                    headTris[q * 2 + 1] = new TriangleMesh.Triangle(b + 1, b + 2, b + 3);
-                }
-                sLeaser.sprites[SpriteHead] = new TriangleMesh("Futile_White", headTris, customColor: false);
-
-                var eyeTris = new TriangleMesh.Triangle[2]
-                {
-                    new TriangleMesh.Triangle(0, 1, 2),
-                    new TriangleMesh.Triangle(1, 2, 3),
-                };
-                sLeaser.sprites[SpriteEye] = new TriangleMesh("Futile_White", eyeTris, customColor: false);
-            }
+            BindTailArt(sLeaser.sprites[SpriteTail] as TriangleMesh, bp);
 
             for (int i = 0; i < cosmetics.Count; i++) cosmetics[i].InitiateSprites(sLeaser, rCam);
             if (tobyFramesActive) InitiateTobyFrameSprite(sLeaser);
@@ -1109,9 +832,7 @@ namespace MotherMod
             }
         }
 
-        private int LimbSprite(int i) { return SpriteLimbsStart + i * LimbSpriteCount; }
-
-        private const int HEAD_QUADS = 7;
+        private int LimbSprite(int i) { return SpriteLimbsStart + i * PARTS_LEG_SPRITES; }
 
         public Vector2 DrawHeadPos { get; private set; }
 
@@ -1119,16 +840,18 @@ namespace MotherMod
 
         private bool headDrawGuard;
 
-        public Vector2 DrawHeadUp { get; private set; }
-
         public Vector2 DrawNosePos { get; private set; }
-
-        public Vector2 DrawNeckPos { get; private set; }
 
         public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam,
                                          float timeStacker, Vector2 camPos)
         {
             FoxBreedParams p = fox.P;
+
+            if (drawNothing)
+            {
+                base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+                return;
+            }
 
             RestoreCamoColors(sLeaser);
 
@@ -1136,138 +859,27 @@ namespace MotherMod
             Vector2 midChunk = Vector2.Lerp(drawPositions[1, 1], drawPositions[1, 0], timeStacker);
             Vector2 rearChunk = Vector2.Lerp(drawPositions[2, 1], drawPositions[2, 0], timeStacker);
             Vector2 drawAxis = DrawAxis(headChunk, rearChunk);
-            Vector2 drawUp = DrawUp(headChunk, rearChunk);
             float depth = Mathf.Lerp(lastHeadDepth, headDepth, timeStacker);
 
-            Vector2 aOrigin, aFwd, aUp; float aSx, aSy;
-            BuildArtFrame(p, rearChunk, headChunk, depth, out aOrigin, out aFwd, out aUp, out aSx, out aSy);
-            float faceSign = (depth >= 0f) ? 1f : -1f;
+            Vector2 aFwd, aUp;
+            BuildArtFrame(rearChunk, headChunk, depth, out aFwd, out aUp);
 
-            ComputeHeadFrame(p, timeStacker, headChunk, midChunk, rearChunk, drawUp, depth);
-            if (partsRigActive)
-            {
-                DrawPartsRig(sLeaser, p, timeStacker, headChunk, midChunk, rearChunk, depth, camPos);
-            }
-            if (bodySpriteActive)
-            {
-                DrawHeadPos = ArtPoint(aOrigin, aFwd, aUp, aSx, aSy, ART_NECK_X, ART_SPINE_Y);
-                DrawNeckPos = DrawHeadPos;
-                DrawNosePos = DrawHeadPos + DrawHeadDir * (ART_BODY_W * 0.25f * aSy);
-            }
-
-            Vector2 bez = midChunk * 2f - (headChunk + rearChunk) * 0.5f;
-            for (int i = 0; i < bodyMeshPoints; i++)
-            {
-                float u = (bodyMeshPoints == 1) ? 0.5f : (float)i / (bodyMeshPoints - 1);
-                spinePos[i] = Bezier(headChunk, bez, rearChunk, u);
-                spineRad[i] = SpineHalfWidth(p, u);
-            }
-
-            if (bodySpriteActive)
-            {
-                FSprite bodyArt = sLeaser.sprites[SpriteBodyMesh];
-                bodyArt.x = aOrigin.x - camPos.x;
-                bodyArt.y = aOrigin.y - camPos.y;
-                bodyArt.rotation = AimDeg(aFwd) - 90f * faceSign;
-                bodyArt.scaleX = aSx * faceSign * TurnForeshorten(p, depth);
-                bodyArt.scaleY = aSy;
-                bodyArt.color = BodyArtTint(p, p.BodySpriteMask);
-            }
-
-            var bodyMesh = partsRigActive ? null : sLeaser.sprites[SpriteBodyMesh] as TriangleMesh;
-            if (bodyMesh != null)
-            {
-                Vector2 prev = DrawNeckPos;
-                float prevW = p.BodyFrontCap;
-                for (int i = 0; i < bodyMeshPoints; i++)
-                {
-                    Vector2 here = spinePos[i];
-                    Vector2 seg = prev - here;
-                    float dist = seg.magnitude;
-                    Vector2 dir = (dist > 0.01f) ? seg / dist : drawAxis;
-                    Vector2 perp = new Vector2(-dir.y, dir.x);
-                    float w = spineRad[i];
-                    Vector2 lead = here + dir * (dist * (1f + p.BodyMeshOverlap));
-
-                    int b = i * 4;
-                    bodyMesh.MoveVertice(b, lead - perp * prevW - camPos);
-                    bodyMesh.MoveVertice(b + 1, lead + perp * prevW - camPos);
-                    bodyMesh.MoveVertice(b + 2, here - perp * w - camPos);
-                    bodyMesh.MoveVertice(b + 3, here + perp * w - camPos);
-
-                    prevW = w;
-                    prev = here;
-                }
-                bodyMesh.color = p.ColorBody;
-            }
-
-            for (int i = 0; i < bodyCircleCount; i++)
-            {
-                Vector2 pos = Bezier(headChunk, bez, rearChunk, bodyCircleU[i]);
-                FSprite s = sLeaser.sprites[SpriteBodyFillStart + i];
-                s.x = pos.x - camPos.x;
-                s.y = pos.y - camPos.y;
-                bodyCircleRad[i] = SpineHalfWidth(p, bodyCircleU[i]);
-                s.scale = bodyCircleRad[i] / 10f;
-                s.color = p.ColorBody;
-            }
-
-            for (int i = 0; i < limbs.Length && !partsRigActive; i++)
-            {
-                Vector2 paw = Vector2.Lerp(limbs[i].lastPos, limbs[i].pos, timeStacker);
-                bool front = i < 2;
-                Vector2 shoulder;
-                if (bodySpriteActive)
-                {
-                    shoulder = ArtPoint(aOrigin, aFwd, aUp, aSx, aSy, ART_LEG_X[i], 0f)
-                               - aUp * p.LimbAttachDrop;
-                }
-                else
-                {
-                    Vector2 from = front ? headChunk : rearChunk;
-                    float along = front ? p.LimbAttachFront : p.LimbAttachRear;
-                    shoulder = Vector2.Lerp(from, midChunk, Mathf.Clamp01(along)) - drawUp * p.LimbAttachDrop;
-                }
-
-                float bend = Mathf.Lerp(limbs[i].lastBend, limbs[i].bend, timeStacker);
-
-                if (legSpritesActive)
-                {
-                    DrawSpriteLeg(sLeaser, p, i, shoulder, paw, depth, camPos);
-                    continue;
-                }
-                DrawMeshLeg(sLeaser, p, i, shoulder, paw, bend, drawAxis, camPos);
-            }
+            ComputeHeadFrame(p, timeStacker, headChunk, midChunk, rearChunk);
+            DrawPartsRig(sLeaser, p, timeStacker, headChunk, midChunk, rearChunk, depth, camPos);
 
             var tailMesh = sLeaser.sprites[SpriteTail] as TriangleMesh;
             if (tailMesh != null)
             {
-                Vector2 prev;
-                if (partsRigActive)
-                {
-                    Vector2 tChest, tFwd, tUp; float tSign;
-                    BuildPartsFrame(p, rearChunk, midChunk, headChunk, depth,
-                                    out tChest, out tFwd, out tUp, out tSign);
-                    Vector2 tRear = midChunk + (rearChunk - midChunk) * TurnForeshorten(p, depth);
-                    prev = PartsTailRoot(p, tRear, tFwd) - tUp * p.TailRootDrop;
-                }
-                else
-                {
-                    prev = bodySpriteActive
-                        ? ArtPoint(aOrigin, aFwd, aUp, aSx, aSy, ART_TAIL_X, ART_SPINE_Y) - aUp * p.TailRootDrop
-                        : rearChunk - drawUp * p.TailRootDrop;
-                }
+                Vector2 tChest, tFwd, tUp; float tSign;
+                BuildPartsFrame(p, rearChunk, midChunk, headChunk, depth,
+                                out tChest, out tFwd, out tUp, out tSign);
+                Vector2 tRear = midChunk + (rearChunk - midChunk) * TurnForeshorten(p, depth);
+                Vector2 prev = PartsTailRoot(p, tRear, tFwd) - tUp * p.TailRootDrop;
                 float tailSq = TailSqueezeFac(p);
-                float prevRad = (bodySpriteActive || partsRigActive)
-                    ? TailRad(0) * tailSq
-                    : SpineHalfWidth(p, 1f);
-                if (tailSpriteActive)
-                {
-                    Vector2 first = Vector2.Lerp(tail[0].lastPos, tail[0].pos, timeStacker) - prev;
-                    float side = (first.sqrMagnitude > 0.01f)
-                        ? Mathf.Sign(Vector2.Dot(new Vector2(-first.y, first.x), aUp)) : 1f;
-                    MapTailUV(tailMesh, tailMesh.element, side);
-                }
+                Vector2 first = Vector2.Lerp(tail[0].lastPos, tail[0].pos, timeStacker) - prev;
+                float side = (first.sqrMagnitude > 0.01f)
+                    ? Mathf.Sign(Vector2.Dot(new Vector2(-first.y, first.x), aUp)) : 1f;
+                MapTailUV(tailMesh, tailMesh.element, side);
                 for (int i = 0; i < tail.Length; i++)
                 {
                     Vector2 seg = Vector2.Lerp(tail[i].lastPos, tail[i].pos, timeStacker);
@@ -1275,31 +887,22 @@ namespace MotherMod
                     float dist = dir.magnitude;
                     dir = (dist > 0.01f) ? dir / dist : -drawAxis;
                     Vector2 perp = new Vector2(-dir.y, dir.x);
-                    float overlap = (tailSpriteActive || i == 0) ? 0f : dist * p.TailMeshOverlap;
-                    Vector2 wBase = tailSpriteActive
-                        ? perp * (TailRad(i) * tailSq)
-                        : perp * ((prevRad + tail[i].StretchedRad * tailSq) * 0.5f);
-                    tailMesh.MoveVertice(i * 4, prev - wBase + dir * overlap - camPos);
-                    tailMesh.MoveVertice(i * 4 + 1, prev + wBase + dir * overlap - camPos);
+                    Vector2 w = perp * (TailRad(i) * tailSq);
+                    tailMesh.MoveVertice(i * 4, prev - w - camPos);
+                    tailMesh.MoveVertice(i * 4 + 1, prev + w - camPos);
                     if (i < tail.Length - 1)
                     {
-                        Vector2 wTip = perp * ((tailSpriteActive ? TailRad(i) : tail[i].StretchedRad) * tailSq);
-                        tailMesh.MoveVertice(i * 4 + 2, seg - wTip - dir * overlap - camPos);
-                        tailMesh.MoveVertice(i * 4 + 3, seg + wTip - dir * overlap - camPos);
+                        tailMesh.MoveVertice(i * 4 + 2, seg - w - camPos);
+                        tailMesh.MoveVertice(i * 4 + 3, seg + w - camPos);
                     }
                     else
                     {
                         tailMesh.MoveVertice(i * 4 + 2, seg - camPos);
                     }
-                    prevRad = (tailSpriteActive ? TailRad(i) : tail[i].StretchedRad) * tailSq;
                     prev = seg;
                 }
-                TintTail(tailMesh, p);
+                TintTail(tailMesh);
             }
-
-            if (partsRigActive) { }
-            else if (headSpriteActive) DrawHeadSprite(sLeaser, p, depth, camPos);
-            else DrawHeadMesh(sLeaser, p, depth, camPos);
 
             for (int i = 0; i < cosmetics.Count; i++)
             {
@@ -1502,60 +1105,15 @@ namespace MotherMod
         }
 
         private void ComputeHeadFrame(FoxBreedParams p, float timeStacker,
-                                      Vector2 headChunk, Vector2 midChunk, Vector2 rearChunk,
-                                      Vector2 drawUp, float depth)
+                                      Vector2 headChunk, Vector2 midChunk, Vector2 rearChunk)
         {
-            Vector2 headPart = Vector2.Lerp(head.lastPos, head.pos, timeStacker);
-            DrawHeadPos = Vector2.Lerp(headPart, headChunk, 0.2f);
-
             Vector2 neckLine = Fox.Dir(midChunk, headChunk);
-            Vector2 bodyFwd = Fox.Dir(rearChunk, headChunk);
             headDrawGuard = Fox.NeckDot(headChunk, midChunk, rearChunk) < 0f;
-            if (headDrawGuard) neckLine = bodyFwd;
-            Vector2 lookLine = Fox.Dir(headChunk, headPart);
-            if (lookLine.sqrMagnitude < 0.01f) lookLine = neckLine;
+            if (headDrawGuard) neckLine = Fox.Dir(rearChunk, headChunk);
 
-            if (partsRigActive)
-            {
-                float deg = Mathf.Lerp(lastHeadPitchDeg, headPitchDeg, timeStacker);
-                float pitchLim = SpearHeadPitchLimit(p);
-                DrawHeadDir = PitchFromNeck(neckLine, Mathf.Clamp(deg, -pitchLim, pitchLim));
-            }
-            else
-            {
-                Vector2 want = Vector3.Slerp(neckLine, lookLine, Mathf.Clamp01(p.HeadLookFac));
-                DrawHeadDir = ClampPitch(neckLine, want, p.HeadPitchMax);
-
-                Vector2 up = new Vector2(-DrawHeadDir.y, DrawHeadDir.x);
-                if (up.y < 0f) up = -up;
-                Vector2 drooped = DrawHeadDir - up * p.HeadMuzzleDroop;
-                float m = drooped.magnitude;
-                if (m > 0.01f) DrawHeadDir = drooped / m;
-            }
-            DrawHeadUp = new Vector2(-DrawHeadDir.y, DrawHeadDir.x);
-            if (DrawHeadUp.y < 0f) DrawHeadUp = -DrawHeadUp;
-
-            float fore = Mathf.Lerp(Mathf.Clamp01(p.HeadForeshorten), 1f, Mathf.Abs(depth));
-            DrawNosePos = DrawHeadPos + DrawHeadDir * (p.HeadMuzzleLength * p.HeadSize * fore);
-
-            DrawNeckPos = DrawHeadPos - DrawHeadDir * (head.rad * 0.9f);
-            if (!Custom.DistLess(DrawNeckPos, headChunk, head.rad * 2f))
-            {
-                DrawNeckPos = headChunk + Fox.Dir(headChunk, DrawNeckPos) * (head.rad * 2f);
-            }
-            if (drawUp.sqrMagnitude < 0.01f) drawUp = new Vector2(0f, 1f);
-        }
-
-        private static Vector2 ClampPitch(Vector2 reference, Vector2 want, float maxDeg)
-        {
-            float cosMax = Mathf.Cos(Mathf.Clamp(maxDeg, 0f, 180f) * Mathf.Deg2Rad);
-            float dot = Vector2.Dot(reference, want);
-            if (dot >= cosMax) return want.normalized;
-            float ang = Mathf.Acos(Mathf.Clamp(dot, -1f, 1f));
-            float frac = (ang > 0.0001f) ? Mathf.Clamp01((maxDeg * Mathf.Deg2Rad) / ang) : 1f;
-            Vector3 v = Vector3.Slerp(reference, want, frac);
-            Vector2 r = new Vector2(v.x, v.y);
-            return (r.sqrMagnitude > 0.0001f) ? r.normalized : reference;
+            float deg = Mathf.Lerp(lastHeadPitchDeg, headPitchDeg, timeStacker);
+            float pitchLim = SpearHeadPitchLimit(p);
+            DrawHeadDir = PitchFromNeck(neckLine, Mathf.Clamp(deg, -pitchLim, pitchLim));
         }
 
         private static Vector2 PitchFromNeck(Vector2 neckLine, float deg)
@@ -1575,184 +1133,14 @@ namespace MotherMod
             return a * (iu * iu) + control * (2f * iu * u) + c * (u * u);
         }
 
-        private void DrawMeshLeg(RoomCamera.SpriteLeaser sLeaser, FoxBreedParams p, int i,
-                                 Vector2 shoulder, Vector2 paw, float bend, Vector2 drawAxis, Vector2 camPos)
-        {
-            var mesh = sLeaser.sprites[LimbSprite(i)] as TriangleMesh;
-            if (mesh == null) return;
-
-            float reach = Mathf.Max(2f, limbs[i].jointDist);
-            float upper = reach * Mathf.Clamp(p.LimbUpperFac, 0.1f, 0.9f);
-            float lower = reach - upper;
-
-            Vector2 pawDir = drawAxis;
-            Vector2 legVec = paw - shoulder;
-            float legLen = legVec.magnitude;
-            Vector2 legDir = (legLen > 0.01f) ? legVec / legLen : new Vector2(0f, -1f);
-            Vector2 ankle = paw - pawDir * (p.LimbPawLength * 0.5f);
-
-            Vector2 knee = Custom.InverseKinematic(shoulder, ankle, upper, lower, bend);
-            Vector2 kneePerp = PerpOf(ankle - shoulder);
-            knee += kneePerp * (p.LimbKneeBend * Mathf.Clamp(bend, -1f, 1f) * reach * 0.15f);
-
-            float thick = p.LimbThickness * 0.5f;
-            Vector2 wUpper = PerpOf(knee - shoulder) * thick;
-            Vector2 wLower = PerpOf(ankle - knee) * (thick * 0.8f);
-            Vector2 alongLower = (ankle - knee);
-            float lowLen = alongLower.magnitude;
-            alongLower = (lowLen > 0.01f) ? alongLower / lowLen : legDir;
-
-            Vector2 pawPerp = PerpOf(pawDir);
-            float pawHalf = thick * Mathf.Max(0.2f, p.LimbPawWidth);
-            Vector2 toe = ankle + pawDir * p.LimbPawLength;
-
-            mesh.MoveVertice(0, shoulder - wUpper - camPos);
-            mesh.MoveVertice(1, shoulder + wUpper - camPos);
-            mesh.MoveVertice(2, Vector2.Lerp(shoulder, ankle, 0.5f) - camPos);
-            mesh.MoveVertice(3, knee - wUpper * 0.8f - camPos);
-            mesh.MoveVertice(4, knee + wUpper * 0.8f - camPos);
-            mesh.MoveVertice(5, ankle - alongLower * (thick * 0.5f) - camPos);
-            mesh.MoveVertice(6, ankle - wLower - camPos);
-            mesh.MoveVertice(7, ankle + wLower - camPos);
-            mesh.MoveVertice(8, ankle - pawPerp * pawHalf - camPos);
-            mesh.MoveVertice(9, ankle + pawPerp * pawHalf - camPos);
-            mesh.MoveVertice(10, toe - pawPerp * (pawHalf * 0.7f) - camPos);
-            mesh.MoveVertice(11, toe + pawPerp * (pawHalf * 0.7f) - camPos);
-            mesh.color = p.ColorBody;
-        }
-
-        private void DrawSpriteLeg(RoomCamera.SpriteLeaser sLeaser, FoxBreedParams p, int i,
-                                   Vector2 shoulder, Vector2 paw, float depth, Vector2 camPos)
-        {
-            FSprite s = sLeaser.sprites[LimbSprite(i)];
-            Vector2 leg = paw - shoulder;
-            float len = leg.magnitude;
-            s.x = shoulder.x - camPos.x;
-            s.y = shoulder.y - camPos.y;
-            s.anchorX = 0.5f;
-            s.anchorY = 1f;
-            s.rotation = AimDeg(leg) + 180f;
-            s.scaleY = (s.element != null && s.element.sourcePixelSize.y > 0.01f)
-                ? len / s.element.sourcePixelSize.y : 1f;
-            s.scaleX = (bodySpriteActive ? artScale : (p.LimbThickness / 3f)) * p.LegSpriteWidthFac
-                       * TurnForeshorten(p, depth);
-            if (depth < 0f) s.scaleX = -s.scaleX;
-            s.color = BodyArtTint(p, p.LegSpriteMask);
-        }
-
-        private void DrawHeadSprite(RoomCamera.SpriteLeaser sLeaser, FoxBreedParams p, float depth, Vector2 camPos)
-        {
-            FSprite s = sLeaser.sprites[SpriteHead];
-            bool facingRight = depth >= 0f;
-            s.x = DrawNeckPos.x - camPos.x;
-            s.y = DrawNeckPos.y - camPos.y;
-            s.anchorX = p.HeadSpriteAnchorX;
-            s.anchorY = p.HeadSpriteAnchorY;
-            s.rotation = AimDeg(DrawHeadDir) + (facingRight ? -90f : 90f);
-            float scale = Mathf.Max(0.01f, p.HeadSpriteScale * p.HeadSize
-                                           * (bodySpriteActive ? artScale : 1f));
-            s.scaleX = (facingRight ? scale : -scale) * TurnForeshorten(p, depth);
-            s.scaleY = scale;
-            s.color = HeadTint(p);
-
-            FSprite eye = sLeaser.sprites[SpriteEye];
-            if (headEyeActive)
-            {
-                eye.x = s.x;
-                eye.y = s.y;
-                eye.anchorX = s.anchorX;
-                eye.anchorY = s.anchorY;
-                eye.rotation = s.rotation;
-                eye.scaleX = s.scaleX;
-                eye.scaleY = s.scaleY;
-                eye.color = InkEyeTint(p, EyeColor(p));
-            }
-            else
-            {
-                eye.scaleX = 0f;
-                eye.scaleY = 0f;
-            }
-        }
-
-        private static Color HeadTint(FoxBreedParams p)
-        {
-            if (p.HeadSpriteMask) return p.ColorHead;
-            const float ART_GREY = 0x97 / 255f;
-            return new Color(Mathf.Clamp01(p.ColorHead.r / ART_GREY),
-                             Mathf.Clamp01(p.ColorHead.g / ART_GREY),
-                             Mathf.Clamp01(p.ColorHead.b / ART_GREY));
-        }
-
-        private void DrawHeadMesh(RoomCamera.SpriteLeaser sLeaser, FoxBreedParams p, float depth, Vector2 camPos)
-        {
-            var mesh = sLeaser.sprites[SpriteHead] as TriangleMesh;
-            if (mesh == null) return;
-
-            float skull = head.rad;
-            float fore = Mathf.Lerp(Mathf.Clamp01(p.HeadForeshorten), 1f, Mathf.Abs(depth));
-            float muzzle = p.HeadMuzzleLength * p.HeadSize * fore;
-            Vector2 dir = DrawHeadDir;
-            Vector2 perp = new Vector2(-dir.y, dir.x);
-
-            Vector2 prev = DrawHeadPos - dir * skull;
-            float prevW = 0.05f * skull;
-            for (int q = 0; q < HEAD_QUADS; q++)
-            {
-                float t = (float)(q + 1) / HEAD_QUADS;
-                float x = Mathf.Lerp(-skull, muzzle, t);
-                float w = HeadHalfWidth(p, x, skull, muzzle);
-                Vector2 here = DrawHeadPos + dir * x;
-                int b = q * 4;
-                mesh.MoveVertice(b, prev - perp * prevW - camPos);
-                mesh.MoveVertice(b + 1, prev + perp * prevW - camPos);
-                mesh.MoveVertice(b + 2, here - perp * w - camPos);
-                mesh.MoveVertice(b + 3, here + perp * w - camPos);
-                prev = here;
-                prevW = w;
-            }
-            mesh.color = p.ColorTail;
-
-            var eye = sLeaser.sprites[SpriteEye] as TriangleMesh;
-            if (eye == null) return;
-            Vector2 centre = DrawHeadPos + dir * (p.EyeAlong * p.HeadSize) + DrawHeadUp * (p.EyeUp * p.HeadSize);
-            Vector2 half = dir * (p.EyeLength * 0.5f * p.HeadSize);
-            Vector2 thick = DrawHeadUp * (p.EyeThickness * 0.5f * p.HeadSize);
-            eye.MoveVertice(0, centre - half - thick - camPos);
-            eye.MoveVertice(1, centre - half + thick - camPos);
-            eye.MoveVertice(2, centre + half - thick - camPos);
-            eye.MoveVertice(3, centre + half + thick - camPos);
-            eye.color = NoHole(p, EyeColor(p));
-        }
-
-        private static float HeadHalfWidth(FoxBreedParams p, float x, float skull, float muzzle)
-        {
-            float circle = (Mathf.Abs(x) < skull)
-                ? skull * Mathf.Sqrt(Mathf.Max(0f, 1f - (x / skull) * (x / skull)))
-                : 0f;
-            if (x <= 0f) return Mathf.Max(0.05f * skull, circle);
-            float wedge = Mathf.Lerp(skull * p.HeadMuzzleWidth, skull * p.HeadMuzzleTip,
-                                     Mathf.Clamp01(muzzle > 0.01f ? x / muzzle : 1f));
-            return Mathf.Max(circle, wedge);
-        }
-
-        private void TintTail(TriangleMesh mesh, FoxBreedParams p)
+        private static void TintTail(TriangleMesh mesh)
         {
             if (mesh.verticeColors == null)
             {
-                mesh.color = p.ColorTail;
+                mesh.color = Color.white;
                 return;
             }
-            int n = mesh.verticeColors.Length;
-            if (partsRigActive && !p.PartsMask)
-            {
-                for (int v = 0; v < n; v++) mesh.verticeColors[v] = Color.white;
-                return;
-            }
-            for (int v = 0; v < n; v++)
-            {
-                float t = (n > 1) ? (float)v / (n - 1) : 1f;
-                mesh.verticeColors[v] = Color.Lerp(p.ColorTailRoot, p.ColorTail, t);
-            }
+            for (int v = 0; v < mesh.verticeColors.Length; v++) mesh.verticeColors[v] = Color.white;
         }
 
         private static float AimDeg(Vector2 v)
@@ -1772,13 +1160,6 @@ namespace MotherMod
             return perp * upSign;
         }
 
-        private static Vector2 PerpOf(Vector2 v)
-        {
-            float m = v.magnitude;
-            if (m < 0.0001f) return new Vector2(1f, 0f);
-            return new Vector2(-v.y / m, v.x / m);
-        }
-
         public override void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             this.palette = palette;
@@ -1792,6 +1173,15 @@ namespace MotherMod
 
             sLeaser.RemoveAllSpritesFromContainer();
 
+            if (drawNothing)
+            {
+                if (sLeaser.containers != null && sLeaser.containers.Length > 0)
+                {
+                    newContatiner.AddChild(sLeaser.containers[0]);
+                }
+                return;
+            }
+
             if (tobyFramesActive)
             {
                 AddTobyFrameToContainer(sLeaser, newContatiner);
@@ -1799,50 +1189,13 @@ namespace MotherMod
             }
 
             AddLayer(sLeaser, rCam, newContatiner, FoxCosmetic.ZOrder.Behind);
-
-            if (partsRigActive)
-            {
-                AddPartsToContainer(sLeaser, newContatiner);
-                AddLayer(sLeaser, rCam, newContatiner, FoxCosmetic.ZOrder.BodySurface);
-                AddLayer(sLeaser, rCam, newContatiner, FoxCosmetic.ZOrder.BehindHead);
-                if (sLeaser.containers != null && sLeaser.containers.Length > 0)
-                {
-                    newContatiner.AddChild(sLeaser.containers[0]);
-                }
-                AddLayer(sLeaser, rCam, newContatiner, FoxCosmetic.ZOrder.InFront);
-                return;
-            }
-
-            for (int i = 0; i < limbs.Length; i += 2)
-            {
-                newContatiner.AddChild(sLeaser.sprites[LimbSprite(i)]);
-            }
-
-            newContatiner.AddChild(sLeaser.sprites[SpriteTail]);
-
-            for (int i = SpriteBodyFillStart; i < SpriteBodyFillEnd; i++)
-            {
-                newContatiner.AddChild(sLeaser.sprites[i]);
-            }
-            newContatiner.AddChild(sLeaser.sprites[SpriteBodyMesh]);
-
+            AddPartsToContainer(sLeaser, newContatiner);
             AddLayer(sLeaser, rCam, newContatiner, FoxCosmetic.ZOrder.BodySurface);
-
-            for (int i = 1; i < limbs.Length; i += 2)
-            {
-                newContatiner.AddChild(sLeaser.sprites[LimbSprite(i)]);
-            }
-
             AddLayer(sLeaser, rCam, newContatiner, FoxCosmetic.ZOrder.BehindHead);
-
-            newContatiner.AddChild(sLeaser.sprites[SpriteHead]);
-            newContatiner.AddChild(sLeaser.sprites[SpriteEye]);
-
             if (sLeaser.containers != null && sLeaser.containers.Length > 0)
             {
                 newContatiner.AddChild(sLeaser.containers[0]);
             }
-
             AddLayer(sLeaser, rCam, newContatiner, FoxCosmetic.ZOrder.InFront);
         }
 

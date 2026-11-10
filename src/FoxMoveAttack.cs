@@ -30,6 +30,8 @@ namespace MotherMod
         private Vector2 hopTouchPos;
         private int hopTouchFrames;
         private float hopTouchAimErr;
+        private IntVector2 hopStartTile;
+        private float hopPeakY;
         private int boostLeft;
         private float launchFrac = 1f;
         private float wantDist;
@@ -112,7 +114,7 @@ namespace MotherMod
 
         protected override int BudgetFor(FoxBreedParams p, FoxMoveSituation s)
         {
-            return Math.Max(1, p.AttackStateCeilingTicks) + 1;
+            return p.AttackStateCeilingTicks + 1;
         }
 
         protected override void OnBegin(FoxBreedParams p, FoxMoveSituation s, FoxMoveBid bid)
@@ -135,6 +137,8 @@ namespace MotherMod
             {
                 gatherFramesUsed = Math.Max(0, s.HopChargeTicks);
                 hopVel = s.HopVel;
+                hopStartTile = s.HopStartTile;
+                hopPeakY = float.NegativeInfinity;
                 fox.HopLook.BeginHop(p, s);
             }
             else fox.HopLook.Abandon(p, "pounce_began");
@@ -253,32 +257,37 @@ namespace MotherMod
 
             if (planRouted)
             {
-                if (p.PounceRouteFlyLaunchVel)
-                {
-                    v = planVel;
-                }
+                v = planVel;
             }
 
-            if (isHop && hopVel.sqrMagnitude > 0.0001f)
+            bool hopFlies = isHop && hopVel.sqrMagnitude > 0.0001f;
+            if (hopFlies)
             {
                 v = hopVel;
             }
+            fox.PredictedRange(p, v);
+            fox.PredictedApex(p, v);
 
-            Vector2 predicted;
-            if (p.PounceRoomClamp && fox.RoomRef != null && !fox.PredictedLandingInRoom(p, v, out predicted))
+            Vector2 predicted = targetPos;
+            if (fox.RoomRef != null
+                && !(hopFlies ? fox.LandingXInRoom(p, targetPos.x) : fox.PredictedLandingInRoom(p, v, out predicted)))
             {
                 End(p, "launch_refused");
                 return;
             }
 
-            if (p.PounceRequireLanding && fox.RoomRef != null)
+            if (fox.RoomRef != null)
             {
                 Vector2 landAt;
                 IntVector2 landTile;
                 string landWhy;
                 string landEntry;
-                bool landOk = fox.PredictedLandingSurvivable(p, v, out landAt, out landTile,
-                                                            out landWhy, out landEntry);
+                bool landOk = hopFlies
+                    ? fox.PredictedHopLandingSurvivable(p,
+                          fox.HopLook.SnapsLaunch(p) ? fox.HopLook.SnapPoint(v) : fox.mainBodyChunk.pos,
+                          v, out landAt, out landTile, out landWhy, out landEntry)
+                    : fox.PredictedLandingSurvivable(p, v, out landAt, out landTile,
+                                                     out landWhy, out landEntry);
                 if (!landOk)
                 {
                     End(p, "launch_refused");
@@ -299,7 +308,8 @@ namespace MotherMod
 
             if (isHop) fox.HopLook.Launch(p, c, v);
 
-            boostLeft = Math.Max(0, p.PounceBoostFrames);
+            boostLeft = isHop ? 0 : Math.Max(0, p.PounceBoostFrames);
+            if (isHop) hopPeakY = c[1].pos.y;
             Stage = Fox.PounceState.Propel;
             counter = 0;
             fox.PounceGather = 1f;
@@ -325,6 +335,8 @@ namespace MotherMod
                 boostLeft--;
             }
 
+            if (isHop && c[1].pos.y > hopPeakY) hopPeakY = c[1].pos.y;
+
             fox.ClearGoThroughFloors();
 
             if (isHop && fox.HopLook.OwnsAttitude) fox.HopLook.FlightTick(p);
@@ -338,7 +350,8 @@ namespace MotherMod
                 return;
             }
 
-            if (counter > p.PounceFlightMaxFrames)
+            int flightMax = isHop ? p.HopFlightMaxFrames : p.PounceFlightMaxFrames;
+            if (counter > flightMax)
             {
                 if (isHop) hopOutcome = "flight_timeout";
                 EnterRecovery();
@@ -408,8 +421,10 @@ namespace MotherMod
             {
                 string refused = "none";
                 fox.HopLook.NotePounceEnded(p, reason, hopTouched, handover);
+                float hopApex = (float.IsNegativeInfinity(hopPeakY) || fox.RoomRef == null) ? -1f
+                    : Mathf.Max(0f, hopPeakY - fox.RoomRef.MiddleOfTile(hopStartTile.x, hopStartTile.y).y);
                 fox.Move.Hop.NoteEnded(p, reason, Stage.ToString(), handover, hopTouched, hopOutcome,
-                                       hopTouchPos, hopTouchFrames, hopTouchAimErr, refused, ran);
+                                       hopTouchPos, hopTouchFrames, hopTouchAimErr, hopApex, refused, ran);
             }
 
             bool forced = reason == "overran" || reason == "overran_bite_gate";
@@ -562,7 +577,7 @@ namespace MotherMod
 
             if (gate != null)
             {
-                gateCooldown = (gate == "cooldown") ? Cooldown : Math.Max(1, p.ChargeGateRetryDelay);
+                gateCooldown = (gate == "cooldown") ? Cooldown : p.ChargeGateRetryDelay;
                 string m = null;
                 return FoxMoveBid.No(gate, m);
             }
@@ -574,7 +589,7 @@ namespace MotherMod
 
         protected override int BudgetFor(FoxBreedParams p, FoxMoveSituation s)
         {
-            return Math.Max(1, p.AttackStateCeilingTicks) + 1;
+            return p.AttackStateCeilingTicks + 1;
         }
 
         protected override void OnBegin(FoxBreedParams p, FoxMoveSituation s, FoxMoveBid bid)
@@ -658,7 +673,7 @@ namespace MotherMod
             fox.ClearGoThroughFloors();
 
             bool thrusting = counter <= Math.Max(0, p.ChargeThrustFrames)
-                             && (!p.ChargeRequireGrounded || fox.Grounded);
+                             && fox.Grounded;
             if (thrusting)
             {
                 for (int k = 0; k < c.Length; k++) c[k].vel += chargeDir * (p.ChargeThrust / (k + 1));
@@ -776,7 +791,7 @@ namespace MotherMod
 
         protected override int BudgetFor(FoxBreedParams p, FoxMoveSituation s)
         {
-            return Math.Max(1, p.AttackStateCeilingTicks) + 1;
+            return p.AttackStateCeilingTicks + 1;
         }
 
         protected override string TimeoutReason { get { return "overran"; } }

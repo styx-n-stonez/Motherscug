@@ -79,8 +79,6 @@ namespace MotherMod
 
         public string RelRouteSocialDependent = "prey";
 
-        public bool DiscomfortEnabled = true;
-
         public float BodyMass = 3.2f;
         public float BodySizeFac = 0.9f;
         public float BodyRadFac = 1f;
@@ -90,42 +88,32 @@ namespace MotherMod
         public float SpineElasticity = 0.95f;
         public float SpineWeightSymmetry = 0.5f;
 
-        public bool RouteHoleAvoid = true;
         public float RouteHolePenalty = 10.0f;
         public float RouteCorridorPenalty = 0.0f;
-        public bool  RouteCorridorDetectSideways = true;
         public string RouteHoleLegality = "unwanted";
         public int RouteHoleProbeTiles = 1;
-        public bool RouteObstacleEnabled = true;
         public float RouteObstacleWeight = 5.0f;
         public float RouteObstacleExponent = 3.0f;
 
-        public bool RouteObstacleSkipWhenWedged = true;
-
         public int RouteObstacleEscapeMuteTicks = 200;
         public bool PounceRouteEnabled = true;
-        public bool PounceRouteWhilePatrolling = true;
         public int PounceRoutePeekSteps = 10;
         public int PounceRouteMaxFinders = 4;
         public int PounceRouteItersPerTick = 100;
         public int PounceRouteMinTilesOrigin = 3;
         public int PounceRouteMinTilesDest = 3;
-        public bool PounceRouteBlockNarrow = false;
         public int PounceRouteReplanTicks = 60;
         public string PounceRouteMaxLegality = "unwanted";
         public int MantleRouteScanTiles = 2;
         public int MantleRouteReplanTicks = 20;
         public float PartsSpineRevMinSpeed = 0.5f;
         public int PounceRouteSeedAttemptsPerTick = 4;
-        public bool MantleRiseFromClimbEnds = true;
-        public bool StepUpRampConnWalks = true;
         public float StepArcPeak = 0.32f;
         public float StepTargetFreezeFrac = 1.0f;
         public int StepSwingMinTicks = 9;
         public int PipeReentryDelayTicks = 100;
         public float PipeMouthShovePx = 4.0f;
         public int PipeExitDelayTicks = 80;
-        public bool GaitWalkEnabled = true;
         public float GaitWalkTrotSpeed = 2.2f;
         public float StepGaitGapShort = 0.15f;
         public float StepGaitGapLong = 0.35f;
@@ -134,9 +122,7 @@ namespace MotherMod
         public float PounceRouteMinRise = 0f;
         public float PounceRouteMaxRise = 80f;
         public int SqueezeWedgeMaxTicks = 90;
-        public bool SqueezeWedgeRearmInCorridor = true;
         public int SqueezeWedgeMaxRearms = 6;
-        public bool SqueezeWedgeEscapeEnabled = true;
         public int SqueezeWedgeEscapeTicks = 120;
 
         public int SqueezeWedgeEscapeStuckTicks = 400;
@@ -144,34 +130,21 @@ namespace MotherMod
         public int SqueezeReinflateTicks = 20;
 
         public int CorridorTerrainMinChunks = 2;
-        public bool CorridorNarrowIgnoreDiagonals = true;
-        public bool CorridorFootingGate = true;
         public int CorridorEntryFootingFrames = 2;
 
         public float CorridorCenterFac = 0.5f;
 
         public float CorridorCenterReachTiles = 1.25f;
 
-        public bool CorridorCenterYieldToTravel = true;
-
         public float CorridorFoldFac = 0.45f;
 
-        public bool SqueezeArmWhenWedged = true;
         public float SqueezeWedgeUtilityMin = 0f;
-        public bool PounceRouteFlyLaunchVel = true;
-        public bool TurnRearAnchorEnabled = true;
-        public bool TurnBlockedProbeLevel = true;
         public int PounceRouteGoalSeedSnapRows = 5;
-        public bool PounceRouteGoalSeedEnabled = true;
         public int PounceRouteGoalSeedPathFloor = 4;
         public float PounceRouteGoalSeedRadiusTiles = 6.0f;
         public float PounceRouteGoalSeedLateralTiles = 3.0f;
         public float PounceRouteGoalSeedMinGainTiles = 1.0f;
         public int PounceRouteGoalMinTilesOrigin = 2;
-        public bool MantleRouteVeto = true;
-        public bool MantleRouteVetoOnSilence = false;
-        public bool MantleRouteVetoOnIllegalLanding = false;
-        public bool MantleRouteEnabled = true;
         public float MantleRoutePenalty = 6.0f;
         public float MantleRouteMaxRise = 30.0f;
 
@@ -189,34 +162,25 @@ namespace MotherMod
         public int   PreyGiveUpUnreachable = 900;
         public int   PreyGiveUpGhostGeneration = 90;
         public int   HuntPersistFrames = 400;
-        public bool  HuntGhostPursue = true;
 
         public float PhysGravity = 0.9f;
         public float PhysSurfaceFriction = 0.5f;
         public float PhysAirFriction = 0.999f;
         public float PhysBounce = 0.1f;
-        public bool PhysGoThroughFloors = false;
         public float PhysWaterFriction = 0.92f;
         public float PhysBuoyancy = 1.06f;
 
-        public bool SwimEnabled = true;
         public float SwimSpeed = 0.2f;
         public float SwimSubmersionMin = 0.5f;
-        public bool SwimSurfaceHold = true;
         public float SwimSurfaceDamping = 0.8f;
         public float SwimSurfacePull = 0.1f;
         public float SwimSurfaceClamp = 10f;
-        public bool SwimClimbOutFooting = true;
         public int SwimLogTicks = 20;
 
-        public bool SwimDiveEnabled = true;
         public float SwimDiveDepthTiles = 3f;
         public float SwimDiveSpeed = 0.2f;
-        public bool SwimSurfaceHoldReleaseOnDive = true;
 
-        public bool StunFallEnabled = true;
         public int StunFallMinStun = 10;
-        public bool StunFallRightingOff = true;
         public float StunFallSurfaceFriction = 0.3f;
         public int StunFallRecoverTicks = 0;
 
@@ -224,7 +188,6 @@ namespace MotherMod
         public float BlindOmniFac = 0f;
         public float BlindHeadScatterPx = 400f;
         public int BlindHeadScatterTicks = 1;
-        public bool BlindEyeFlicker = true;
 
         public bool BlindStunEnabled = true;
 
@@ -244,8 +207,6 @@ namespace MotherMod
 
         public int DeathBehindLayTicks = 40;
         public float DeathBehindLayLimbFac = 0.35f;
-
-        public bool DeathLayAllDeaths = true;
 
         public float DeathBehindConeDeg = 90f;
 
@@ -285,19 +246,12 @@ namespace MotherMod
         public int LedgePounceHeadroomTiles = 2;
         public float LedgePounceLandMarginPx = 20f;
 
-        public bool  LedgePounceAllowLevel = true;
         public float LedgePounceMinGapPx = 40f;
-        public bool  LedgePounceAllowDescend = true;
         public float LedgePounceMaxDrop = 120f;
 
         public int LedgePounceDescendRows
         {
-            get
-            {
-                if (LedgePounceAllowDescend)
-                    return 1 + Mathf.CeilToInt(Mathf.Max(0f, LedgePounceMaxDrop) / 20f);
-                return LedgePounceAllowLevel ? 1 : 0;
-            }
+            get { return 1 + Mathf.CeilToInt(Mathf.Max(0f, LedgePounceMaxDrop) / 20f); }
         }
 
         public bool MantleEnabled = true;
@@ -314,7 +268,6 @@ namespace MotherMod
         public int MantleHeadroomTiles = 1;
         public int MantleProbeTiles = 1;
         public int MantleMaxScanTiles = 2;
-        public bool  MantleFacePlatforms = true;
         public float MantleClearMarginPx = 3f;
         public float MantleFootAboveFac = 1.1f;
         public int MantleLogTicks = 10;
@@ -325,24 +278,18 @@ namespace MotherMod
         public float ReachSpeed = 5f;
         public float ReachAccelFac = 2f;
         public float ReachArrivePx = 12f;
-        public bool ReachGravityOff = true;
         public int ReachCooldown = 15;
         public int ReachLogTicks = 5;
 
-        public bool EnterEnabled = true;
         public int EnterGatherFrames = 8;
         public float EnterGatherCompress = 0.12f;
         public float EnterHeadLead = 0.10f;
         public float EnterRearLag = 0.6f;
         public float EnterPull = 1.5f;
-        public bool EnterSpinePull = true;
         public int EnterMaxFrames = 90;
         public int EnterCooldown = 15;
         public float EnterReachPx = 30f;
 
-        public bool EnterThroughFloors = true;
-        public bool EnterShortcutEnabled = true;
-        public bool EnterShortcutNeedsGround = false;
         public int EnterShortcutScanTiles = 2;
         public int EnterShortcutNearTiles = 2;
 
@@ -401,7 +348,6 @@ namespace MotherMod
 
         public float PounceMaxLaunchDeg = 75f;
 
-        public bool SqueezeEnabled = true;
         public float SqueezeStartFrames = 10f;
         public float SqueezeFullFrames = 30f;
         public float SqueezeMinFac = 0.05f;
@@ -409,11 +355,9 @@ namespace MotherMod
         public float SqueezeBodyFac = 1.0f;
         public float SqueezeTailFac = 1.0f;
         public float SqueezeSpineLenFac = 1.0f;
-        public bool SqueezeDrawFromTerrain = true;
         public float SqueezeDrawTerrainMax = 1f;
         public float SqueezeDrawTerrainLerp = 0.25f;
         public int SqueezeSlopesOffFrames = 30;
-        public bool SqueezeSpinePull = true;
         public int SqueezeBacklogSteps = 20;
         public float SqueezeProgressPx = 12f;
         public int SqueezeProgressWindow = 20;
@@ -423,14 +367,10 @@ namespace MotherMod
         public int SpanLogTicks = 40;
         public int SpanLogFloorTicks = 10;
         public int SpanFloorGraceTicks = 20;
-        public bool SqueezeSpinePullAlways = false;
         public float DriveMidSpeedFac = 0.85f;
         public float DriveMidAccelFac = 0.8f;
         public float DriveRearSpeedFac = 0.7f;
         public float DriveRearAccelFac = 0.6f;
-        public bool  DriveHeadLed = true;
-        public bool  DriveGroundDescentClamp = false;
-        public bool  DriveSlopeHorizontal = true;
         public float DriveTrailSlackPx = 2f;
         public float DriveTrailBackstepFac = 0f;
 
@@ -455,13 +395,11 @@ namespace MotherMod
         public float BiteRadius = 45f;
         public int   BiteCooldown = 60;
         public float BiteMomentumFac = 2f;
-        public bool  BiteThroughWalls = false;
         public float BiteContactRadius = 10f;
         public float BiteContactGap = 3.0f;
         public float BiteFacingDot = 0.3f;
         public float BiteFacingPounceDot = -0.2f;
         public float BiteFacingChargeDot = -0.2f;
-        public bool  BiteSweptContact = true;
         public float BiteSweptMinSpeed = 3.0f;
         public float LungeSpeed = 0.35f;
         public float LungeMaxSpeed = 8f;
@@ -492,7 +430,6 @@ namespace MotherMod
         public float PounceBoost = 2f;
         public int   PounceBoostFrames = 3;
 
-        public bool  PounceRangeScaling = true;
         public float PounceLaunchMinFrac = 0.45f;
         public float PounceRangeOvershootFac = 1.15f;
         public float PounceRiseMargin = 20f;
@@ -520,15 +457,9 @@ namespace MotherMod
         public float PounceLandDamp = 0.5f;
         public float PounceLandCompress = 3f;
 
-        public bool  PounceRoomClamp = true;
         public float PounceRoomMargin = 60f;
 
-        public bool  PounceRequireLanding = true;
         public int   PounceLandingScanTiles = 10;
-
-        public bool  PounceLandingCheckObstruction = true;
-
-        public bool  PounceLandingRequireStandingRoom = true;
 
         public bool  ChargeEnabled = false;
         public float ChargeDistance = 260f;
@@ -542,13 +473,11 @@ namespace MotherMod
         public int   ChargeMaxFrames = 34;
         public float ChargeMaxSpeed = 14f;
         public float ChargeAimTrack = 0f;
-        public bool  ChargeRequireGrounded = true;
         public int   ChargeRecoveryStun = 34;
         public int   ChargeCooldown = 150;
         public int   AttackStateCeilingTicks = 400;
         public int   ChargeGateRetryDelay = 5;
         public float ChargeRoomMargin = 60f;
-        public bool  ChargeRequireLanding = true;
         public int   ChargeLandingSamples = 6;
         public float ChargeStallSpeed = 1.5f;
         public int   ChargeStallGrace = 6;
@@ -560,15 +489,9 @@ namespace MotherMod
 
         public int   PathLatchMaxRejects = 3;
 
-        public bool  PathBodyTieBreak = true;
-
         public int   PathTieBreakMaxStreak = 8;
 
         public int   PathTiebreakCommitTicks = 6;
-
-        public bool  PathTiebreakNormaliseTurn = true;
-
-        public bool  PathTiebreakTravelPreference = true;
 
         public float TurnTriggerDot = -0.3f;
         public float TurnTriggerMinHorizontal = 0.35f;
@@ -583,7 +506,6 @@ namespace MotherMod
         public float TurnPivotBrake = 0.5f;
         public float TurnPivotJitter = 0.16f;
         public float TurnPivotStretchPx = 14.00f;
-        public bool TurnPivotSpanClamp = true;
         public float TurnPivotCrossFac = 0.12f;
         public float TurnPivotFinish = 0.15f;
         public float TurnPivotReleaseDot = 0.5f;
@@ -591,23 +513,17 @@ namespace MotherMod
         public float TurnPivotSwingPx = 9.00f;
         public float TurnPivotGoalDot = 0.5f;
         public int   TurnPivotMaxTicks = 80;
-        public bool  TurnPivotPushOff = true;
         public float TurnPivotSpanFloorFac = 0.60f;
 
-        public bool  TurnFocusHold = true;
         public float TurnFocusHoldDot = 0f;
         public int   TurnMinIntervalTicks = 50;
 
         public int   TurnLogTicks = 4;
         public int   TurnAbortAirTicks = 3;
-        public bool  TurnInWater = true;
-        public bool  TurnCarryRotate = true;
         public float TurnSpineRelax = 0f;
         public int   TurnSpineRecoverTicks = 8;
 
         public float BodyTurnForeshorten = 0.6f;
-
-        public bool DepthVerticalHold = true;
 
         public float DepthVerticalHoldBand = 0.30f;
 
@@ -620,8 +536,6 @@ namespace MotherMod
         public float LimbSweepSpeedGate = 0.1f;
         public int   LimbSweepMinGrip = 2;
         public float LimbSweepBodySpeedGate = 0.3f;
-
-        public bool  DenFedEnabled = false;
 
         public bool  ConspecificAwareness = false;
 
@@ -640,11 +554,9 @@ namespace MotherMod
 
         public float SenseRadius = 500f;
         public float SenseMaxScore = 0.55f;
-        public bool SenseThroughWalls = true;
         public float SenseWallRadiusFac = 0.6f;
         public float SenseWallScoreFac = 0.5f;
         public int SenseOmniIntervalTicks = 10;
-        public bool SenseOmniInLosFull = false;
 
         public bool ScentEnabled = true;
         public float ScentRadiusTiles = 75f;
@@ -679,9 +591,6 @@ namespace MotherMod
         public float RoamPickJitter = 0.25f;
         public int RoamCandidates = 12;
 
-        public int DenRestFrames = 1200;
-        public float DenFedPriority = 0.5f;
-
         public bool StalkEnabled = true;
         public float StalkDistance = 260f;
         public float RunSpeedStalk = 0.45f;
@@ -707,14 +616,10 @@ namespace MotherMod
 
         public float LandRightSuppressFac = 0f;
 
-        public bool LandRightAxisSignLatch = true;
-
         public float LandRightAxisSignBand = 0.12f;
 
-        public bool LandRightAirAlways = true;
         public float LandRightAirFac = 0.4f;
         public int   LandRightAirMinTicks = 3;
-        public bool  LandRightSuppressInCorridor = true;
 
         public string LandSound = "Lizard_Heavy_Terrain_Impact";
 
@@ -733,38 +638,21 @@ namespace MotherMod
         public float RepMemoryDecay = 0.0005f;
         public float RepCommunityInfluence = 1f;
 
-        public Color ColorBody = new Color(0x2B / 255f, 0x2B / 255f, 0x2B / 255f);
         public Color ColorTail = new Color(0x97 / 255f, 0x97 / 255f, 0x97 / 255f);
-        public Color ColorTailRoot = new Color(0x56 / 255f, 0x56 / 255f, 0x56 / 255f);
-        public Color ColorLegs = new Color(0x5E / 255f, 0x5E / 255f, 0x5E / 255f);
-        public Color ColorPaws = new Color(0x45 / 255f, 0x45 / 255f, 0x45 / 255f);
         public Color ColorLegLower = new Color(0x77 / 255f, 0x77 / 255f, 0x77 / 255f);
-        public Color ColorEye = new Color(0x1A / 255f, 0x1A / 255f, 0x1A / 255f);
         public float EyeInkTintFloor = 1f;
-        public Color EyeHoleFloor = new Color(0x0A / 255f, 0x0A / 255f, 0x0A / 255f);
         public Color ColorHead = new Color(0x97 / 255f, 0x97 / 255f, 0x97 / 255f);
 
-        public bool SandboxGlowEnabled = false;
-
-        public Color SandboxGlowColor = new Color(1f, 1f, 1f);
-        public bool SandboxHideArtCopy = false;
-
         public Color IconColor = new Color(1f, 1f, 1f);
-
-        public float SandboxGlowAlpha = 0.0f;
 
         public int PoseLogTicks = 80;
         public int FeetLogTicks = 40;
 
-        public int BodyCircles = 4;
         public float BodyMeshRadFac = 1.15f;
-        public int BodyMeshPoints = 7;
         public float BodyProfileNeck = 0.80f;
         public float BodyProfileChest = 1.30f;
         public float BodyProfileWaist = 0.72f;
         public float BodyProfileHaunch = 1.00f;
-        public float BodyFrontCap = 4.0f;
-        public float BodyMeshOverlap = 0.08f;
         public float BodyRideHeight = 9f;
 
         public float BodyRideCorridorFac = 0.40f;
@@ -775,69 +663,29 @@ namespace MotherMod
 
         public int BodyRideDeathTicks = 40;
 
-        public bool BodyRideStunCollapse = true;
-
         public float BodyRideStunCollapseFac = 0.7f;
-
-        public bool StunFallFrictionOnDead = true;
-
-        public bool DeathAssertPhysics = true;
 
         public float DrawSmoothing = 0f;
 
         public float HeadSize = 1f;
-        public bool HeadSprite = true;
-        public string HeadSpriteElement = "FoxRef_HeadMask";
-        public string HeadEyeElement = "FoxRef_HeadEye";
-        public bool HeadSpriteMask = true;
         public float HeadSpriteScale = 1f;
         public float HeadSpriteAnchorX = 0.06f;
         public float HeadSpriteAnchorY = 0.31f;
         public float HeadDrop = 2.5f;
         public float HeadNeckSlack = 0.45f;
         public float HeadGravity = 0.35f;
-        public float HeadLookFac = 0.55f;
         public float HeadPitchMax = 32f;
-        public float HeadMuzzleDroop = 0.08f;
-        public float HeadMuzzleLength = 10f;
-        public float HeadMuzzleWidth = 0.62f;
-        public float HeadMuzzleTip = 0.24f;
-        public float HeadForeshorten = 0.55f;
-
-        public float EyeLength = 5f;
-        public float EyeThickness = 1.6f;
-        public float EyeAlong = 2f;
-        public float EyeUp = 1f;
         public float NeckStiffness = 0.5f;
 
         public float LimbLengthFac = 0.8f;
         public float LimbSize = 3f;
-        public float LimbThickness = 3.0f;
-        public float LimbKneeBend = 0.35f;
         public float LimbUpperFac = 0.5f;
-        public float LimbPawLength = 3.5f;
-        public float LimbPawWidth = 1.4f;
         public float LimbBendSmooth = 0.15f;
         public float LimbBendFlipDeadband = 0.15f;
-        public bool BodySprite = true;
-        public string BodySpriteElement = "FoxRef_BodyMask";
-        public bool BodySpriteMask = true;
-        public float BodySpriteScaleFac = 1f;
-        public float BodySpriteStretch = 0.15f;
-        public bool LegSprites = true;
-        public string LegSpriteFront = "FoxRef_LegStraightMask";
-        public string LegSpriteFrontFar = "FoxRef_LegDiagonalMask";
-        public string LegSpriteHind = "FoxRef_LegFrontBMask";
-        public string LegSpriteHindFar = "FoxRef_LegFrontAMask";
-        public bool LegSpriteMask = true;
-        public string TailSpriteElement = "FoxRef_TailMask";
-        public float LegSpriteWidthFac = 1f;
 
-        public bool PartsRig = true;
         public string PartsPrefix = "FoxTofu_";
-        public bool PartsMask = false;
 
-        public int TobyDraw = 1;
+        public bool TobyFramesEnabled = false;
         public int TobyFrameTicks = 10;
         public float TobyFrameScale = 1f;
         public float TobyFrameFeetPx = 17f;
@@ -895,9 +743,10 @@ namespace MotherMod
         public int HopItersPerTick = 100;
         public int HopMinTilesOrigin = 5;
         public int HopMinTilesDest = 3;
-        public bool HopBlockNarrow = true;
-        public float HopMinSpeedFrac = 0.28f;
+        public float HopLaunchSpeedMin = 14f;
+        public float HopLaunchSpeedMax = 50f;
         public float HopSpeedFac = 1f;
+        public int HopFlightMaxFrames = 200;
         public float HopCarrySpeedFac = 0.75f;
         public float HopArcClearNearPx = 10f;
         public float HopArcClearFarPx = 20f;
@@ -946,7 +795,6 @@ namespace MotherMod
         public float PartsBodySquashMax = 0.3f;
         public float PartsBodyFlexMaxDeg = 9f;
         public float PartsBodyWidthMax = 0.12f;
-        public bool PartsLegRootFollowBend = false;
         public float PartsBodyFlexWave = 0.9f;
         public float PartsBodyFlexWavePhase = 1.57f;
         public float PartsBodyFlexAccel = 0.6f;
@@ -986,7 +834,6 @@ namespace MotherMod
         public float PartsKneeMaxStep = 2.5f;
         public float PartsKneeStepSpeedFac = 1.2f;
         public float PartsKneeReseedDist = 40f;
-        public bool  PartsLegSingleSprite = false;
 
         public float PartsLegForeOffset = 1.5f;
         public float PartsHaunchLean = 25f;
@@ -1002,7 +849,6 @@ namespace MotherMod
         public float PartsWaveSpeedFull = 6f;
         public float PartsWaveGroundFade = 0.15f;
         public float PartsLegMaxExtend = 0.93f;
-        public bool PartsTurnStep = true;
         public float PartsTurnStepFrontAt = 0.12f;
         public float PartsTurnStepHindAt = 0.58f;
         public float PartsTurnStepStagger = 0.1f;
@@ -1011,9 +857,6 @@ namespace MotherMod
         public float IdleBreathAmp = 0.03f;
         public float IdleBreathTicks = 110f;
         public float IdleBreathBob = 0.35f;
-        public float IdleGlanceChance = 0.004f;
-        public float IdleGlanceRange = 45f;
-        public int IdleGlanceTicks = 60;
         public float IdleTailSwayAmp = 0.5f;
         public float IdleTailSwayTicks = 150f;
         public float TailStreamFac = 0.5f;
@@ -1025,7 +868,6 @@ namespace MotherMod
         public float HeadPitchRate = 0.08f;
         public float HeadLookPitchFac = 0.7f;
 
-        public bool HeadIdleEnabled = true;
         public float HeadIdleSpeed = 1.2f;
         public float HeadSniffChance = 0.006f;
         public int HeadSniffTicks = 90;
@@ -1039,7 +881,6 @@ namespace MotherMod
         public float HeadYawRate = 0.06f;
         public float HeadYawDepth = 0.95f;
 
-        public bool HeadNoiseEnabled = true;
         public int HeadNoiseMaxAge = 40;
         public int HeadNoiseHoldTicks = 80;
         public float HeadBehindYaw = 0.9f;
@@ -1063,20 +904,12 @@ namespace MotherMod
         public int StepPlantCommitTicks = 6;
         public int StepMinGrip = 2;
         public int StepSwingMaxTicks = 8;
-        public bool PartsGaitChainAll = false;
-        public bool StepHindAxisFlip = false;
-        public bool StepPlantWorldLock = true;
-        public bool StepTargetClamp = true;
         public float StepTargetMaxAboveFac = 0.25f;
         public float StepReachClampFac = 1f;
 
-        public bool StepReachFloorFollowsFold = true;
-
-        public bool StepPlantAhead = true;
         public float StepPlantAheadMinSpeed = 0.3f;
         public float StepPlantAheadFullSpeed = 0.9f;
         public float StepPlantAheadTravelFac = 1f;
-        public bool StepTrueStance = true;
         public bool StepEventLog = true;
 
         public float RunPitchAmp = 18f;
@@ -1087,7 +920,6 @@ namespace MotherMod
         public float PouncePropelPitch = 10f;
         public float PartsLegRootFront = 0.78f;
         public float PartsLegRootHind = 0.175f;
-        public bool GaitDiagonal = true;
 
         public bool TailNoTuck = true;
         public float TailRearBias = 0.35f;
@@ -1104,9 +936,6 @@ namespace MotherMod
         public float LegPairDisplacement = 3f;
         public bool SmoothenLegMovement = true;
         public float WalkBob = 1f;
-        public float LimbAttachFront = 0.35f;
-        public float LimbAttachRear = 0.35f;
-        public float LimbAttachDrop = 0.0f;
 
         public int TailSegments = 5;
         public float TailLengthFac = 1f;
@@ -1114,13 +943,9 @@ namespace MotherMod
         public float TailLengthVsBody = 1f;
         public float TailHeightVsBody = 0.85f;
         public float TailTipTaper = 0.6f;
-        public float TailRootThickness = 0.90f;
-        public float TailTipThickness = 0.12f;
-        public float TailSwellPos = 0.25f;
         public float TailRootDrop = 0.0f;
         public float TailRootDroop = 0.45f;
         public float TailGravityCurve = 2f;
-        public float TailMeshOverlap = 0.2f;
         public float TailStiffness = 120f;
         public float TailStiffnessDecline = 0.5f;
         public float TailGravity = 0.9f;
@@ -1166,7 +991,6 @@ namespace MotherMod
         public float PoleLegMetaDegFront = 60f;
         public float PoleLegMetaDegHind = 45f;
         public float PolePawSpeedFac = 1.5f;
-        public bool PoleBackDown = true;
         public float PolePullPulseFac = 0.15f;
         public float PoleBodySwayPx = 1.25f;
         public int PoleBodySwayCycles = 1;
@@ -1185,14 +1009,10 @@ namespace MotherMod
         public int PoleMeetAsideTiles = 2;
         public int PoleMeetGiveUpTicks = 1200;
 
-        public bool PoleAscentHeadFirst = true;
-        public bool PoleAlignOrder = true;
         public float PoleAlignFarMaxPx = 2f;
         public float PoleAlignSwingPx = 1f;
 
         public int PoleFloorRegrabTicks = 40;
-
-        public bool PoleDestFilter = true;
 
         public bool WallOverhangAllowed = false;
 
@@ -1288,6 +1108,9 @@ namespace MotherMod
         public int EvasionReactionMaxTicks = 12;
         public int EvasionCooldownTicks = 40;
         public int EvasionStaggerTicks = 12;
+        public float EvasionPadPx = 8f;
+        public float EvasionDodgePop = 4f;
+        public float EvasionDodgeMaxPx = 60f;
 
         public int VoiceCooldownFrames = 25;
 
@@ -1856,8 +1679,6 @@ namespace MotherMod
             p.RoamNoiseWeight = F(o, "roam_noise_weight", p.RoamNoiseWeight);
             p.RoamDistanceWeight = F(o, "roam_distance_weight", p.RoamDistanceWeight);
             p.RoamPickJitter = F(o, "roam_pick_jitter", p.RoamPickJitter);
-            p.DenRestFrames = I(o, "den_rest_frames", p.DenRestFrames);
-            p.DenFedPriority = F(o, "den_fed_priority", p.DenFedPriority);
             p.StalkEnabled = B(o, "stalk_enabled", p.StalkEnabled);
             p.StalkDistance = F(o, "stalk_distance", p.StalkDistance);
             p.RunSpeedStalk = F(o, "run_speed_stalk", p.RunSpeedStalk);
@@ -1967,13 +1788,8 @@ namespace MotherMod
             p.RepMemoryDecay = F(o, "rep_memory_decay", p.RepMemoryDecay);
             p.RepCommunityInfluence = F(o, "rep_community_influence", p.RepCommunityInfluence);
 
-            p.ColorBody = C(o, "color_body", p.ColorBody);
             p.ColorTail = C(o, "color_tail", p.ColorTail);
-            p.ColorTailRoot = C(o, "color_tail_root", p.ColorTailRoot);
-            p.ColorLegs = C(o, "color_legs", p.ColorLegs);
-            p.ColorPaws = C(o, "color_paws", p.ColorPaws);
             p.ColorLegLower = C(o, "color_leg_lower", p.ColorLegLower);
-            p.ColorEye = C(o, "color_eye", p.ColorEye);
             p.EyeInkTintFloor = F(o, "eye_ink_tint_floor", p.EyeInkTintFloor);
             p.ColorHead = C(o, "color_head", p.ColorHead);
 
@@ -1986,7 +1802,6 @@ namespace MotherMod
             p.BodyProfileChest = F(o, "body_profile_chest", p.BodyProfileChest);
             p.BodyProfileWaist = F(o, "body_profile_waist", p.BodyProfileWaist);
             p.BodyProfileHaunch = F(o, "body_profile_haunch", p.BodyProfileHaunch);
-            p.BodyFrontCap = F(o, "body_front_cap", p.BodyFrontCap);
             p.BodyRideHeight = F(o, "body_ride_height", p.BodyRideHeight);
             p.BodyRideCorridorFac = F(o, "body_ride_corridor_fac", p.BodyRideCorridorFac);
             p.BodyRideCorridorLerp = F(o, "body_ride_corridor_lerp", p.BodyRideCorridorLerp);
@@ -1995,28 +1810,17 @@ namespace MotherMod
             p.BodyRideStunCollapseFac = F(o, "body_ride_stun_collapse_fac", p.BodyRideStunCollapseFac);
             p.DrawSmoothing = F(o, "draw_smoothing", p.DrawSmoothing);
             p.HeadSize = F(o, "head_size", p.HeadSize);
-            p.HeadSprite = B(o, "head_sprite", p.HeadSprite);
             p.HeadSpriteScale = F(o, "head_sprite_scale", p.HeadSpriteScale);
             p.HeadSpriteAnchorX = F(o, "head_sprite_anchor_x", p.HeadSpriteAnchorX);
             p.HeadSpriteAnchorY = F(o, "head_sprite_anchor_y", p.HeadSpriteAnchorY);
-            p.HeadLookFac = F(o, "head_look_fac", p.HeadLookFac);
             p.HeadPitchMax = F(o, "head_pitch_max", p.HeadPitchMax);
-            p.HeadMuzzleLength = F(o, "head_muzzle_length", p.HeadMuzzleLength);
-            p.HeadMuzzleWidth = F(o, "head_muzzle_width", p.HeadMuzzleWidth);
-            p.HeadMuzzleTip = F(o, "head_muzzle_tip", p.HeadMuzzleTip);
-            p.EyeThickness = F(o, "eye_thickness", p.EyeThickness);
             p.LimbLengthFac = F(o, "limb_length_fac", p.LimbLengthFac);
             p.LimbSize = F(o, "limb_size", p.LimbSize);
-            p.LimbThickness = F(o, "limb_thickness", p.LimbThickness);
             p.LimbUpperFac = F(o, "limb_upper_fac", p.LimbUpperFac);
-            p.LimbPawLength = F(o, "limb_paw_length", p.LimbPawLength);
             p.LimbBendSmooth = F(o, "limb_bend_smooth", p.LimbBendSmooth);
             p.LimbBendFlipDeadband = F(o, "limb_bend_flip_deadband", p.LimbBendFlipDeadband);
-            p.LegSprites = B(o, "leg_sprites", p.LegSprites);
-            p.BodySprite = B(o, "body_sprite", p.BodySprite);
             p.PartsPrefix = S(o, "parts_prefix", p.PartsPrefix);
-            p.PartsMask = B(o, "parts_mask", p.PartsMask);
-            p.TobyDraw = I(o, "toby_draw", p.TobyDraw);
+            p.TobyFramesEnabled = B(o, "toby_frames_enabled", p.TobyFramesEnabled);
             p.TobyFrameTicks = I(o, "toby_frame_ticks", p.TobyFrameTicks);
             p.TobyFrameScale = F(o, "toby_frame_scale", p.TobyFrameScale);
             p.TobyFrameFeetPx = F(o, "toby_frame_feet_px", p.TobyFrameFeetPx);
@@ -2069,8 +1873,10 @@ namespace MotherMod
             p.HopWhileStalking = B(o, "hop_while_stalking", p.HopWhileStalking);
             p.HopMinTilesOrigin = I(o, "hop_min_tiles_origin", p.HopMinTilesOrigin);
             p.HopMinTilesDest = I(o, "hop_min_tiles_dest", p.HopMinTilesDest);
-            p.HopMinSpeedFrac = F(o, "hop_min_speed_frac", p.HopMinSpeedFrac);
+            p.HopLaunchSpeedMin = F(o, "hop_launch_speed_min", p.HopLaunchSpeedMin);
+            p.HopLaunchSpeedMax = F(o, "hop_launch_speed_max", p.HopLaunchSpeedMax);
             p.HopSpeedFac = F(o, "hop_speed_fac", p.HopSpeedFac);
+            p.HopFlightMaxFrames = I(o, "hop_flight_max_frames", p.HopFlightMaxFrames);
             p.HopCarrySpeedFac = F(o, "hop_carry_speed_fac", p.HopCarrySpeedFac);
             p.HopArcClearNearPx = F(o, "hop_arc_clear_near_px", p.HopArcClearNearPx);
             p.HopArcClearFarPx = F(o, "hop_arc_clear_far_px", p.HopArcClearFarPx);
@@ -2176,9 +1982,6 @@ namespace MotherMod
             p.IdleBreathAmp = F(o, "idle_breath_amp", p.IdleBreathAmp);
             p.IdleBreathTicks = F(o, "idle_breath_ticks", p.IdleBreathTicks);
             p.IdleBreathBob = F(o, "idle_breath_bob", p.IdleBreathBob);
-            p.IdleGlanceChance = F(o, "idle_glance_chance", p.IdleGlanceChance);
-            p.IdleGlanceRange = F(o, "idle_glance_range", p.IdleGlanceRange);
-            p.IdleGlanceTicks = I(o, "idle_glance_ticks", p.IdleGlanceTicks);
             p.IdleTailSwayAmp = F(o, "idle_tail_sway_amp", p.IdleTailSwayAmp);
             p.IdleTailSwayTicks = F(o, "idle_tail_sway_ticks", p.IdleTailSwayTicks);
             p.TailStreamFac = F(o, "tail_stream_fac", p.TailStreamFac);
@@ -2248,9 +2051,6 @@ namespace MotherMod
             p.LegPairDisplacement = F(o, "leg_pair_displacement", p.LegPairDisplacement);
             p.SmoothenLegMovement = B(o, "smoothen_leg_movement", p.SmoothenLegMovement);
             p.WalkBob = F(o, "walk_bob", p.WalkBob);
-            p.LimbAttachFront = F(o, "limb_attach_front", p.LimbAttachFront);
-            p.LimbAttachRear = F(o, "limb_attach_rear", p.LimbAttachRear);
-            p.LimbAttachDrop = F(o, "limb_attach_drop", p.LimbAttachDrop);
             p.TailSegments = I(o, "tail_segments", p.TailSegments);
             p.TailLengthFac = F(o, "tail_length_fac", p.TailLengthFac);
             p.TailThicknessFac = F(o, "tail_thickness_fac", p.TailThicknessFac);
@@ -2397,6 +2197,9 @@ namespace MotherMod
             p.EvasionReactionMaxTicks = I(o, "evasion_reaction_max_ticks", p.EvasionReactionMaxTicks);
             p.EvasionCooldownTicks = I(o, "evasion_cooldown_ticks", p.EvasionCooldownTicks);
             p.EvasionStaggerTicks = I(o, "evasion_stagger_ticks", p.EvasionStaggerTicks);
+            p.EvasionPadPx = F(o, "evasion_pad_px", p.EvasionPadPx);
+            p.EvasionDodgePop = F(o, "evasion_dodge_pop", p.EvasionDodgePop);
+            p.EvasionDodgeMaxPx = F(o, "evasion_dodge_max_px", p.EvasionDodgeMaxPx);
             p.VoiceVolume = F(o, "voice_volume", p.VoiceVolume);
             p.VoicePitch = F(o, "voice_pitch", p.VoicePitch);
             p.VoiceCooldownFrames = I(o, "voice_cooldown_frames", p.VoiceCooldownFrames);
@@ -2750,10 +2553,14 @@ namespace MotherMod
                 Mathf.Clamp(p.HopChargeTicksMedium, 0, 200), "range_0_to_200_it_is_the_pounce_gather");
             p.HopChargeTicksLarge = ClampI(o, "hop_charge_ticks_large", p.HopChargeTicksLarge,
                 Mathf.Clamp(p.HopChargeTicksLarge, 0, 200), "range_0_to_200_it_is_the_pounce_gather");
-            p.HopMinSpeedFrac = ClampF(o, "hop_min_speed_frac", p.HopMinSpeedFrac,
-                Mathf.Clamp(p.HopMinSpeedFrac, 0f, 1f), "range_0_to_1_it_is_a_fraction_of_the_leap");
+            p.HopLaunchSpeedMin = ClampF(o, "hop_launch_speed_min", p.HopLaunchSpeedMin,
+                Mathf.Clamp(p.HopLaunchSpeedMin, 0f, 100f), "range_0_to_100_px_per_tick");
+            p.HopLaunchSpeedMax = ClampF(o, "hop_launch_speed_max", p.HopLaunchSpeedMax,
+                Mathf.Clamp(p.HopLaunchSpeedMax, p.HopLaunchSpeedMin, 100f), "range_min_to_100_px_per_tick");
             p.HopSpeedFac = ClampF(o, "hop_speed_fac", p.HopSpeedFac,
-                Mathf.Clamp(p.HopSpeedFac, 0f, 4f), "range_0_to_4_it_scales_the_launch_impulse");
+                Mathf.Clamp(p.HopSpeedFac, 0f, 2f), "range_0_to_2_it_scales_the_cyan_launch_speed");
+            p.HopFlightMaxFrames = ClampI(o, "hop_flight_max_frames", p.HopFlightMaxFrames,
+                Mathf.Clamp(p.HopFlightMaxFrames, 1, 600), "range_1_to_600_ticks_it_is_a_loop_bound");
             p.HopChargePullFac = ClampF(o, "hop_charge_pull_fac", p.HopChargePullFac,
                 Mathf.Clamp(p.HopChargePullFac, 0f, 1f), "range_0_to_1_it_is_a_fraction_of_the_gather_pull");
             if (p.HopWhen != "moving" && p.HopWhen != "hunting" && p.HopWhen != "hurry")
@@ -3066,54 +2873,41 @@ namespace MotherMod
         public readonly string Layer;
 
         private readonly JsonObject _params;
-        private readonly bool _hasParams;
 
         public FoxCosmeticSpec(string layer, JsonObject paramsObject)
         {
             Layer = layer;
             _params = paramsObject;
-            _hasParams = true;
-        }
-
-        public FoxCosmeticSpec(string layer)
-        {
-            Layer = layer;
-            _hasParams = false;
         }
 
         public float F(string key, float fallback)
         {
-            return _hasParams ? FoxBreedParams.F(_params, key, fallback) : fallback;
+            return FoxBreedParams.F(_params, key, fallback);
         }
 
         public int I(string key, int fallback)
         {
-            return _hasParams ? FoxBreedParams.I(_params, key, fallback) : fallback;
+            return FoxBreedParams.I(_params, key, fallback);
         }
 
         public bool B(string key, bool fallback)
         {
-            return _hasParams ? FoxBreedParams.B(_params, key, fallback) : fallback;
+            return FoxBreedParams.B(_params, key, fallback);
         }
 
         public string S(string key, string fallback)
         {
-            return _hasParams ? FoxBreedParams.S(_params, key, fallback) : fallback;
+            return FoxBreedParams.S(_params, key, fallback);
         }
 
         public Color C(string key, Color fallback)
         {
-            return _hasParams ? FoxBreedParams.C(_params, key, fallback) : fallback;
+            return FoxBreedParams.C(_params, key, fallback);
         }
 
         public static List<FoxCosmeticSpec> Defaults()
         {
-            return new List<FoxCosmeticSpec>
-            {
-                new FoxCosmeticSpec("Ears"),
-                new FoxCosmeticSpec("Snout"),
-                new FoxCosmeticSpec("BrushTail"),
-            };
+            return new List<FoxCosmeticSpec>();
         }
 
         public override string ToString()

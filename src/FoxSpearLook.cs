@@ -30,7 +30,7 @@ namespace MotherMod
 
         private bool SpearLayerOn(FoxBreedParams p)
         {
-            return partsRigActive && FoxSpear.IsOn(p) && SpearState != null;
+            return FoxSpear.IsOn(p) && SpearState != null;
         }
 
         private static float SpEase(float t) { t = Mathf.Clamp01(t); return t * t * (3f - 2f * t); }

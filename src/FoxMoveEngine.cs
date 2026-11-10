@@ -86,14 +86,15 @@ namespace MotherMod
 
         internal string RunningActionNameExcept(FoxMoveAction skip)
         {
-            return RunningActionNameExcept(skip, null);
+            return RunningActionNameExcept(skip, null, null);
         }
 
-        internal string RunningActionNameExcept(FoxMoveAction skip, FoxMoveAction skip2)
+        internal string RunningActionNameExcept(FoxMoveAction skip, FoxMoveAction skip2, FoxMoveAction skip3)
         {
             for (int i = 0; i < all.Length; i++)
             {
-                if (ReferenceEquals(all[i], skip) || ReferenceEquals(all[i], skip2)) continue;
+                if (ReferenceEquals(all[i], skip) || ReferenceEquals(all[i], skip2)
+                    || ReferenceEquals(all[i], skip3)) continue;
                 if (all[i].Running) return all[i].Name;
             }
             return null;
@@ -155,8 +156,8 @@ namespace MotherMod
             bool live = !fox.EngineOwnsBody;
             if (p == null) return c;
 
-            if (live && p.SqueezeEnabled) c |= FoxBodyClaim.TerrainSqueeze;
-            if (live && p.SqueezeEnabled && p.SqueezeSpinePull) c |= FoxBodyClaim.SpineLinks;
+            if (live) c |= FoxBodyClaim.TerrainSqueeze;
+            if (live) c |= FoxBodyClaim.SpineLinks;
             if (live && fox.SpineRecovering) c |= FoxBodyClaim.SpineElasticity;
             if (live && fox.Consious && fox.ClimbOwnsGravity) c |= FoxBodyClaim.Gravity;
             if (live && fox.PoleOwnsGravity) c |= FoxBodyClaim.Gravity;
@@ -251,9 +252,8 @@ namespace MotherMod
                 return true;
             }
 
-            if (p.StepUpRampConnWalks
-                && (conn.type == MovementConnection.MovementType.Slope
-                    || conn.type == MovementConnection.MovementType.CeilingSlope))
+            if (conn.type == MovementConnection.MovementType.Slope
+                || conn.type == MovementConnection.MovementType.CeilingSlope)
             {
                 return false;
             }

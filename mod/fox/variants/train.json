@@ -18,14 +18,9 @@
   "pounce_route_goal_seed_radius_tiles": 7.0,
   "climbs_poles": true,
   "climbs_walls": true,
-  "color_body": "0B0011",
   "color_tail": "270025",
-  "color_tail_root": "0B0011",
   "color_head": "3B0034",
-  "color_legs": "0B0011",
   "color_leg_lower": "0B0011",
-  "color_paws": "0B0011",
-  "color_eye": "FFFFFF",
   "icon_color": "3B0034",
   "tiles": {
     "floor": {
@@ -53,37 +48,6 @@
       "legality": "Unallowed"
     }
   },
-  "cosmetics": [
-    {
-      "layer": "Ears",
-      "size": 1.0,
-      "length": 11.0,
-      "width": 4.5,
-      "spread": 0.8,
-      "tilt": 22.0,
-      "flatten": 35.0,
-      "color": "3B0034"
-    },
-    {
-      "layer": "Snout",
-      "length": 9.0,
-      "width": 5.5,
-      "tip_width": 2.6,
-      "droop": 0.12,
-      "color": "3B0034",
-      "nose_size": 2.4,
-      "nose_color": "0A0A0A"
-    },
-    {
-      "layer": "BrushTail",
-      "tufts": 9,
-      "tuft_size": 2.2,
-      "tuft_spread": 0.85,
-      "tuft_droop": 0.3,
-      "tuft_follow_profile": 1.0,
-      "color": "270025"
-    }
-  ],
   "relationships": {
     "Rat": {
       "type": "Eats",

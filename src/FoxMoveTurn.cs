@@ -81,8 +81,7 @@ namespace MotherMod
                                && travelHoriz < p.TurnTriggerMinHorizontal;
             string measure = null;
 
-            bool swimTurn = fox.Swimming;
-            bool waterOk = swimTurn && p.TurnInWater;
+            bool waterOk = fox.Swimming;
             bool noFooting = !fox.Grounded && !waterOk;
 
             if (dot > p.TurnTriggerDot || tooVertical || Cooldown > 0 || noFooting
@@ -93,7 +92,6 @@ namespace MotherMod
                     dot > p.TurnTriggerDot ? "already_facing"
                     : tooVertical ? "travel_vertical"
                     : Cooldown > 0 ? "turn_cooldown"
-                    : (noFooting && swimTurn) ? "water"
                     : noFooting ? "airborne"
                     : fox.pounce != Fox.PounceState.None ? "pouncing"
                     : fox.GatherIsActive ? "gathering"
@@ -108,7 +106,7 @@ namespace MotherMod
             }
 
             Creature prey = fox.chaseTarget;
-            if (p.TurnFocusHold && prey != null && prey.room == fox.RoomRef
+            if (prey != null && prey.room == fox.RoomRef
                 && fox.AI != null
                 && (fox.AI.CurrentBehavior == FoxAI.Behavior.Hunt
                     || fox.AI.CurrentBehavior == FoxAI.Behavior.Stalk))
@@ -138,11 +136,10 @@ namespace MotherMod
             if (room != null)
             {
                 string probe;
-                if (EndPoseClear(p.TurnBlockedProbeLevel, room, c[0].pos, frontEnd, c[2].pos, out probe))
+                if (EndPoseClear(room, c[0].pos, frontEnd, c[2].pos, out probe))
                 {
                 }
-                else if (p.TurnRearAnchorEnabled
-                         && EndPoseClear(p.TurnBlockedProbeLevel, room, c[2].pos, rearEnd, c[0].pos, out probe))
+                else if (EndPoseClear(room, c[2].pos, rearEnd, c[0].pos, out probe))
                 {
                     anchorRear = true;
                 }
@@ -171,13 +168,12 @@ namespace MotherMod
             return FoxMoveBid.Yes("body_points_wrong_way", mOk);
         }
 
-        private static bool EndPoseClear(bool levelProbe, Room room, Vector2 anchorPos, Vector2 endPos, Vector2 swingFromPos,
+        private static bool EndPoseClear(Room room, Vector2 anchorPos, Vector2 endPos, Vector2 swingFromPos,
                                          out string probe)
         {
             if (!room.GetTile(endPos).Solid) { probe = "axis"; return true; }
             if (room.GetTile(swingFromPos).Solid) { probe = "swing_in_solid"; return true; }
-            if (levelProbe
-                && !room.GetTile(new Vector2(endPos.x, anchorPos.y)).Solid)
+            if (!room.GetTile(new Vector2(endPos.x, anchorPos.y)).Solid)
             {
                 probe = "level";
                 return true;
@@ -210,7 +206,7 @@ namespace MotherMod
                 reason = "aborted_pounce";
             else if (fox.charge != Fox.ChargeState.None || fox.ChargeWindup > 0f || fox.ChargeRush > 0f)
                 reason = "aborted_charge";
-            else if ((!fox.Grounded && !(p.TurnInWater && fox.Swimming))
+            else if ((!fox.Grounded && !fox.Swimming)
                      || fox.AirTicks >= Math.Max(1, p.TurnAbortAirTicks))
                 reason = "aborted_airborne";
             else if (!fox.Consious) reason = "aborted_unconscious";
@@ -236,7 +232,7 @@ namespace MotherMod
 
             if (span > pivotMaxSpan)
             {
-                if (p.TurnPivotSpanClamp && span > 0.01f)
+                if (span > 0.01f)
                 {
                     Vector2 outward = off / span;
                     swing.pos = anchor.pos + outward * pivotMaxSpan;

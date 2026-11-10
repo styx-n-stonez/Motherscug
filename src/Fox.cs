@@ -17,8 +17,6 @@ namespace MotherMod
         public float AirFric;
         public bool Evaluated;
 
-        public float MissPx { get { return WantRise - HeightAt; } }
-
         internal static FoxReachVerdict NotEvaluated()
         {
             return new FoxReachVerdict
@@ -52,6 +50,18 @@ namespace MotherMod
                 Boost = p.PounceBoost,
                 BoostFrames = Mathf.Clamp(p.PounceBoostFrames, 0, 600),
                 MaxFrames = Mathf.Clamp(p.PounceFlightMaxFrames, 1, 600),
+            };
+        }
+
+        internal static FoxArcModel OfHop(FoxBreedParams p, float g, float airFriction)
+        {
+            return new FoxArcModel
+            {
+                G = Mathf.Max(0f, g),
+                Friction = Mathf.Clamp(airFriction, 0.5f, 1f),
+                Boost = 0f,
+                BoostFrames = 0,
+                MaxFrames = Mathf.Clamp(p.HopFlightMaxFrames, 1, 600),
             };
         }
 
@@ -497,7 +507,7 @@ namespace MotherMod
                 waterFriction = p.PhysWaterFriction;
                 buoyancy = p.PhysBuoyancy;
 
-                GoThroughFloors = p.PhysGoThroughFloors;
+                GoThroughFloors = false;
             }
             catch (Exception e)
             {
@@ -541,7 +551,7 @@ namespace MotherMod
             get
             {
                 FoxBreedParams p = P;
-                if (p == null || !p.SqueezeDrawFromTerrain) return 0f;
+                if (p == null) return 0f;
 
                 int now = GameTick;
                 if (now != drawEnclosureTick)
@@ -614,7 +624,7 @@ namespace MotherMod
         private float DownTargetAmount(FoxBreedParams p)
         {
             if (dead) return 1f;
-            if (!p.BodyRideStunCollapse || Consious) return 0f;
+            if (Consious) return 0f;
             if (!StunFallActive && stun < Math.Max(1, p.StunFallMinStun)) return 0f;
             return Mathf.Clamp01(p.BodyRideStunCollapseFac);
         }
@@ -664,14 +674,14 @@ namespace MotherMod
 
         private void UpdateStunPosture(FoxBreedParams p)
         {
-            bool down = p.StunFallEnabled && !dead && stun >= Math.Max(1, p.StunFallMinStun);
+            bool down = !dead && stun >= Math.Max(1, p.StunFallMinStun);
 
             int tick = GameTick;
             if (down)
             {
                 stunFallReleaseTick = tick + Math.Max(0, p.StunFallRecoverTicks);
             }
-            else if (p.StunFallEnabled && !dead && tick < stunFallReleaseTick)
+            else if (!dead && tick < stunFallReleaseTick)
             {
                 down = true;
             }
@@ -790,7 +800,7 @@ namespace MotherMod
                 FoxBreedParams p = P;
                 if (p == null) return 0f;
 
-                if (!dead || !p.DeathLayAllDeaths) return 0f;
+                if (!dead) return 0f;
                 int elapsed = deadTicks;
                 int ticks = Math.Max(0, p.DeathBehindLayTicks);
                 if (ticks <= 0) return 1f;
@@ -969,7 +979,7 @@ namespace MotherMod
         {
             base.PlaceInRoom(placeRoom);
             FoxBreedParams p = P;
-            spanFloorGraceTicks = Math.Max(0, p.SpanFloorGraceTicks);
+            spanFloorGraceTicks = p.SpanFloorGraceTicks;
             spanBelowFloorTicks = 0;
         }
 
@@ -1110,8 +1120,7 @@ namespace MotherMod
 
             if (stuckMoveUpdatedTick != GameTick)
             {
-                bool wedged = p.SqueezeArmWhenWedged
-                              && Consious
+                bool wedged = Consious
                               && AI != null && AI.stuckTracker != null
                               && AI.stuckTracker.Utility() > p.SqueezeWedgeUtilityMin;
                 if (wedged)
@@ -1121,8 +1130,7 @@ namespace MotherMod
                         wedgeHoldTicks++;
                         stuckMoveTicks = Math.Min(stuckMoveTicks + 1, STUCK_MOVE_TICKS_MAX);
                     }
-                    else if (p.SqueezeWedgeRearmInCorridor
-                             && (p.SqueezeWedgeMaxRearms <= 0 || wedgeRearms < p.SqueezeWedgeMaxRearms)
+                    else if ((p.SqueezeWedgeMaxRearms <= 0 || wedgeRearms < p.SqueezeWedgeMaxRearms)
                              && BodyInCorridorTerrain())
                     {
                         wedgeHoldTicks = 1;
@@ -1143,7 +1151,7 @@ namespace MotherMod
             }
 
             int escArm = Mathf.Clamp(p.SqueezeWedgeEscapeStuckTicks, 1, STUCK_MOVE_TICKS_MAX);
-            if (p.SqueezeWedgeEscapeEnabled && Consious && stuckMoveTicks >= escArm)
+            if (Consious && stuckMoveTicks >= escArm)
             {
                 wedgeSaturatedTicks++;
                 if (wedgeSaturatedTicks >= Math.Max(1, p.SqueezeWedgeEscapeTicks)) ForceWedgeEscape(p);
@@ -1155,14 +1163,9 @@ namespace MotherMod
 
             UpdateSqueezeProgress(p);
 
-            float squeeze = 1f;
-            bool slopes = true;
-            if (p.SqueezeEnabled)
-            {
-                squeeze = Custom.LerpMap(stuckMoveTicks, p.SqueezeStartFrames, p.SqueezeFullFrames,
-                                         1f, Mathf.Clamp(p.SqueezeMinFac, 0.01f, 1f));
-                slopes = stuckMoveTicks < p.SqueezeSlopesOffFrames;
-            }
+            float squeeze = Custom.LerpMap(stuckMoveTicks, p.SqueezeStartFrames, p.SqueezeFullFrames,
+                                           1f, Mathf.Clamp(p.SqueezeMinFac, 0.01f, 1f));
+            bool slopes = stuckMoveTicks < p.SqueezeSlopesOffFrames;
 
             int reinflate = Consious ? Math.Max(0, p.SqueezeReinflateTicks) : 0;
             if (reinflate > 0 && squeeze > lastSqueezeApplied)
@@ -1177,7 +1180,7 @@ namespace MotherMod
             }
 
             bool enterPull = move != null && move.Enter.HoldsSpinePull;
-            if ((p.SqueezeSpinePull || enterPull) && bodyChunkConnections != null && bodyChunkConnections.Length > 1
+            if (bodyChunkConnections != null && bodyChunkConnections.Length > 1
                 && bodyChunkConnections[0] != null && bodyChunkConnections[1] != null && room != null)
             {
                 bool headLags = true;
@@ -1187,10 +1190,10 @@ namespace MotherMod
                     headLags = Vector2.Distance(bodyChunks[0].pos, dest)
                                > Vector2.Distance(bodyChunks[1].pos, dest);
                 }
-                bool stuck = p.SqueezeSpinePull && stuckMoveTicks > p.SqueezeStartFrames;
+                bool stuck = stuckMoveTicks > p.SqueezeStartFrames;
                 bodyChunkConnections[0].type = (enterPull || (headLags && stuck))
                     ? BodyChunkConnection.Type.Pull : BodyChunkConnection.Type.Normal;
-                bodyChunkConnections[1].type = (enterPull || stuck || (p.SqueezeSpinePull && p.SqueezeSpinePullAlways))
+                bodyChunkConnections[1].type = (enterPull || stuck)
                     ? BodyChunkConnection.Type.Pull : BodyChunkConnection.Type.Normal;
 
             }
@@ -1281,9 +1284,9 @@ namespace MotherMod
             AI.Update();
             AI.spear.BodyTick(p, eu);
 
-            if (move.Pounce.Running && move.Pounce.LiveTicks > Math.Max(1, p.AttackStateCeilingTicks))
+            if (move.Pounce.Running && move.Pounce.LiveTicks > p.AttackStateCeilingTicks)
                 move.Pounce.End(p, "overran_bite_gate");
-            if (move.Charge.Running && move.Charge.LiveTicks > Math.Max(1, p.AttackStateCeilingTicks))
+            if (move.Charge.Running && move.Charge.LiveTicks > p.AttackStateCeilingTicks)
                 move.Charge.End(p, "overran_bite_gate");
 
             if (move.Pounce.Running)
@@ -1334,7 +1337,7 @@ namespace MotherMod
             get
             {
                 FoxBreedParams p = P;
-                if (p == null || !p.SwimEnabled) return false;
+                if (p == null) return false;
                 if (room == null || !room.water) return false;
                 return Submersion > p.SwimSubmersionMin;
             }
@@ -1356,9 +1359,7 @@ namespace MotherMod
             bool divedLastTick = swimDiving;
             swimDiving = false;
 
-            if (!p.SwimSurfaceHold) return;
-
-            if (p.SwimSurfaceHoldReleaseOnDive && divedLastTick)
+            if (divedLastTick)
             {
                 LogSwimHoldSuppressed(p);
                 return;
@@ -1382,11 +1383,8 @@ namespace MotherMod
             bool destWet = room.GetTile(conn.DestTile).AnyWater;
             if (!destWet)
             {
-                if (p.SwimClimbOutFooting)
-                {
-                    inAllowedTerrainCounter = Math.Max(inAllowedTerrainCounter,
-                                                       Math.Max(1, p.RegainFootingFrames) + 2);
-                }
+                inAllowedTerrainCounter = Math.Max(inAllowedTerrainCounter,
+                                                   Math.Max(1, p.RegainFootingFrames) + 2);
                 swimDiving = false;
                 LogSwimTick(p, conn, "climb_out", 0f, destWet, 0f);
                 return false;
@@ -1405,7 +1403,7 @@ namespace MotherMod
         private float SwimDive(FoxBreedParams p, MovementConnection conn)
         {
             swimDiving = false;
-            if (!p.SwimDiveEnabled || p.SwimDiveSpeed == 0f) return 0f;
+            if (p.SwimDiveSpeed == 0f) return 0f;
 
             float surface = room.FloatWaterLevel(mainBodyChunk.pos);
             float limitY = surface - Mathf.Max(0f, p.SwimDiveDepthTiles) * 20f;
@@ -1546,17 +1544,15 @@ namespace MotherMod
             Vector2 desired = toTarget.normalized * top;
 
             bool stepDescends = conn.DestTile.y < conn.StartTile.y;
-            bool clampApplies = p.DriveGroundDescentClamp || !stepDescends;
-            DriveDescentClamped = Grounded && desired.y < 0f && clampApplies;
+            DriveDescentClamped = Grounded && desired.y < 0f && !stepDescends;
             if (DriveDescentClamped) desired.y = 0f;
 
-            DriveSlopeFlattened = p.DriveSlopeHorizontal
-                                  && (conn.type == MovementConnection.MovementType.Slope
-                                      || conn.type == MovementConnection.MovementType.CeilingSlope)
+            DriveSlopeFlattened = (conn.type == MovementConnection.MovementType.Slope
+                                   || conn.type == MovementConnection.MovementType.CeilingSlope)
                                   && desired.y != 0f;
             if (DriveSlopeFlattened) desired.y = 0f;
 
-            if (p.DriveHeadLed && !PoleBacking(p, desired))
+            if (!PoleBacking(desired))
             {
                 Drive(bodyChunks[0], desired, p.Acceleration);
                 Vector2 travelDir = desired.sqrMagnitude > 0.0001f ? desired.normalized : Vector2.zero;
@@ -1696,7 +1692,7 @@ namespace MotherMod
                 bodyChunkConnections[i].elasticity = spineElasticBase[i] * fac;
             }
 
-            if (P != null && P.TurnPivotPushOff
+            if (P != null
                 && bodyChunkConnections.Length > 2 && bodyChunkConnections[2] != null)
             {
                 bodyChunkConnections[2].active = fac >= 0.999f;
@@ -1773,7 +1769,7 @@ namespace MotherMod
                 bodyChunkConnections[1].type = BodyChunkConnection.Type.Normal;
             }
 
-            float step = Mathf.Max(0f, p.SpanFloorCorrectPx);
+            float step = p.SpanFloorCorrectPx;
             if (act && step > 0f && !turnOwnsBody && span > 0.01f
                 && NeckDot(bodyChunks[0].pos, bodyChunks[1].pos, bodyChunks[2].pos) < 0f)
             {
@@ -1797,12 +1793,11 @@ namespace MotherMod
                 bodyChunks[2].vel += dir * need;
             }
 
-            bool squeezing = p.SqueezeEnabled && p.SqueezeSpinePull
-                             && stuckMoveTicks > p.SqueezeStartFrames;
+            bool squeezing = stuckMoveTicks > p.SqueezeStartFrames;
             if (squeezing) { spanBelowFloorTicks = 0; return; }
 
             int warnAt = p.SpanCollapseWarnTicks;
-            if (warnAt <= 0 || ++spanBelowFloorTicks < warnAt) return;
+            if (++spanBelowFloorTicks < warnAt) return;
 
             spanBelowFloorTicks = 0;
             spanFloorRunning = true;
@@ -1848,7 +1843,6 @@ namespace MotherMod
 
         private void CarryThroughTurn(FoxBreedParams p, Vector2 carryBefore)
         {
-            if (!p.TurnCarryRotate) return;
             if (grasps == null || grasps.Length == 0 || grasps[0] == null) return;
             PhysicalObject held = grasps[0].grabbed;
             if (held == null || held.room != room || held.bodyChunks == null) return;
@@ -2046,13 +2040,10 @@ namespace MotherMod
         {
             sample = 0;
             landTile = new IntVector2(-1, -1);
-            landWhy = "disabled";
-            if (!p.ChargeRequireLanding) return true;
-            if (room == null) { landWhy = "no_room"; return true; }
+            landWhy = "no_room";
+            if (room == null) return true;
 
             int samples = p.ChargeLandingSamples;
-            if (samples <= 0) { landWhy = "no_samples"; return true; }
-            samples = Mathf.Min(samples, CHARGE_LANDING_SAMPLE_CAP);
 
             float reach = ChargeReach(p, targetDist);
             Vector2 v = dir * Mathf.Abs(p.ChargeMaxSpeed);
@@ -2069,8 +2060,6 @@ namespace MotherMod
             }
             return true;
         }
-
-        private const int CHARGE_LANDING_SAMPLE_CAP = 32;
 
         internal void RestoreAfterCommittedState(FoxBreedParams p, string tag)
         {
@@ -2093,8 +2082,13 @@ namespace MotherMod
         {
             predicted = from + new Vector2(PredictedRange(p, v) * Mathf.Sign(v.x), 0f);
             if (room == null) return true;
-            return predicted.x >= p.PounceRoomMargin
-                && predicted.x <= room.PixelWidth - p.PounceRoomMargin;
+            return LandingXInRoom(p, predicted.x);
+        }
+
+        internal bool LandingXInRoom(FoxBreedParams p, float x)
+        {
+            if (room == null) return true;
+            return x >= p.PounceRoomMargin && x <= room.PixelWidth - p.PounceRoomMargin;
         }
 
         internal bool PredictedLandingSurvivable(FoxBreedParams p, Vector2 v, out Vector2 predicted,
@@ -2102,8 +2096,18 @@ namespace MotherMod
                                                  out string landEntry)
         {
             return WalkLandingArc(p, Arc(p), mainBodyChunk.pos, v,
-                                  p.PounceLandingCheckObstruction,
-                                  p.PounceLandingRequireStandingRoom,
+                                  true, true, 0f,
+                                  out predicted, out landTile, out landWhy, out landEntry);
+        }
+
+        private const float HOP_WALK_SAMPLE_PX = 10f;
+
+        internal bool PredictedHopLandingSurvivable(FoxBreedParams p, Vector2 from, Vector2 v,
+                                                    out Vector2 predicted, out IntVector2 landTile,
+                                                    out string landWhy, out string landEntry)
+        {
+            return WalkLandingArc(p, HopArc(p), from, v,
+                                  true, true, HOP_WALK_SAMPLE_PX,
                                   out predicted, out landTile, out landWhy, out landEntry);
         }
 
@@ -2112,8 +2116,7 @@ namespace MotherMod
                                                          out string landWhy, out string landEntry)
         {
             return WalkLandingArc(p, Arc(p), from, v,
-                                  p.PounceLandingCheckObstruction,
-                                  p.PounceLandingRequireStandingRoom,
+                                  true, true, 0f,
                                   out predicted, out landTile, out landWhy, out landEntry);
         }
 
@@ -2122,12 +2125,12 @@ namespace MotherMod
                                                  out IntVector2 landTile, out string landWhy)
         {
             string ignoredEntry;
-            return WalkLandingArc(p, LiveArc(p), from, v, false, false,
+            return WalkLandingArc(p, LiveArc(p), from, v, false, false, 0f,
                                   out predicted, out landTile, out landWhy, out ignoredEntry);
         }
 
         private bool WalkLandingArc(FoxBreedParams p, FoxArcModel arc, Vector2 from, Vector2 v,
-                                    bool checkObstruction, bool requireStandingRoom,
+                                    bool checkObstruction, bool requireStandingRoom, float maxSamplePx,
                                     out Vector2 predicted,
                                     out IntVector2 landTile, out string landWhy, out string landEntry)
         {
@@ -2149,50 +2152,60 @@ namespace MotherMod
 
             for (int tick = 1; tick <= arc.MaxFrames; tick++)
             {
+                Vector2 tickFrom = new Vector2(x, y);
                 arc.Step(ref vel, ref x, ref y, tick);
-                predicted = new Vector2(x, y);
-                IntVector2 t = room.GetTilePosition(predicted);
-                landTile = t;
-
-                if (t.x == start.x && t.y == start.y) { prev = predicted; continue; }
-
-                if (t.x < 0 || t.x >= room.TileWidth) { landWhy = "left_room"; return false; }
-                if (t.y < 0) { landWhy = "below_room"; return false; }
-                if (room.water && t.y <= room.defaultWaterLevel)
+                Vector2 tickTo = new Vector2(x, y);
+                int samples = 1;
+                if (maxSamplePx > 0f)
+                    samples = Mathf.Max(1, Mathf.CeilToInt(Vector2.Distance(tickFrom, tickTo) / maxSamplePx));
+                for (int sample = 1; sample <= samples; sample++)
                 {
-                    landWhy = "water"; landEntry = "water"; return true;
-                }
-                if (t.y >= room.TileHeight) { prev = predicted; continue; }
+                    predicted = sample == samples
+                        ? tickTo
+                        : Vector2.Lerp(tickFrom, tickTo, (float)sample / samples);
+                    IntVector2 t = room.GetTilePosition(predicted);
+                    landTile = t;
 
-                if (FoxLandingSurface.At(room, t.x, t.y, sign, mask, out surfY, out kind))
-                {
-                    if (checkObstruction)
+                    if (t.x == start.x && t.y == start.y) { prev = predicted; continue; }
+
+                    if (t.x < 0 || t.x >= room.TileWidth) { landWhy = "left_room"; return false; }
+                    if (t.y < 0) { landWhy = "below_room"; return false; }
+                    if (room.water && t.y <= room.defaultWaterLevel)
                     {
-                        string face = FoxLandingSurface.EntryFaceOf(room, t.x, t.y, prev, predicted);
-                        if (face != "above")
+                        landWhy = "water"; landEntry = "water"; return true;
+                    }
+                    if (t.y >= room.TileHeight) { prev = predicted; continue; }
+
+                    if (FoxLandingSurface.At(room, t.x, t.y, sign, mask, out surfY, out kind))
+                    {
+                        if (checkObstruction)
                         {
-                            if (kind == "rock")
+                            string face = FoxLandingSurface.EntryFaceOf(room, t.x, t.y, prev, predicted);
+                            if (face != "above")
                             {
-                                landWhy = "wall_strike_" + face;
-                                return false;
+                                if (kind == "rock")
+                                {
+                                    landWhy = "wall_strike_" + face;
+                                    return false;
+                                }
+                                prev = predicted;
+                                continue;
                             }
-                            prev = predicted;
-                            continue;
                         }
+                        if (requireStandingRoom && !FoxLandingSurface.OpenForBody(room, t.x, t.y + 1))
+                        {
+                            landWhy = "no_standing_room";
+                            return false;
+                        }
+                        landWhy = "surface_" + kind;
+                        landEntry = checkObstruction ? "above" : "unchecked";
+                        return true;
                     }
-                    if (requireStandingRoom && !FoxLandingSurface.OpenForBody(room, t.x, t.y + 1))
-                    {
-                        landWhy = "no_standing_room";
-                        return false;
-                    }
-                    landWhy = "surface_" + kind;
-                    landEntry = checkObstruction ? "above" : "unchecked";
-                    return true;
+                    prev = predicted;
                 }
-                prev = predicted;
             }
 
-            int rows = Mathf.Clamp(p.PounceLandingScanTiles, 0, 200);
+            int rows = p.PounceLandingScanTiles;
             IntVector2 end = landTile;
             for (int r = 1; r <= rows; r++)
             {
@@ -2232,6 +2245,13 @@ namespace MotherMod
             float g, airFric;
             FlightArcInputs(p, out g, out airFric);
             return FoxArcModel.Of(p, g, airFric);
+        }
+
+        internal FoxArcModel HopArc(FoxBreedParams p)
+        {
+            float g, airFric;
+            FlightArcInputs(p, out g, out airFric);
+            return FoxArcModel.OfHop(p, g, airFric);
         }
 
         private FoxArcModel LiveArc(FoxBreedParams p)
@@ -2292,6 +2312,11 @@ namespace MotherMod
             return Mathf.Max(0f, p.PounceLaunchSpeed) * MaxJumpVariation(p);
         }
 
+        internal float PredictedApex(FoxBreedParams p, Vector2 v)
+        {
+            return Arc(p).Apex(v);
+        }
+
         public bool TryPounce(Vector2 targetPos)
         {
             if (EvadeStaggering) return false;
@@ -2316,7 +2341,7 @@ namespace MotherMod
             return true;
         }
 
-        internal static Vector2 LaunchVelocity(FoxBreedParams p, Vector2 dir, float speed)
+        private static Vector2 LaunchVelocity(FoxBreedParams p, Vector2 dir, float speed)
         {
             Vector2 v = dir * speed;
             v.y += speed * p.PounceLaunchLift;
@@ -2334,7 +2359,7 @@ namespace MotherMod
         {
             WantTermsOf(p, targetPos.x - from.x, targetPos.y - from.y, 0f, out wantDist, out wantRise);
 
-            if (!p.PounceRangeScaling || EffectiveLaunchSpeed(p) <= 0f) { frac = 1f; return; }
+            if (EffectiveLaunchSpeed(p) <= 0f) { frac = 1f; return; }
 
             float lo = Mathf.Clamp(p.PounceLaunchMinFrac, 0.05f, 1f);
             if (Reaches(p, dir, lo, wantDist, wantRise)) { frac = lo; return; }
@@ -2511,7 +2536,6 @@ namespace MotherMod
         internal int GatherFramesFor(FoxBreedParams p, float frac)
         {
             int full = Math.Max(0, p.PounceGatherFrames);
-            if (!p.PounceRangeScaling) return full;
             int min = Mathf.Clamp(p.PounceGatherFramesMin, 0, full);
             float lo = Mathf.Clamp(p.PounceLaunchMinFrac, 0.05f, 1f);
             float t = (lo >= 1f) ? 1f : Mathf.Clamp01((frac - lo) / (1f - lo));
@@ -2549,7 +2573,7 @@ namespace MotherMod
             }
 
             float sweep = Vector2.Distance(mainBodyChunk.lastPos, mainBodyChunk.pos);
-            if (p.BiteSweptContact && sweep >= Mathf.Max(0.01f, p.BiteSweptMinSpeed))
+            if (sweep >= Mathf.Max(0.01f, p.BiteSweptMinSpeed))
             {
                 for (int i = 0; i < target.bodyChunks.Length; i++)
                 {
@@ -2566,7 +2590,7 @@ namespace MotherMod
             }
             float reach = p.BiteContactRadius > 0f ? p.BiteContactRadius : p.BiteRadius;
 
-            if (!p.BiteThroughWalls && room != null && !room.VisualContact(mainBodyChunk.pos, hit.pos))
+            if (room != null && !room.VisualContact(mainBodyChunk.pos, hit.pos))
             {
                 move.Lunge.End(p, "no_line_of_sight");
                 return;
@@ -2732,7 +2756,6 @@ namespace MotherMod
 
         private bool NarrowSpaceHere(AItile ai, IntVector2 t)
         {
-            if (!P.CorridorNarrowIgnoreDiagonals) return ai.narrowSpace;
             if (!ai.narrowSpace) return false;
             bool h = room.GetTile(t.x - 1, t.y).Solid && room.GetTile(t.x + 1, t.y).Solid;
             bool v = room.GetTile(t.x, t.y - 1).Solid && room.GetTile(t.x, t.y + 1).Solid;
@@ -2762,7 +2785,6 @@ namespace MotherMod
 
             int entryThr = p.CorridorEntryFootingFrames;
             if (entryThr <= 0) return false;
-            if (!p.CorridorFootingGate) return false;
             if (!CorridorEntryIntent()) return false;
             if (CorridorChunkCount() < 1) return false;
             return inAllowedTerrainCounter >= entryThr;
@@ -2840,8 +2862,6 @@ namespace MotherMod
         {
             FoxBreedParams p = P;
             if (p == null) return false;
-            if (!p.CorridorFootingGate) return CorridorChunkCount() >= CorridorMinChunks(p);
-
             return CorridorFootingMet(p);
         }
 
@@ -2864,11 +2884,8 @@ namespace MotherMod
                 chunksInLegalTerrain++;
             }
 
-            bool ramp = p.CorridorFootingGate
-                        ? chunksInLegalTerrain > 0
-                        : chunksInLegalTerrain >= CorridorMinChunks(p);
-            bool entryIntent = p.CorridorFootingGate
-                               && p.CorridorEntryFootingFrames > 0
+            bool ramp = chunksInLegalTerrain > 0;
+            bool entryIntent = p.CorridorEntryFootingFrames > 0
                                && CorridorEntryIntent();
             if (ramp)
             {
@@ -2916,12 +2933,12 @@ namespace MotherMod
             {
                 gravity = p.PhysGravity;
                 airFriction = p.PhysAirFriction;
-                bool slumped = (StunFallActive && p.StunFallEnabled) || (dead && p.StunFallFrictionOnDead);
+                bool slumped = StunFallActive || dead;
                 surfaceFriction = slumped
                     ? Mathf.Clamp(p.StunFallSurfaceFriction, 0f, 1f)
                     : p.PhysSurfaceFriction;
                 bounce = p.PhysBounce;
-                GoThroughFloors = p.PhysGoThroughFloors;
+                GoThroughFloors = false;
             }
             else
             {
@@ -2993,9 +3010,7 @@ namespace MotherMod
             float lineX = ccBodyX ? room.MiddleOfTile(ccLineTileX, 0).x : 0f;
             float lineY = ccBodyY ? room.MiddleOfTile(0, ccLineTileY).y : 0f;
 
-            bool travelX = false, travelY = false;
-            string travelSrc = "none";
-            if (p.CorridorCenterYieldToTravel) TryTravelAxes(out travelX, out travelY, out travelSrc);
+            TryTravelAxes(out bool travelX, out bool travelY, out string travelSrc);
             bool yieldX = travelX && ccBodyX;
             bool yieldY = travelY && ccBodyY;
 
@@ -3156,7 +3171,7 @@ namespace MotherMod
         {
             if (bodyChunks == null || bodyChunks.Length < 3 || room == null) return;
 
-            if (StunFallActive && p.StunFallRightingOff)
+            if (StunFallActive)
             {
                 LandingPose = Mathf.Max(0f, LandingPose - 0.2f);
                 return;
@@ -3174,17 +3189,15 @@ namespace MotherMod
                 LandingPose = Mathf.Max(0f, LandingPose - 0.2f);
                 return;
             }
-            bool genuinelyAirborne = airTicks >= Math.Max(0, p.LandRightAirMinTicks);
-            bool airAlways = p.LandRightAirAlways && genuinelyAirborne;
+            bool airAlways = airTicks >= Math.Max(0, p.LandRightAirMinTicks);
 
             float fallRelease = Mathf.Max(0f, p.LandRightMinFallSpeed - Mathf.Max(0f, p.LandRightFallHysteresis));
             bool falling = fallLatched ? (fall >= fallRelease) : (fall >= p.LandRightMinFallSpeed);
             fallLatched = falling;
 
             bool inCorridor = BodyInCorridorTerrain();
-            bool corridorSuppress = inCorridor && p.LandRightSuppressInCorridor;
-            float suppressFac = corridorSuppress ? Mathf.Clamp01(p.LandRightSuppressFac) : 1f;
-            bool suppressed = corridorSuppress && suppressFac < 1f;
+            float suppressFac = inCorridor ? Mathf.Clamp01(p.LandRightSuppressFac) : 1f;
+            bool suppressed = inCorridor && suppressFac < 1f;
 
             if (!falling && !airAlways)
             {
@@ -3239,16 +3252,13 @@ namespace MotherMod
             Vector2 perp = new Vector2(-axis.y, axis.x);
 
             float facingSign = Mathf.Sign(axis.x);
-            if (p.LandRightAxisSignLatch)
+            if (Mathf.Abs(axis.x) >= Mathf.Max(0f, p.LandRightAxisSignBand))
             {
-                if (Mathf.Abs(axis.x) >= Mathf.Max(0f, p.LandRightAxisSignBand))
-                {
-                    rightFacingSign = facingSign;
-                }
-                else if (rightFacingSign != 0f)
-                {
-                    facingSign = rightFacingSign;
-                }
+                rightFacingSign = facingSign;
+            }
+            else if (rightFacingSign != 0f)
+            {
+                facingSign = rightFacingSign;
             }
             float cross = -axis.y * facingSign;
 
@@ -3286,6 +3296,12 @@ namespace MotherMod
             float fallSpeed = vy < 0f ? -vy : 0f;
 
             if (InPounceWindow(p))
+            {
+                ShouldLogLanding(true);
+                return;
+            }
+
+            if (EvadeLandingOwned)
             {
                 ShouldLogLanding(true);
                 return;
@@ -3390,13 +3406,10 @@ namespace MotherMod
 
             move.AssertStandingBody(p, "dead", true);
 
-            if (p.DeathAssertPhysics)
-            {
-                bool held = grabbedBy != null && grabbedBy.Count > 0;
-                bool hadThroughFloors = held && GoThroughFloors;
-                ApplyBodyPhysics(p);
-                if (held && hadThroughFloors && !GoThroughFloors) GoThroughFloors = true;
-            }
+            bool held = grabbedBy != null && grabbedBy.Count > 0;
+            bool hadThroughFloors = held && GoThroughFloors;
+            ApplyBodyPhysics(p);
+            if (held && hadThroughFloors && !GoThroughFloors) GoThroughFloors = true;
 
             if (deadTicks < int.MaxValue) deadTicks++;
 

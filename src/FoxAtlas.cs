@@ -7,7 +7,7 @@ namespace MotherMod
     {
         private static readonly string[] ATLAS_PATHS =
         {
-            "atlases/fox_ref", "atlases/fox_tofu", "atlases/fox_milk", "atlases/fox_popcorn", "atlases/fox_corn",
+            "atlases/fox_tofu", "atlases/fox_milk", "atlases/fox_popcorn", "atlases/fox_corn",
             "atlases/fox_cherry", "atlases/fox_mushroom", "atlases/fox_potato", "atlases/fox_toby",
             "atlases/fox_train",
         };
@@ -68,7 +68,7 @@ namespace MotherMod
             catch (System.Exception ex)
             {
                 FoxFault.Warn($"graphics_atlas elements=0 path={ATLAS_PATH} err={ex.GetType().Name} " +
-                            $"msg=\"{ex.Message}\" action=mesh_head_and_mesh_legs");
+                            $"msg=\"{ex.Message}\" action=draw_nothing");
                 return;
             }
 

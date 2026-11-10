@@ -434,45 +434,9 @@
   "parts_prefix": "FoxPotato_",
   "step_arc_lift": 3.5,
   "stalk_crouch_drop": 7.0,
-  "cosmetics": [
-    {
-      "layer": "Ears",
-      "size": 1.0,
-      "length": 10.0,
-      "width": 5.0,
-      "spread": 0.8,
-      "tilt": 26.0,
-      "flatten": 35.0,
-      "color": "A17B52"
-    },
-    {
-      "layer": "Snout",
-      "length": 8.0,
-      "width": 5.8,
-      "tip_width": 2.8,
-      "droop": 0.12,
-      "color": "A17B52",
-      "nose_size": 2.4,
-      "nose_color": "0A0A0A"
-    },
-    {
-      "layer": "BrushTail",
-      "tufts": 9,
-      "tuft_size": 2.4,
-      "tuft_spread": 0.85,
-      "tuft_droop": 0.3,
-      "tuft_follow_profile": 1.0,
-      "color": "FF7931"
-    }
-  ],
-  "color_body": "170D05",
   "color_tail": "170D05",
-  "color_tail_root": "170D05",
   "color_head": "A17B52",
-  "color_legs": "170D05",
   "color_leg_lower": "FF7931",
-  "color_paws": "170D05",
-  "color_eye": "0A0A0A",
   "icon_color": "A17B52",
   "base_speed": 3.55,
   "speed_corridor": 0.71,

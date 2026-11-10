@@ -53,10 +53,7 @@ namespace MotherMod
 
         private static void NoteStash(AbstractCreature self, WorldCoordinate den, AbstractCreature carried)
         {
-            string variantId = FoxCritob.VariantIdFor(self.creatureTemplate.type);
-            FoxBreedParams p = FoxParams.For(variantId);
-
-            (self.abstractAI?.RealAI as FoxAI)?.Fed(p.DenRestFrames);
+            FoxCritob.VariantIdFor(self.creatureTemplate.type);
         }
     }
 }

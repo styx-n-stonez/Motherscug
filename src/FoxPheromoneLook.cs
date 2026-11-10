@@ -222,7 +222,7 @@ namespace MotherMod
 
             string skip = null;
             if (!p.PheromoneReceiverSniff) skip = "key_off";
-            else if (!partsRigActive || tobyFramesActive) skip = "no_parts_rig";
+            else if (drawNothing || tobyFramesActive) skip = "no_parts_rig";
             else if (fox.dead || !fox.Consious) skip = "unconscious";
             else if (pherSniffLeft > 0) skip = "already_sniffing";
             if (skip != null)
