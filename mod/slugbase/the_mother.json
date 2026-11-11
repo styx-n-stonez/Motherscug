@@ -86,7 +86,7 @@
 			"recharge_delay": 30,
 			"exhausted_recharge_mult": 0.35,
 
-			"_doc_zone": "OVEREXERTION RED ZONE -- enter at/below overexert_enter points, leave at/above overexert_exit (hysteresis, no flicker). SLOWDOWN SCALES WITH DEPTH: the speed multiplier is overexert_speed_mult right at the entry line and slides down to overexert_speed_mult_min at 0 points. It always applies to running; overexert_slow_climb / _swim / _throw extend it to pole+corridor climbing, swimming, and throw strength (spears and rocks fly slower and shorter). Passive gains are throttled inside the zone.",
+			"_doc_zone": "OVEREXERTION RED ZONE -- enter at/below overexert_enter points, leave at/above overexert_exit (hysteresis, no flicker). SLOWDOWN SCALES WITH DEPTH: the speed multiplier is overexert_speed_mult right at the entry line and slides down to overexert_speed_mult_min at 0 points. It always applies to running; overexert_slow_climb / _swim / _throw extend it to pole+corridor climbing, swimming, and throw strength (spears and rocks fly slower and shorter). Passive gains are throttled inside the zone. sprint -- mult are based on rivs stats and spear_damage is gourmands.",
 			"overexert_enter": 500,
 			"overexert_exit": 600,
 			"overexert_speed_mult": 0.85,
@@ -94,8 +94,6 @@
 			"overexert_slow_climb": true,
 			"overexert_slow_swim": true,
 			"overexert_slow_throw": true,
-			
-			"_doc_zone": "sprint -- mult are based on rivs stats and spear_damage is gourmands.",
 			"sprint_enabled": true,
 			"sprint_run_speed_mult": 1.75,
 			"sprint_pole_speed_mult": 1.8,
@@ -150,7 +148,7 @@
 			"hud_fill_color": "00F700",
 			"hud_zone_color": "ff4040",
 			"hud_pip_count": 15,
-			"hud_pip_spacing": 200,
+			"hud_pip_spacing": 20,
 			"hud_pip_scale": 0.8,
 			"hud_empty_dim": 0.4,
 			"hud_fade_in": 0.05,
