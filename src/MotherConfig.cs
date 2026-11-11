@@ -51,6 +51,14 @@ namespace MotherMod
         public bool  OverexertSlowSwim = true;
         public bool  OverexertSlowThrow = true;
 
+        public bool  SprintEnabled = true;
+        public float SprintRunSpeedMult = 1.75f;
+        public float SprintPoleSpeedMult = 1.8f;
+        public float SprintCorridorSpeedMult = 1.6f;
+        public float SprintDrainPerSecond = 25f;
+        public float SprintMinStamina = 0f;
+        public float SprintSpearDamage = 3f;
+
         public float HitStaminaCost = 0f;
         public int   HitCostCooldown = 20;
 
@@ -220,6 +228,14 @@ namespace MotherMod
             c.OverexertSlowClimb = B(o, "overexert_slow_climb", c.OverexertSlowClimb);
             c.OverexertSlowSwim = B(o, "overexert_slow_swim", c.OverexertSlowSwim);
             c.OverexertSlowThrow = B(o, "overexert_slow_throw", c.OverexertSlowThrow);
+
+            c.SprintEnabled = B(o, "sprint_enabled", c.SprintEnabled);
+            c.SprintRunSpeedMult = Mathf.Clamp(F(o, "sprint_run_speed_mult", c.SprintRunSpeedMult), 0.1f, 5f);
+            c.SprintPoleSpeedMult = Mathf.Clamp(F(o, "sprint_pole_speed_mult", c.SprintPoleSpeedMult), 0.1f, 5f);
+            c.SprintCorridorSpeedMult = Mathf.Clamp(F(o, "sprint_corridor_speed_mult", c.SprintCorridorSpeedMult), 0.1f, 5f);
+            c.SprintDrainPerSecond = Mathf.Max(0f, F(o, "sprint_drain_per_second", c.SprintDrainPerSecond));
+            c.SprintMinStamina = Mathf.Clamp(F(o, "sprint_min_stamina", c.SprintMinStamina), 0f, Mathf.Max(0f, c.StaminaMax));
+            c.SprintSpearDamage = Mathf.Max(0f, F(o, "sprint_spear_damage", c.SprintSpearDamage));
 
             c.HitStaminaCost = F(o, "hit_stamina_cost", c.HitStaminaCost);
             c.HitCostCooldown = I(o, "hit_cost_cooldown", c.HitCostCooldown);

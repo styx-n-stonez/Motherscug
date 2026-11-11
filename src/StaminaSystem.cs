@@ -65,18 +65,14 @@ namespace MotherMod
 
             int preDelay = ReadWaterJumpDelay(self);
 
-            float mult = d.SpeedMult;
             var st = self.slugcatStats;
-            if (mult < 0.999f && st != null)
+            if (d.SpeedScaleActive && st != null)
             {
                 float run = st.runspeedFac, pole = st.poleClimbSpeedFac, corr = st.corridorClimbSpeedFac, swim = st.swimForceFac;
-                st.runspeedFac = run * mult;
-                if (d.config.OverexertSlowClimb)
-                {
-                    st.poleClimbSpeedFac = pole * mult;
-                    st.corridorClimbSpeedFac = corr * mult;
-                }
-                if (d.config.OverexertSlowSwim) st.swimForceFac = swim * mult;
+                st.runspeedFac = run * d.RunSpeedMult;
+                st.poleClimbSpeedFac = pole * d.PoleSpeedMult;
+                st.corridorClimbSpeedFac = corr * d.CorridorSpeedMult;
+                st.swimForceFac = swim * d.SwimSpeedMult;
                 try { orig(self, eu); }
                 finally
                 {
@@ -148,6 +144,7 @@ namespace MotherMod
                 ? self.grasps[grasp]?.grabbed
                 : null;
             float throwMult = d.ThrowMult;
+            bool sprintThrow = d.SprintActive;
             orig(self, grasp, eu);
             if (held != null && (self.grasps[grasp] == null || self.grasps[grasp].grabbed != held))
             {
@@ -157,6 +154,13 @@ namespace MotherMod
                         held.bodyChunks[i].vel *= throwMult;
                     if (held is Weapon w)
                         w.overrideExitThrownSpeed = Mathf.Min(w.exitThrownModeSpeed, 20f * throwMult);
+                }
+                if (sprintThrow && held is Spear spear && spear.mode == Weapon.Mode.Thrown)
+                {
+                    if (throwMult >= 0.999f)
+                    {
+                        spear.spearDamageBonus = d.config.SprintSpearDamage;
+                    }
                 }
                 d.NotifyThrow(self, held, throwMult);
             }
