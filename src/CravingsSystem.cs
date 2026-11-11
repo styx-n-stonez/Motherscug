@@ -26,13 +26,22 @@ namespace MotherMod
 
         public static void Register()
         {
-            On.SlugcatStats.NourishmentOfObjectEaten += SlugcatStats_NourishmentOfObjectEaten;
-            HookEndpointManager.Add(typeof(SlugBase.DataTypes.Diet).GetMethod("GetMeatMultiplier", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic),
-                (hook_GetMeatMultiplier)MeatMultiplierHK);
-            On.StoryGameSession.ctor += StoryGameSession_ctor;
-            On.GameSession.ctor += GameSession_ctor;
+            try
+            {
+                On.SlugcatStats.NourishmentOfObjectEaten += SlugcatStats_NourishmentOfObjectEaten;
+                HookEndpointManager.Add(typeof(SlugBase.DataTypes.Diet).GetMethod("GetMeatMultiplier", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic),
+                    (hook_GetMeatMultiplier)MeatMultiplierHK);
+                On.StoryGameSession.ctor += StoryGameSession_ctor;
+                On.GameSession.ctor += GameSession_ctor;
 
-            On.HUD.HUD.ctor += HUD_ctor;
+                On.HUD.HUD.ctor += HUD_ctor;
+
+                Plugin.LogSource.LogInfo("Cravings applied");
+            }
+            catch(System.Exception ex)
+            {
+                Plugin.LogSource.LogError("Cravings Register FAILED\n" + ex);
+            }
         }
 
         private static void HUD_ctor(On.HUD.HUD.orig_ctor orig, HUD.HUD self, FContainer[] fContainers, RainWorld rainWorld, IOwnAHUD owner)
@@ -47,8 +56,15 @@ namespace MotherMod
 
         public static void LateRegister()
         {
-            RegisterObjects();
-            RegisterMeat();
+            try
+            {
+                RegisterObjects();
+                RegisterMeat();
+                Plugin.LogSource.LogInfo("Cravings registered");
+            }catch(System.Exception ex)
+            {
+                Plugin.LogSource.LogError("Cravings Late Register FAILED\n" + ex);
+            }
         }
 
         public static void RegisterObjects()
