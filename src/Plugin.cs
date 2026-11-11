@@ -40,6 +40,7 @@ namespace MotherMod
             StaminaHud.Register();
             PredatorAI.Register();
             MotherSprites.Register();
+            CravingsSystem.Register();
 
             Content.Register(FoxCritob.AllVariants());
 
@@ -95,12 +96,14 @@ namespace MotherMod
             }
         }
 
-        private const int   VIGNETTE_SIZE          = 256;
-        private const float VIGNETTE_INNER_CLEAR   = 0.45f;
-        private const float VIGNETTE_OUTER_OPAQUE  = 1.00f;
+        private const int VIGNETTE_SIZE = 256;
+        private const float VIGNETTE_INNER_CLEAR = 0.45f;
+        private const float VIGNETTE_OUTER_OPAQUE = 1.00f;
 
         private void LoadResources(RainWorld rainWorld)
         {
+            CravingsSystem.LateRegister();
+
             MotherSprites.LoadAtlases();
 
             FoxParams.Load();
