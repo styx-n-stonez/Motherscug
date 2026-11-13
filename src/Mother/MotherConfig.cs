@@ -37,6 +37,7 @@ namespace MotherMod
         public float StandGainPerSecond = 1f;
         public float LayGainPerSecond = 2f;
         public float IteratorGainPerSecond = 5f;
+        public float FoodRegenMult = 1.5f;
         public float IteratorRestRadius = 300f;
         public string[] IteratorRestOracles = new string[0];
         public int   RechargeDelay = 60;
@@ -246,6 +247,7 @@ namespace MotherMod
             c.StandGainPerSecond = F(o, "stand_gain_per_second", c.StandGainPerSecond);
             c.LayGainPerSecond = F(o, "lay_gain_per_second", c.LayGainPerSecond);
             c.IteratorGainPerSecond = F(o, "iterator_gain_per_second", c.IteratorGainPerSecond);
+            c.FoodRegenMult = Mathf.Clamp(F(o, "food_regen_mult", c.FoodRegenMult), 0f, 20f);
             c.IteratorRestRadius = F(o, "iterator_rest_radius", c.IteratorRestRadius);
             c.IteratorRestOracles = SList(o, "iterator_rest_oracles", c.IteratorRestOracles);
             c.RechargeDelay = I(o, "recharge_delay", c.RechargeDelay);

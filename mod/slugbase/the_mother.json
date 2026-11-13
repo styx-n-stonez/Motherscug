@@ -81,6 +81,7 @@
 			"stand_gain_per_second": 10,
 			"lay_gain_per_second": 20,
 			"iterator_gain_per_second": 25,
+			"food_regen_mult": 1.5,
 			"iterator_rest_radius": 300,
 			"iterator_rest_oracles": [],
 			"recharge_delay": 30,

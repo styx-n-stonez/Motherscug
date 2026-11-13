@@ -670,6 +670,11 @@ namespace MotherMod
                 if (rate > 0f)
                 {
                     float applied = exhausted ? rate * config.ExhaustedRechargeMult : rate;
+                    float fullness = self.MaxFoodInStomach > 0
+                        ? Mathf.Clamp01((self.FoodInStomach + self.playerState.quarterFoodPoints * 0.25f) / self.MaxFoodInStomach)
+                        : 0f;
+                    float foodMult = Mathf.Lerp(1f, config.FoodRegenMult, fullness);
+                    applied *= foodMult;
                     stamina = Mathf.Min(config.StaminaMax, stamina + PerFrame(applied));
                     if (tag != activeGainTag)
                     {
