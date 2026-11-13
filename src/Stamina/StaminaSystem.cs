@@ -39,6 +39,7 @@ namespace MotherMod
             On.Player.ObjectEaten += Player_ObjectEaten;
             On.Lizard.Bite += Lizard_Bite;
             On.Creature.Violence += Creature_Violence;
+            VaultSystem.Register();
         }
 
         private static void Player_ctor(On.Player.orig_ctor orig, Player self,
@@ -90,6 +91,7 @@ namespace MotherMod
             bool boostEdge = preDelay <= 1
                 && ReadWaterJumpDelay(self) > 0
                 && self.animation == Player.AnimationIndex.DeepSwim;
+            d.vault.Tick(self, d.config, d.SprintActive);
             d.Update(self, boostEdge);
         }
 
@@ -143,6 +145,8 @@ namespace MotherMod
             PhysicalObject held = (self.grasps != null && grasp >= 0 && grasp < self.grasps.Length)
                 ? self.grasps[grasp]?.grabbed
                 : null;
+            if (d.vault.TryVault(self, d, grasp, held)) return;
+
             float throwMult = d.ThrowMult;
             bool sprintThrow = d.SprintActive;
             orig(self, grasp, eu);
@@ -162,6 +166,8 @@ namespace MotherMod
                         spear.spearDamageBonus = d.config.SprintSpearDamage;
                     }
                 }
+                if (held is Spear thrown && thrown.mode == Weapon.Mode.Thrown)
+                    d.vault.VaultThrow(thrown, d.config, sprintThrow, throwMult < 0.999f);
                 d.NotifyThrow(self, held, throwMult);
             }
         }

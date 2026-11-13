@@ -54,6 +54,8 @@ namespace MotherMod
 
         private bool sprintActive;
 
+        public readonly VaultSystem vault = new VaultSystem();
+
         public bool suppressWallJumpDrain;
 
         private int feelTier;
@@ -764,6 +766,11 @@ namespace MotherMod
             }
             if (thrown is Spear) DrainAction("spearThrow", config.SpearThrowCost, isAct: false);
             else if (thrown is Rock) DrainAction("rockThrow", config.RockThrowCost, isAct: false);
+        }
+
+        public void NotifyVault(float cost)
+        {
+            DrainAction("vault", cost, isAct: false);
         }
 
         public void NotifyEat(Player self, IPlayerEdible edible)

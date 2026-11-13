@@ -701,7 +701,7 @@ namespace MotherMod
         {
             internal bool Found;
             internal WorldCoordinate Coord;
-            internal float Score, Threat;
+            internal float Score, Threat, Noise;
             internal int Radius;
             internal IntVector2 From;
         }
@@ -760,6 +760,7 @@ namespace MotherMod
             result.Coord = best;
             result.Score = bestScore;
             result.Threat = bestThreat;
+            result.Noise = bestNoise;
             result.Radius = radius;
             result.From = here;
 
