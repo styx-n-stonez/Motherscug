@@ -54,6 +54,8 @@ namespace MotherMod
 
         private bool sprintActive;
 
+        public readonly VaultSystem vault = new VaultSystem();
+
         public bool suppressWallJumpDrain;
 
         private int feelTier;
@@ -668,6 +670,11 @@ namespace MotherMod
                 if (rate > 0f)
                 {
                     float applied = exhausted ? rate * config.ExhaustedRechargeMult : rate;
+                    float fullness = self.MaxFoodInStomach > 0
+                        ? Mathf.Clamp01((self.FoodInStomach + self.playerState.quarterFoodPoints * 0.25f) / self.MaxFoodInStomach)
+                        : 0f;
+                    float foodMult = Mathf.Lerp(1f, config.FoodRegenMult, fullness);
+                    applied *= foodMult;
                     stamina = Mathf.Min(config.StaminaMax, stamina + PerFrame(applied));
                     if (tag != activeGainTag)
                     {
@@ -764,6 +771,11 @@ namespace MotherMod
             }
             if (thrown is Spear) DrainAction("spearThrow", config.SpearThrowCost, isAct: false);
             else if (thrown is Rock) DrainAction("rockThrow", config.RockThrowCost, isAct: false);
+        }
+
+        public void NotifyVault(float cost)
+        {
+            DrainAction("vault", cost, isAct: false);
         }
 
         public void NotifyEat(Player self, IPlayerEdible edible)
