@@ -42,6 +42,10 @@ namespace MotherMod
             MotherSprites.Register();
             CravingsSystem.Register();
 
+            SlideShowManager.Register();
+            Mother.MotherSaveStuff.Register();
+            Mother.MotherHooks.Register();
+
             Content.Register(FoxCritob.AllVariants());
 
             On.SandboxGameSession.SpawnEntity += SandboxGameSession_SpawnEntity;
