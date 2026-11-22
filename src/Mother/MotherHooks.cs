@@ -31,7 +31,7 @@ public static class MotherHooks
                 var grabbed = self.grasps[graspIndex].grabbed;
                 if (self.room is not null && self.room.game.session is StoryGameSession sess && sess.saveStateNumber == MotherEnums.Mother && (grabbed is DaddyLongLegs || (grabbed is Lizard liz && liz.LizardState.rotType != LizardState.RotType.None)))
                 {
-                    MotherSaveStuff.AteRot = true;
+                    MotherSaveStuff.AteRot += 2;
                 }
             });
         }
@@ -52,7 +52,7 @@ public static class MotherHooks
             {
                 if (self.room is not null && self.room.game.session is StoryGameSession sess && sess.saveStateNumber == MotherEnums.Mother)
                 {
-                    MotherSaveStuff.AteRot = true;
+                    MotherSaveStuff.AteRot++;
                 }
             });
         }catch(Exception ex)
@@ -68,7 +68,7 @@ public static class MotherHooks
         if(self.room is not null && self.room.game.session is StoryGameSession sess &&
             sess.saveStateNumber == MotherEnums.Mother && edible is DangleFruit { AbstrConsumable.rotted : true})
         {
-            MotherSaveStuff.AteRot = true;
+            MotherSaveStuff.AteRot++;
         }
     }
 }

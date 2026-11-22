@@ -1,6 +1,3 @@
-using System;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -10,19 +7,6 @@ namespace MotherMod
     {
         private static readonly ConditionalWeakTable<Player, StaminaData> data =
             new ConditionalWeakTable<Player, StaminaData>();
-
-        private static readonly Func<Player, int> getWaterJumpDelay = BuildWaterJumpDelayGetter();
-        private static bool warnedNoWaterJumpDelay;
-
-        private static Func<Player, int> BuildWaterJumpDelayGetter()
-        {
-            FieldInfo field = typeof(Player).GetField("waterJumpDelay",
-                BindingFlags.Instance | BindingFlags.NonPublic);
-            if (field == null) return null;
-            ParameterExpression p = Expression.Parameter(typeof(Player), "p");
-            return Expression.Lambda<Func<Player, int>>(Expression.Field(p, field), p).Compile();
-        }
-
         public static bool TryGet(Player player, out StaminaData d)
         {
             d = null;
@@ -64,7 +48,7 @@ namespace MotherMod
                 return;
             }
 
-            int preDelay = ReadWaterJumpDelay(self);
+            int preDelay = self.waterJumpDelay;
 
             var st = self.slugcatStats;
             if (d.SpeedScaleActive && st != null)
@@ -89,24 +73,10 @@ namespace MotherMod
             }
 
             bool boostEdge = preDelay <= 1
-                && ReadWaterJumpDelay(self) > 0
+                && self.waterJumpDelay > 0
                 && self.animation == Player.AnimationIndex.DeepSwim;
             d.vault.Tick(self, d.config, d.SprintActive);
             d.Update(self, boostEdge);
-        }
-
-        private static int ReadWaterJumpDelay(Player self)
-        {
-            if (getWaterJumpDelay == null)
-            {
-                if (!warnedNoWaterJumpDelay)
-                {
-                    warnedNoWaterJumpDelay = true;
-                    Plugin.LogSource?.LogWarning("[Mother][Exh2] Player.waterJumpDelay not found — boost-swim cost disabled");
-                }
-                return int.MaxValue;
-            }
-            return getWaterJumpDelay(self);
         }
 
         private static void Player_Jump(On.Player.orig_Jump orig, Player self)

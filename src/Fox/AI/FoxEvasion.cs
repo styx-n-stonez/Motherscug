@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 using RWCustom;
 using UnityEngine;
 
@@ -65,31 +63,6 @@ namespace MotherMod
 
         private Vector2[] evadeBodyPos;
         private float[] evadeRise;
-
-        private static readonly Func<Weapon, IntVector2> evadeThrowDirGetter = BuildThrowDirGetter();
-
-        private static Func<Weapon, IntVector2> BuildThrowDirGetter()
-        {
-            try
-            {
-                FieldInfo f = typeof(Weapon).GetField("throwDir", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (f == null || f.FieldType != typeof(IntVector2)) return null;
-                ParameterExpression w = Expression.Parameter(typeof(Weapon), "w");
-                return Expression.Lambda<Func<Weapon, IntVector2>>(Expression.Field(w, f), w).Compile();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static IntVector2 ThrowDirOf(Weapon w)
-        {
-            if (evadeThrowDirGetter != null) return evadeThrowDirGetter(w);
-            Vector2 v = w.firstChunk.vel;
-            if (Mathf.Abs(v.x) >= Mathf.Abs(v.y)) return new IntVector2(v.x >= 0f ? 1 : -1, 0);
-            return new IntVector2(0, v.y >= 0f ? 1 : -1);
-        }
 
         internal bool EvadeStaggering { get { return GameTick < evadeStaggerUntil; } }
 
@@ -560,7 +533,7 @@ namespace MotherMod
             float projRad = SpearHitRad(w) + pad;
             ticks = Math.Min(ticks, EVADE_MAX_TRACE_TICKS);
 
-            IntVector2 dir = ThrowDirOf(w);
+            IntVector2 dir = w.throwDir;
             IntVector2 contact = sc.ContactPoint;
             int bounceFrames = w.floorBounceFrames;
             int modeFrames = w.throwModeFrames;

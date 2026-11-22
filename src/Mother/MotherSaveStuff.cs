@@ -9,7 +9,9 @@ namespace MotherMod.Mother
         const string CHILDDEAD = "MOTHER_ChildDead";
         const string BOTHCHILDRENDEAD = "MOTHER_ChildrenDead";
 
-        public static bool AteRot;
+        public static int AteRot;
+        public static bool AteRotFlag => AteRot >= 2;
+
         public static bool OneChildDead;
         public static bool BothChildrenDead;
 
@@ -45,19 +47,19 @@ namespace MotherMod.Mother
             SlugBaseSaveData MotherData = self.saveState.miscWorldSaveData.GetSlugBaseData();
 
             Plugin.LogSource.LogInfo("Mother session loaded\n AteRot: " +
-            (AteRot = MotherData.GetData(ATEROT)) + "\n One Child Dead: " +
-            (OneChildDead = MotherData.GetData(CHILDDEAD)) + "\n Both Children Dead: " +
-            (BothChildrenDead = MotherData.GetData(BOTHCHILDRENDEAD)));
+            (AteRot = MotherData.GetData<int>(ATEROT)) + "\n One Child Dead: " +
+            (OneChildDead = MotherData.GetData<bool>(CHILDDEAD)) + "\n Both Children Dead: " +
+            (BothChildrenDead = MotherData.GetData<bool>(BOTHCHILDRENDEAD)));
 
         }
 
-        private static bool GetData(this SlugBaseSaveData CustomData, string key)
+        private static T GetData<T>(this SlugBaseSaveData CustomData, string key)
         {
-            if(CustomData.TryGet(key, out bool value))
+            if(CustomData.TryGet<T>(key, out T value))
             {
                 return value;
             }
-            return false; // false by default
+            return default;
         }
     }
 }
