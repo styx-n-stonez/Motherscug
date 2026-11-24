@@ -9,10 +9,27 @@ namespace MotherMod
     {
         public static PlacedObject.Type CutsceneDen = new("mother_cutsceneden", true);
 
+#warning remove this later
+        public static SlideShow.SlideShowID test = new("Intro_Mother");
+
         public static void Register()
         {
             On.DevInterface.ObjectsPage.DevObjectGetCategoryFromPlacedType += ObjectsPage_DevObjectGetCategoryFromPlacedType;
             On.Room.Loaded += Room_Loaded;
+
+#warning remove this
+            On.Player.Update += Player_Update;
+        }
+
+        private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        {
+            orig(self, eu);
+
+            if (Input.GetKey(KeyCode.Slash) && self.room?.game?.session is StoryGameSession)
+            {
+                Plugin.LogSource.LogInfo("Cutscene test..");
+                InitiateScene(self.room.game, test, "TK_TOP1");
+            }
         }
 
         private static void Room_Loaded(On.Room.orig_Loaded orig, Room self)

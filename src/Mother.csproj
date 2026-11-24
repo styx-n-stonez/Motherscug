@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
@@ -14,8 +14,8 @@
         </Reference>
     </ItemGroup>
 
-    <Target Name="DeployMod" AfterTargets="Build" Condition="'$(RainWorldModDir)' != ''">
-        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(RainWorldModDir)/newest/plugins" />
+    <Target Name="DeployMod" AfterTargets="Build">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildThisFileDirectory)../mod/newest/plugins" />
     </Target>
 
 </Project>
